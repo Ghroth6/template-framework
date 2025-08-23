@@ -7,7 +7,7 @@
 
 namespace TFW {
 
-// 鏍稿績鎺ュ彛绫?
+// 核心接口类
 class CoreInterface {
 public:
     static CoreInterface* GetInstance();

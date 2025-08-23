@@ -53,7 +53,7 @@ private:
     TFW_Type type_;
 };
 
-// 鏍稿績绠＄悊绫?
+// 核心管理类
 class Core {
 public:
     static Core& GetInstance();
