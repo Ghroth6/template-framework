@@ -1,79 +1,141 @@
-﻿# Simple 绀轰緥椤圭洰
+﻿# Simple 示例项目
 
-鏈洰褰曞寘鍚玊FW妗嗘灦鐨勭畝鍗曠ず渚嬮」鐩紝鍒嗗埆鎻愪緵C鍜孋++鐗堟湰鐨勫疄鐜般€?
+本目录包含TFW框架的简单示例项目，分别提供C和C++版本的实现。
 
-## 鐩綍缁撴瀯
+## 目录结构
 
 ```
 simple/
-鈹溾攢鈹€ c/                    # C璇█鐗堟湰绀轰緥
-鈹?  鈹溾攢鈹€ main.c           # 涓荤▼搴?
-鈹?  鈹溾攢鈹€ CMakeLists.txt   # C鐗堟湰鏋勫缓閰嶇疆
-鈹?  鈹斺攢鈹€ README.md        # C鐗堟湰璇存槑
-鈹溾攢鈹€ cpp/                  # C++鐗堟湰绀轰緥
-鈹?  鈹溾攢鈹€ main.cpp         # 涓荤▼搴?
-鈹?  鈹溾攢鈹€ CMakeLists.txt   # C++鐗堟湰鏋勫缓閰嶇疆
-鈹?  鈹斺攢鈹€ README.md        # C++鐗堟湰璇存槑
-鈹溾攢鈹€ CMakeLists.txt        # 鏍规瀯寤洪厤缃?
-鈹斺攢鈹€ README.md             # 鏈枃妗?
+├── c/                          # C语言示例
+│   ├── main.c                  # C示例主程序
+│   └── CMakeLists.txt          # C示例构建配置
+├── cpp/                        # C++示例
+│   ├── main.cpp                # C++示例主程序
+│   └── CMakeLists.txt          # C++示例构建配置
+├── CMakeLists.txt              # 示例项目总构建配置
+└── README.md                   # 本文件
 ```
 
-## 鏋勫缓璇存槑
+## 构建说明
 
-### 浠庢牴鐩綍鏋勫缓鎵€鏈夌ず渚嬶紙鎺ㄨ崘锛?
+### 从根目录构建（推荐）
+
+**Linux/macOS:**
 ```bash
-# Windows
-.\build_simple.bat
-
-# Linux/macOS
-chmod +x build_simple.sh
+# 在项目根目录执行
 ./build_simple.sh
 ```
 
-### 鏋勫缓鐗瑰畾鐗堟湰
-```bash
-# 鏋勫缓C鐗堟湰
-cd simple/c
-mkdir build && cd build
-cmake ..
-cmake --build . --config Release
-
-# 鏋勫缓C++鐗堟湰
-cd simple/cpp
-mkdir build && cd build
-cmake ..
-cmake --build . --config Release
+**Windows:**
+```batch
+# 在项目根目录执行
+./build_simple.bat
 ```
 
-## 杈撳嚭鐩綍
+### 手动构建
 
-鎵€鏈夋瀯寤轰骇鐗╁皢杈撳嚭鍒伴」鐩牴鐩綍鐨?`build/out/` 鏂囦欢澶逛腑锛?
-- `build/out/c/` - C鐗堟湰鍙墽琛屾枃浠?
-- `build/out/cpp/` - C++鐗堟湰鍙墽琛屾枃浠?
-
-鏋勫缓瀹屾垚鍚庯紝鏍圭洰褰曚細鑷姩鐢熸垚锛?
-- **Windows**: 蹇嵎鏂瑰紡鏂囦欢锛?lnk锛?
-- **Linux/macOS**: 杞摼鎺ユ枃浠?
-
-鍙互鐩存帴鍦ㄦ牴鐩綍杩愯锛?
+**构建C版本:**
 ```bash
-# Windows
-.\tfw_simple_c.exe.lnk
-.\tfw_simple_cpp.exe.lnk
-
-# Linux/macOS
-./tfw_simple_c
-./tfw_simple_cpp
+cd build
+cmake -B simple_c -S ../simple/c
+cmake --build simple_c --config Release
 ```
 
-## 鍔熻兘璇存槑
+**构建C++版本:**
+```bash
+cd build
+cmake -B simple_cpp -S ../simple/cpp
+cmake --build simple_cpp --config Release
+```
 
-涓や釜绀轰緥閮藉疄鐜颁簡鐩稿悓鐨勫姛鑳斤細
-1. 鍒濆鍖朤FW鏍稿績
-2. 璋冪敤鎺ュ彛鎵ц绠€鍗曟搷浣?
-3. 鑾峰彇鎿嶄綔缁撴灉
-4. 姝ｅ父閫€鍑?
+## 输出位置
 
-鍖哄埆鍦ㄤ簬锛?
-- **C鐗堟湰**: 浣跨敤C鎺ュ彛锛岄€傚悎C璇█椤圭洰闆嗘垚
-- **C++鐗堟湰**: 浣跨敤C++鎺ュ彛锛岄€傚悎C++椤圭洰闆嗘垚
+构建完成后，可执行文件输出到：
+- **C版本**: `build/out/c/tfw_simple_c` (Linux/macOS) 或 `build/out/c/tfw_simple_c.exe` (Windows)
+- **C++版本**: `build/out/cpp/tfw_simple_cpp` (Linux/macOS) 或 `build/out/cpp/tfw_simple_cpp.exe` (Windows)
+
+根目录会自动创建符号链接（Linux/macOS）或快捷方式（Windows）方便直接运行：
+- `tfw_simple_c` 或 `tfw_simple_c.exe.lnk`
+- `tfw_simple_cpp` 或 `tfw_simple_cpp.exe.lnk`
+
+## 示例说明
+
+### C语言示例 (c/main.c)
+
+使用TFW的C接口实现基本功能：
+1. 初始化框架
+2. 检查初始化状态
+3. 执行操作
+4. 设置和获取值
+5. 清理资源
+
+**主要特点：**
+- 纯C语言实现
+- 使用函数式API
+- 完整的错误处理
+- 资源清理
+
+### C++示例 (cpp/main.cpp)
+
+使用TFW的C++接口实现相同功能：
+1. 获取核心接口实例
+2. 初始化框架
+3. 检查初始化状态
+4. 执行操作
+5. 设置和获取值
+6. 清理资源
+
+**主要特点：**
+- 面向对象设计
+- 单例模式
+- RAII风格
+- 异常安全
+
+## 运行示例
+
+构建完成后可以直接运行：
+
+```bash
+# 运行C版本
+./tfw_simple_c          # Linux/macOS
+.\tfw_simple_c.exe      # Windows
+
+# 运行C++版本
+./tfw_simple_cpp        # Linux/macOS
+.\tfw_simple_cpp.exe    # Windows
+```
+
+## 预期输出
+
+两个示例都会输出类似的内容：
+```
+[INFO] [CORE] 开始示例程序
+[INFO] [CORE] 核心模块初始化完成
+[INFO] [CORE] 初始化状态检查通过
+[INFO] [CORE] 执行示例操作: ExampleOperation
+[INFO] [CORE] 设置值: 42
+[INFO] [CORE] 获取值: 42
+[INFO] [CORE] 核心模块退出完成
+[INFO] [CORE] 示例程序结束
+```
+
+## 自定义开发
+
+这些示例可以作为您开发项目的起点：
+
+1. **复制示例目录**作为新项目的基础
+2. **修改CMakeLists.txt**中的项目名称和依赖
+3. **替换main.c/main.cpp**中的业务逻辑
+4. **添加自己的模块**和功能
+
+## 故障排除
+
+### 构建失败
+- 确保已安装CMake
+- 确保已正确构建主项目的核心库
+- 检查编译器和工具链配置
+
+### 运行失败
+- 确保可执行文件有运行权限
+- 检查动态库路径配置
+- 查看日志输出中的错误信息

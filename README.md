@@ -1,179 +1,177 @@
-﻿# TempleFrameWork (TFW) - 妯℃澘妗嗘灦
+﻿# TemplateFrameWork (TFW) - 模板框架
 
-涓€涓敮鎸丆/C++鍙屾帴鍙ｇ殑鏋佺畝寮€鍙戞鏋舵ā鏉匡紝閲囩敤鍒嗗眰鏃ュ織鏋舵瀯鍜岀粺涓€鐨勯敊璇爜绯荤粺銆?
-## 椤圭洰缁撴瀯
+一个支持C/C++双接口的极简开发框架模板，采用分层日志架构和统一的错误码系统。
+
+## 项目结构
 
 ```
 template-framework/
-鈹溾攢鈹€ interface/                    # 鎺ュ彛瀹氫箟
-鈹?  鈹溾攢鈹€ TFW_errorno.h            # 缁熶竴閿欒鐮佸畾涔?鈹?  鈹溾攢鈹€ TFW_types.h              # 鍩虹绫诲瀷瀹氫箟
-鈹?  鈹溾攢鈹€ TFW_interface.h          # C++鎺ュ彛瀹氫箟
-鈹?  鈹斺攢鈹€ TFW_c_interface.h        # C鎺ュ彛瀹氫箟
-鈹溾攢鈹€ core/                         # 鏍稿績妯″潡
-鈹?  鈹溾攢鈹€ TFW_core.h               # 鏍稿績澶存枃浠?鈹?  鈹溾攢鈹€ TFW_core.cpp             # 鏍稿績瀹炵幇
-鈹?  鈹溾攢鈹€ TFW_interface.cpp        # 鎺ュ彛瀹炵幇
-鈹?  鈹溾攢鈹€ TFW_c_interface.cpp      # C鎺ュ彛瀹炵幇
-鈹?  鈹溾攢鈹€ TFW_core_log.h           # 鏍稿績妯″潡鏃ュ織瀹?鈹?  鈹斺攢鈹€ CMakeLists.txt           # 鏋勫缓閰嶇疆
-鈹溾攢鈹€ utils/                        # 宸ュ叿妯″潡
-鈹?  鈹溾攢鈹€ include/
-鈹?  鈹?  鈹斺攢鈹€ TFW_log.h            # 鍩虹鏃ュ織妗嗘灦
-鈹?  鈹溾攢鈹€ log/
-鈹?  鈹?  鈹斺攢鈹€ TFW_log.c            # 鏃ュ織瀹炵幇
-鈹?  鈹溾攢鈹€ TFW_utils_log.h          # 宸ュ叿妯″潡鏃ュ織瀹?鈹?  鈹斺攢鈹€ CMakeLists.txt           # 鏋勫缓閰嶇疆
-鈹溾攢鈹€ docs/                         # 鏂囨。
-鈹?  鈹斺攢鈹€ 缂栫爜瑙勮寖.md               # 缂栫爜瑙勮寖
-鈹溾攢鈹€ CMakeLists.txt                # 鏍规瀯寤洪厤缃?鈹斺攢鈹€ README.md                     # 鏈枃妗?```
-
-## 鏍稿績鐗规€?
-### 1. **鍙屾帴鍙ｆ敮鎸?*
-- 鍚屾椂鎻愪緵C++鍜孋璇█鎺ュ彛
-- 瀹屽叏鍏煎鐨凙PI璁捐
-
-### 2. **鍒嗗眰鏃ュ織鏋舵瀯**
-- **鍩虹灞?*: `utils/include/TFW_log.h` - 鏍稿績鏃ュ織鍔熻兘鍜岀瓑绾у畯
-- **妯″潡灞?*: 鍚勬ā鍧椾笓鐢ㄦ棩蹇楀ご鏂囦欢 - 鎻愪緵妯″潡鐗瑰畾鏃ュ織瀹?- **搴旂敤灞?*: 鍚勬ā鍧楁簮鏂囦欢 - 浣跨敤鏃ュ織瀹忚褰曟棩蹇?
-### 3. **缁熶竴閿欒鐮佺郴缁?*
-- 瀹屽叏C鍏煎鐨勯敊璇爜鏋氫妇
-- 妯″潡鍖栭敊璇爜鍒嗛厤锛堟瘡涓ā鍧楅鐣?000涓敊璇爜浣嶏級
-- 绫诲瀷瀹夊叏鐨勯敊璇鐞?
-### 4. **妯″潡鍖栬璁?*
-- 娓呮櫚鐨勬ā鍧楀垎绂诲拰渚濊禆绠＄悊
-- 鏄撲簬鎵╁睍鍜岀淮鎶ょ殑鏋舵瀯
-
-## 鏃ュ織妗嗘灦
-
-### 鏃ュ織绛夌骇
-- `TFW_LOGT` - 璺熻釜淇℃伅 (TRACE)
-- `TFW_LOGD` - 璋冭瘯淇℃伅 (DEBUG)
-- `TFW_LOGI` - 涓€鑸俊鎭?(INFO)
-- `TFW_LOGW` - 璀﹀憡淇℃伅 (WARNING)
-- `TFW_LOGE` - 閿欒淇℃伅 (ERROR)
-- `TFW_LOGF` - 鑷村懡閿欒 (FATAL)
-
-### 浣跨敤鏂瑰紡
-
-**鍩虹鐢ㄦ硶锛堟帹鑽愶級锛?*
-```cpp
-#include "../utils/include/TFW_log.h"
-
-TFW_LOGI(TFW_LOG_MODULE_CORE, "Core妯″潡淇℃伅");
-TFW_LOGE(TFW_LOG_MODULE_UTILS, "Utils妯″潡閿欒: %s", error_msg);
+├── interface/                    # 接口定义
+│   ├── TFW_errorno.h            # 统一错误码定义
+│   ├── TFW_types.h              # 基础类型定义
+│   ├── TFW_interface.h          # C++接口定义
+│   └── TFW_c_interface.h        # C接口定义
+├── core/                        # 核心模块
+│   ├── TFW_core.h               # 核心类定义
+│   ├── TFW_core.cpp             # 核心实现
+│   ├── TFW_core_log.h           # Core模块日志宏
+│   ├── TFW_interface.cpp        # C++接口实现
+│   ├── TFW_c_interface.cpp      # C接口实现
+│   └── CMakeLists.txt           # Core模块构建配置
+├── utils/                       # 工具模块
+│   ├── include/
+│   │   └── TFW_log.h            # 基础日志框架
+│   ├── log/
+│   │   └── TFW_log.c            # 日志实现
+│   ├── TFW_utils_log.h          # Utils模块日志宏
+│   └── CMakeLists.txt           # Utils模块构建配置
+├── simple/                      # 示例项目
+│   ├── c/                       # C语言示例
+│   │   ├── main.c
+│   │   └── CMakeLists.txt
+│   ├── cpp/                     # C++示例
+│   │   ├── main.cpp
+│   │   └── CMakeLists.txt
+│   ├── README.md                # 示例说明
+│   └── CMakeLists.txt           # 示例构建配置
+├── docs/                        # 文档
+│   └── 编码规范.md              # 编码规范文档
+├── CMakeLists.txt               # 主构建配置
+├── build_simple.sh              # Linux/macOS构建脚本
+├── build_simple.bat             # Windows构建脚本
+└── README.md                    # 项目说明
 ```
 
-**妯″潡涓撶敤瀹忥細**
-```cpp
-#include "TFW_core_log.h"
+## 核心特性
 
-TFW_LOGI_CORE("Core妯″潡淇℃伅");
-TFW_LOGE_CORE("Core妯″潡閿欒: %s", error_msg);
+### 1. 双接口支持
+- **C接口**: 完全兼容C语言，使用函数式API
+- **C++接口**: 面向对象设计，支持单例模式
+
+### 2. 分层日志框架
+- **基础日志宏**: `TFW_LOGT`, `TFW_LOGD`, `TFW_LOGI`, `TFW_LOGW`, `TFW_LOGE`, `TFW_LOGF`
+- **模块化设计**: 每个模块有独立的日志宏定义
+- **线程安全**: 支持多线程环境
+
+### 3. 统一错误码系统
+- **C兼容**: 使用`typedef enum`和`int32_t`返回值
+- **模块化**: 每个模块预留1000个错误码槽位
+- **可扩展**: 易于添加新的错误码
+
+### 4. 模块化设计
+- **Core模块**: 核心功能实现
+- **Utils模块**: 通用工具函数
+- **Interface层**: 统一的接口定义
+
+## 日志框架
+
+### 日志等级
+- `TFW_LOG_LEVEL_TRACE` (0) - 调试追踪
+- `TFW_LOG_LEVEL_DEBUG` (1) - 调试信息
+- `TFW_LOG_LEVEL_INFO` (2) - 一般信息
+- `TFW_LOG_LEVEL_WARNING` (3) - 警告信息
+- `TFW_LOG_LEVEL_ERROR` (4) - 错误信息
+- `TFW_LOG_LEVEL_FATAL` (5) - 致命错误
+
+### 使用示例
+```c
+// 基础日志宏
+TFW_LOGI(TFW_LOG_MODULE_CORE, "初始化完成");
+
+// 模块专用宏（在各模块的日志头文件中定义）
+TFW_LOGI_CORE("Core模块初始化完成");
+TFW_LOGE_UTILS("Utils模块出现错误: %s", error_msg);
 ```
 
-## 閿欒鐮佺郴缁?
-### 閿欒鐮佽寖鍥?- ** -1000 璧?**: 閫氱敤閿欒鐮侊紙棰勭暀1000浣嶏級
-- ** -2000 璧?**: CORE妯″潡閿欒鐮侊紙棰勭暀1000浣嶏級
-- ** -3000 璧?**: UTILS妯″潡閿欒鐮侊紙棰勭暀1000浣嶏級
-- ** -4000 璧?**: SDK妯″潡閿欒鐮侊紙棰勭暀1000浣嶏級
-- ** -5000 璧?**: SYSTEM妯″潡閿欒鐮侊紙棰勭暀1000浣嶏級
+## 错误码系统
 
-**褰撳墠宸插畾涔夌殑閿欒鐮侊細**
-- **-1000**: `TFW_ERROR` (鏍囧噯閿欒)
-- **-999 鍒?-996**: 閫氱敤閿欒鐮侊紙鑷姩璁＄畻锛?- **-200**: `TFW_ERROR_TASK_FAIL` (浠诲姟澶辫触)
-- **-199 鍒?-198**: 浠诲姟鐩稿叧閿欒锛堣嚜鍔ㄨ绠楋級
-- **-100**: `TFW_ERROR_SYSTEM` (绯荤粺閿欒)
-- **-99 鍒?-97**: 绯荤粺鐩稿叧閿欒锛堣嚜鍔ㄨ绠楋級
-- **0**: `TFW_SUCCESS` (鎴愬姛)
+### 错误码范围
+- **成功**: `TFW_SUCCESS = 0`
+- **通用错误**: `-1000 到 -1` (TFW_ERROR = -1000)
+- **Core模块**: `-2000 到 -1001`
+- **Utils模块**: `-3000 到 -2001`
+- **其他模块**: 依此类推，每模块1000个槽位
 
-### 涓昏閿欒鐮?- `TFW_SUCCESS = 0` - 鎴愬姛
-- `TFW_ERROR = -1000` - 鏍囧噯閿欒
-- `TFW_ERROR_INVALID_PARAM = -999` - 鏃犳晥鍙傛暟
-- `TFW_ERROR_NOT_INIT = -998` - 鏈垵濮嬪寲
-- `TFW_ERROR_OPERATION_FAIL = -996` - 鎿嶄綔澶辫触
+### 主要错误码
+```c
+typedef enum {
+    // 通用错误 (-1000 到 -1)
+    TFW_ERROR = -1000,              // 标准错误
+    TFW_ERROR_INVALID_PARAM,        // 无效参数
+    TFW_ERROR_NULL_POINTER,         // 空指针
+    TFW_ERROR_MEMORY_ALLOCATION,    // 内存分配失败
+    
+    // 任务错误 (-200 到 -101)
+    TFW_ERROR_TASK_FAIL = -200,     // 任务失败
+    TFW_ERROR_TASK_TIMEOUT,         // 任务超时
+    
+    // 系统错误 (-100 到 -1)
+    TFW_ERROR_SYSTEM = -100,        // 系统错误
+    TFW_ERROR_NOT_INITIALIZED,      // 未初始化
+    TFW_ERROR_ALREADY_INITIALIZED,  // 已初始化
+    
+    // 成功
+    TFW_SUCCESS = 0                 // 成功
+} TFW_ErrorCode;
+```
 
-## 蹇€熷紑濮?
-### 1. 鏋勫缓涓婚」鐩?```bash
-mkdir build
-cd build
+## 快速开始
+
+### 主项目构建
+```bash
+# 创建构建目录
+mkdir build && cd build
+
+# 配置项目
 cmake ..
+
+# 编译
 cmake --build . --config Release
 ```
 
-### 2. 鏋勫缓绀轰緥椤圭洰
+### 示例项目构建
 ```bash
-# Windows
-.\build_simple.bat
-
 # Linux/macOS
-chmod +x build_simple.sh
 ./build_simple.sh
+
+# Windows
+./build_simple.bat
 ```
 
-### 2. 浣跨敤C++鎺ュ彛
-```cpp
-#include "TFW_core.h"
-#include "TFW_interface.h"
-#include "TFW_core_log.h"
+构建完成后，可执行文件输出到：
+- `build/out/c/tfw_simple_c` (C版本)
+- `build/out/cpp/tfw_simple_cpp` (C++版本)
 
-using namespace TFW;
+根目录会自动创建软链接/快捷方式，方便直接运行。
 
-// 鍒濆鍖栨牳蹇?auto result = Core::GetInstance().Initialize();
+## C接口兼容性
 
-// 浣跨敤鎺ュ彛
-auto interface = CoreInterface::GetInstance();
-auto configResult = interface.ExecuteOperation("test");
+所有C接口函数都使用`extern "C"`包装，完全兼容C语言项目：
 
-// 璁板綍鏃ュ織
-TFW_LOGI_CORE("Core妯″潡鍒濆鍖栨垚鍔?);
-```
-
-### 3. 浣跨敤C鎺ュ彛
 ```c
+// C接口示例
 #include "TFW_c_interface.h"
 
-// 鍒濆鍖栨牳蹇?int result = TFW_CORE_INITIALIZE();
-
-// 鎵ц鎿嶄綔
-int actionResult = TFW_CORE_ACTION("test");
-
-// 妫€鏌ョ粨鏋?if (result == TFW_SUCCESS) {
-    printf("鎿嶄綔鎴愬姛\n");
-} else {
-    printf("鎿嶄綔澶辫触锛岄敊璇爜: %d\n", result);
+int main() {
+    // 初始化
+    TFW_Result result = TFW_CORE_INITIALIZE();
+    if (result != TFW_SUCCESS) {
+        return result;
+    }
+    
+    // 使用功能
+    TFW_CORE_ACTION();
+    
+    // 清理
+    TFW_CORE_EXIT();
+    return TFW_SUCCESS;
 }
 ```
 
-## 妯″潡寮€鍙?
-### 鍒涘缓鏂版ā鍧?1. 鍦ㄦ牴鐩綍鍒涘缓妯″潡鏂囦欢澶?2. 鍒涘缓妯″潡涓撶敤鏃ュ織澶存枃浠讹紙濡?`TFW_newmodule_log.h`锛?3. 瀹炵幇妯″潡鍔熻兘
-4. 鏇存柊CMakeLists.txt
+## 编码规范
 
-### 妯″潡鏃ュ織瀹忕ず渚?```cpp
-// TFW_newmodule_log.h
-#ifndef TFW_NEWMODULE_LOG_H
-#define TFW_NEWMODULE_LOG_H
+项目遵循统一的编码规范，详见 [`docs/编码规范.md`](docs/编码规范.md)。
 
-#include "../utils/include/TFW_log.h"
+## 许可证
 
-#define TFW_LOGI_NEWMODULE(fmt, ...) \
-    TFW_LOGI(TFW_LOG_MODULE_NEWMODULE, fmt, ##__VA_ARGS__)
-
-#define TFW_LOGE_NEWMODULE(fmt, ...) \
-    TFW_LOGE(TFW_LOG_MODULE_NEWMODULE, fmt, ##__VA_ARGS__)
-
-#endif
-```
-
-## C鎺ュ彛鍏煎鎬?
-鏈鏋舵彁渚涘畬鏁寸殑C璇█鍏煎鎺ュ彛锛屾敮鎸侊細
-
-- **鏍稿績鎿嶄綔**: 鍒濆鍖栥€侀€€鍑恒€佺姸鎬佹鏌?- **閿欒澶勭悊**: 缁熶竴鐨勯敊璇爜浣撶郴
-- **鍐呭瓨瀹夊叏**: 瀹夊叏鐨勫瓧绗︿覆澶勭悊
-
-## 缂栫爜瑙勮寖
-
-璇峰弬鑰?`docs/缂栫爜瑙勮寖.md` 浜嗚В璇︾粏鐨勭紪鐮佽鑼冿紝鍖呮嫭锛?
-- 鍛藉悕瑙勮寖
-- 浠ｇ爜鏍煎紡
-- 閿欒澶勭悊
-- C鎺ュ彛鍏煎鎬ц鑼?- 澶存枃浠剁鐞?- 鏃ュ織浣跨敤瑙勮寖
-
-## 璁稿彲璇?
-鏈」鐩噰鐢∕IT璁稿彲璇併€?
+本项目采用MIT许可证，详见LICENSE文件。
