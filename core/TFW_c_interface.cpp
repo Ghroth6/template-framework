@@ -1,0 +1,92 @@
+﻿#include "../interface/TFW_c_interface.h"
+#include "TFW_core.h"
+#include "TFW_core_log.h"
+#include <cstring>
+#include <algorithm>
+
+extern "C" {
+
+// ============================================================================
+// 鏍稿績妯″潡C鎺ュ彛瀹炵幇
+// ============================================================================
+
+int TFW_CORE_INITIALIZE() {
+    try {
+        auto result = TFW::Core::GetInstance().Initialize();
+        return static_cast<int>(result);
+    } catch (...) {
+        return TFW_ERROR;
+    }
+}
+
+int TFW_CORE_EXIT() {
+    try {
+        auto result = TFW::Core::GetInstance().Exit();
+        return static_cast<int>(result);
+    } catch (...) {
+        return TFW_ERROR;
+    }
+}
+
+int TFW_CORE_IS_INITIALIZED() {
+    try {
+        return TFW::Core::GetInstance().IsInitialized() ? 1 : 0;
+    } catch (...) {
+        return 0;
+    }
+}
+
+int TFW_CORE_GET_VALUE(const char* key, char* value, int maxLen) {
+    if (key == nullptr || value == nullptr || maxLen <= 0) {
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    try {
+        std::string keyStr(key);
+        std::string valueStr;
+
+        auto result = TFW::Core::GetInstance().GetValue(keyStr, valueStr);
+        if (result == TFW_SUCCESS) {
+            size_t copyLen = std::min(static_cast<size_t>(maxLen - 1), valueStr.length());
+            std::strncpy(value, valueStr.c_str(), copyLen);
+            value[copyLen] = '\0';
+            return TFW_SUCCESS;
+        } else {
+            return static_cast<int>(result);
+        }
+    } catch (...) {
+        return TFW_ERROR;
+    }
+}
+
+int TFW_CORE_SET_VALUE(const char* key, const char* value) {
+    if (key == nullptr || value == nullptr) {
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    try {
+        std::string keyStr(key);
+        std::string valueStr(value);
+
+        auto result = TFW::Core::GetInstance().SetValue(keyStr, valueStr);
+        return static_cast<int>(result);
+    } catch (...) {
+        return TFW_ERROR;
+    }
+}
+
+int TFW_CORE_ACTION(const char* action) {
+    if (action == nullptr) {
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    try {
+        std::string actionStr(action);
+        auto result = TFW::Core::GetInstance().Action(actionStr);
+        return static_cast<int>(result);
+    } catch (...) {
+        return TFW_ERROR;
+    }
+}
+
+} // extern "C"
