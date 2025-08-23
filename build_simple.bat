@@ -1,9 +1,9 @@
 ﻿@echo off
-REM TFW Simple 绀轰緥椤圭洰鏋勫缓鑴氭湰 (浠庢牴鐩綍鎵ц)
+REM TFW Simple 示例项目构建脚本 (从根目录执行)
 
 echo === Building TFW Simple Examples ===
 
-REM 纭繚鍦ㄦ牴鐩綍鐨刡uild鐩綍涓?
+REM 确保在根目录的build目录中
 if not exist "build" (
     echo Creating build directory...
     mkdir build
@@ -11,11 +11,11 @@ if not exist "build" (
 
 cd build
 
-REM 鍒涘缓杈撳嚭鐩綍
+REM 创建输出目录
 if not exist "out\c" mkdir "out\c"
 if not exist "out\cpp" mkdir "out\cpp"
 
-REM 鏋勫缓C鐗堟湰
+REM 构建C版本
 echo Building C version...
 cmake -B simple_c -S ..\simple\c
 if %ERRORLEVEL% EQU 0 (
@@ -31,7 +31,7 @@ if %ERRORLEVEL% EQU 0 (
     exit /b 1
 )
 
-REM 鏋勫缓C++鐗堟湰
+REM 构建C++版本
 echo Building C++ version...
 cmake -B simple_cpp -S ..\simple\cpp
 if %ERRORLEVEL% EQU 0 (
@@ -49,14 +49,14 @@ if %ERRORLEVEL% EQU 0 (
 
 cd ..
 
-REM 鍒涘缓蹇嵎鏂瑰紡鍒版牴鐩綍
+REM 创建快捷方式到根目录
 echo Creating shortcuts in root directory...
 
-REM 鍒犻櫎鏃х殑蹇嵎鏂瑰紡锛堝鏋滃瓨鍦級
+REM 删除旧的快捷方式（如果存在）
 if exist "tfw_simple_c.exe.lnk" del "tfw_simple_c.exe.lnk"
 if exist "tfw_simple_cpp.exe.lnk" del "tfw_simple_cpp.exe.lnk"
 
-REM 浣跨敤PowerShell鍒涘缓蹇嵎鏂瑰紡
+REM 使用PowerShell创建快捷方式
 powershell -Command "$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut('tfw_simple_c.exe.lnk'); $Shortcut.TargetPath = 'build\out\c\tfw_simple_c.exe'; $Shortcut.Save()"
 powershell -Command "$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut('tfw_simple_cpp.exe.lnk'); $Shortcut.TargetPath = 'build\out\cpp\tfw_simple_cpp.exe'; $Shortcut.Save()"
 

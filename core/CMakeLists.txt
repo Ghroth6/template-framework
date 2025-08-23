@@ -1,17 +1,17 @@
-﻿# Core妯″潡鏋勫缓閰嶇疆
+﻿# Core模块构建配置
 project(TFW_core)
 
-# 婧愭枃浠?
+# 源文件
 set(CORE_SOURCES
     TFW_core.cpp
     TFW_interface.cpp
     TFW_c_interface.cpp
 )
 
-# 鍒涘缓闈欐€佸簱
+# 创建静态库
 add_library(TFW_core STATIC ${CORE_SOURCES})
 
-# 鍖呭惈鐩綍
+# 包含目录
 target_include_directories(TFW_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../interface
@@ -20,7 +20,7 @@ target_include_directories(TFW_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
-# 閾炬帴搴?
+# 链接库
 target_link_libraries(TFW_core
     TFW_utils
 )

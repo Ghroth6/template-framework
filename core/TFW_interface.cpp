@@ -46,7 +46,7 @@ TFW_Result CoreInterface::ExecuteOperation(const std::string& operation) {
 
     try {
         TFW_LOGI_CORE("Executing operation: %s", operation.c_str());
-        // 杩欓噷鍙互娣诲姞鍏蜂綋鐨勬搷浣滈€昏緫
+        // 这里可以添加具体的操作逻辑
         return TFW_SUCCESS;
     } catch (...) {
         TFW_LOGE_CORE("Exception during operation execution: %s", operation.c_str());

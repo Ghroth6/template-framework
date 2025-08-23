@@ -12,16 +12,16 @@ class CoreInterface {
 public:
     static CoreInterface* GetInstance();
 
-    // 鍒濆鍖栨帴鍙?
+    // 初始化接口
     TFW_Result Initialize();
 
-    // 閫€鍑烘帴鍙?
+    // 退出接口
     TFW_Result Exit();
 
-    // 妫€鏌ョ姸鎬佹帴鍙?
+    // 检查状态接口
     bool IsInitialized() const;
 
-    // 鎵ц鎿嶄綔鎺ュ彛
+    // 执行操作接口
     TFW_Result ExecuteOperation(const std::string& operation);
 
 private:

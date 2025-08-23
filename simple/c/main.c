@@ -6,7 +6,7 @@
 int main() {
     printf("=== TFW Simple C Example ===\n");
 
-    // 鍒濆鍖朤FW鏍稿績
+    // 初始化TFW核心
     printf("Initializing TFW core...\n");
     int result = TFW_CORE_INITIALIZE();
 
@@ -17,7 +17,7 @@ int main() {
 
     printf("TFW core initialized successfully\n");
 
-    // 妫€鏌ュ垵濮嬪寲鐘舵€?
+    // 检查初始化状态
     int isInit = TFW_CORE_IS_INITIALIZED();
     if (isInit) {
         printf("Core is initialized\n");
@@ -26,7 +26,7 @@ int main() {
         return -1;
     }
 
-    // 鎵ц绠€鍗曟搷浣?
+    // 执行简单操作
     printf("Executing simple action...\n");
     result = TFW_CORE_ACTION("test_action");
 
@@ -36,14 +36,14 @@ int main() {
         printf("Action failed, error code: %d\n", result);
     }
 
-    // 璁剧疆鍜岃幏鍙栧€?
+    // 设置和获取值
     printf("Setting key-value pair...\n");
     result = TFW_CORE_SET_VALUE("test_key", "test_value");
 
     if (result == TFW_SUCCESS) {
         printf("Value set successfully\n");
 
-        // 鑾峰彇鍊?
+        // 获取值
         char value[256];
         result = TFW_CORE_GET_VALUE("test_key", value, sizeof(value));
 
@@ -56,7 +56,7 @@ int main() {
         printf("Failed to set value, error code: %d\n", result);
     }
 
-    // 閫€鍑篢FW鏍稿績
+    // 退出TFW核心
     printf("Exiting TFW core...\n");
     result = TFW_CORE_EXIT();
 

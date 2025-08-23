@@ -8,7 +8,7 @@
 
 namespace TFW {
 
-// 鍩虹绫诲瀷绫伙紝浣跨敤TFW_Type缁撴瀯浣撶殑C++鍖呰
+// 基础类型类，使用TFW_Type结构体的C++封装
 class Type {
 public:
     Type() : type_{0, nullptr, nullptr} {}
@@ -58,22 +58,22 @@ class Core {
 public:
     static Core& GetInstance();
 
-    // 鍒濆鍖栨牳蹇?
+    // 初始化核心
     ErrorCode Initialize();
 
-    // 閫€鍑烘牳蹇?
+    // 退出核心
     ErrorCode Exit();
 
-    // 妫€鏌ユ牳蹇冩槸鍚﹀凡鍒濆鍖?
+    // 检查核心是否已初始化
     bool IsInitialized() const;
 
-    // 鑾峰彇涓€涓€?
+    // 获取一个值
     ErrorCode GetValue(const std::string& key, std::string& value);
 
-    // 璁剧疆涓€涓€?
+    // 设置一个值
     ErrorCode SetValue(const std::string& key, const std::string& value);
 
-    // 鎵ц涓€涓姩浣?
+    // 执行一个动作
     ErrorCode Action(const std::string& action);
 
 private:

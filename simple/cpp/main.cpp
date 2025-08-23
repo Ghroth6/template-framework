@@ -10,7 +10,7 @@ int main() {
     std::cout << "=== TFW Simple C++ Example ===" << std::endl;
 
     try {
-        // 鍒濆鍖朤FW鏍稿績
+        // 初始化TFW核心
         std::cout << "Initializing TFW core..." << std::endl;
         TFW_Result result = Core::GetInstance().Initialize();
 
@@ -22,7 +22,7 @@ int main() {
         std::cout << "TFW core initialized successfully" << std::endl;
         TFW_LOGI_CORE("Core initialized successfully");
 
-        // 妫€鏌ュ垵濮嬪寲鐘舵€?
+        // 检查初始化状态
         if (Core::GetInstance().IsInitialized()) {
             std::cout << "Core is initialized" << std::endl;
         } else {
@@ -30,7 +30,7 @@ int main() {
             return -1;
         }
 
-        // 浣跨敤鎺ュ彛鎵ц鎿嶄綔
+        // 使用接口执行操作
         std::cout << "Executing operation via interface..." << std::endl;
         auto interface = CoreInterface::GetInstance();
         result = interface->ExecuteOperation("test_operation");
@@ -43,7 +43,7 @@ int main() {
             TFW_LOGE_CORE("Operation failed with error code: %d", result);
         }
 
-        // 璁剧疆鍜岃幏鍙栧€?
+        // 设置和获取值
         std::cout << "Setting key-value pair..." << std::endl;
         result = Core::GetInstance().SetValue("test_key", "test_value");
 
@@ -51,7 +51,7 @@ int main() {
             std::cout << "Value set successfully" << std::endl;
             TFW_LOGI_CORE("Value set successfully");
 
-            // 鑾峰彇鍊?
+            // 获取值
             std::string value;
             result = Core::GetInstance().GetValue("test_key", value);
 
@@ -67,7 +67,7 @@ int main() {
             TFW_LOGE_CORE("Failed to set value, error code: %d", result);
         }
 
-        // 閫€鍑篢FW鏍稿績
+        // 退出TFW核心
         std::cout << "Exiting TFW core..." << std::endl;
         result = Core::GetInstance().Exit();
 

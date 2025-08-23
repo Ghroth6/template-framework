@@ -1,20 +1,21 @@
 ﻿#!/bin/bash
 
-# TFW Simple 绀轰緥椤圭洰鏋勫缓鑴氭湰 (浠庢牴鐩綍鎵ц)
+# TFW Simple 示例项目构建脚本 (从根目录执行)
 
 echo "=== Building TFW Simple Examples ==="
 
-# 纭繚鍦ㄦ牴鐩綍鐨刡uild鐩綍涓?if [ ! -d "build" ]; then
+# 确保在根目录的build目录中
+if [ ! -d "build" ]; then
     echo "Creating build directory..."
     mkdir -p build
 fi
 
 cd build
 
-# 鍒涘缓杈撳嚭鐩綍
+# 创建输出目录
 mkdir -p out/c out/cpp
 
-# 鏋勫缓C鐗堟湰
+# 构建C版本
 echo "Building C version..."
 cmake -B simple_c -S ../simple/c
 if [ $? -eq 0 ]; then
@@ -30,7 +31,7 @@ else
     exit 1
 fi
 
-# 鏋勫缓C++鐗堟湰
+# 构建C++版本
 echo "Building C++ version..."
 cmake -B simple_cpp -S ../simple/cpp
 if [ $? -eq 0 ]; then
@@ -48,11 +49,14 @@ fi
 
 cd ..
 
-# 鍒涘缓杞摼鎺ュ埌鏍圭洰褰?echo "Creating symbolic links in root directory..."
+# 创建软链接到根目录
+echo "Creating symbolic links in root directory..."
 
-# 鍒犻櫎鏃х殑杞摼鎺ワ紙濡傛灉瀛樺湪锛?rm -f tfw_simple_c tfw_simple_cpp
+# 删除旧的软链接（如果存在）
+rm -f tfw_simple_c tfw_simple_cpp
 
-# 鍒涘缓杞摼鎺?ln -sf build/out/c/tfw_simple_c tfw_simple_c
+# 创建软链接
+ln -sf build/out/c/tfw_simple_c tfw_simple_c
 ln -sf build/out/cpp/tfw_simple_cpp tfw_simple_cpp
 
 echo "=== All examples built successfully ==="
