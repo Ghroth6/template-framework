@@ -53,21 +53,28 @@ private:
     TFW_Type type_;
 };
 
-// 鏍稿績绠＄悊绫?class Core {
+// 鏍稿績绠＄悊绫?
+class Core {
 public:
     static Core& GetInstance();
 
-    // 鍒濆鍖栨牳蹇?    ErrorCode Initialize();
+    // 鍒濆鍖栨牳蹇?
+    ErrorCode Initialize();
 
-    // 閫€鍑烘牳蹇?    ErrorCode Exit();
+    // 閫€鍑烘牳蹇?
+    ErrorCode Exit();
 
-    // 妫€鏌ユ牳蹇冩槸鍚﹀凡鍒濆鍖?    bool IsInitialized() const;
+    // 妫€鏌ユ牳蹇冩槸鍚﹀凡鍒濆鍖?
+    bool IsInitialized() const;
 
-    // 鑾峰彇涓€涓€?    ErrorCode GetValue(const std::string& key, std::string& value);
+    // 鑾峰彇涓€涓€?
+    ErrorCode GetValue(const std::string& key, std::string& value);
 
-    // 璁剧疆涓€涓€?    ErrorCode SetValue(const std::string& key, const std::string& value);
+    // 璁剧疆涓€涓€?
+    ErrorCode SetValue(const std::string& key, const std::string& value);
 
-    // 鎵ц涓€涓姩浣?    ErrorCode Action(const std::string& action);
+    // 鎵ц涓€涓姩浣?
+    ErrorCode Action(const std::string& action);
 
 private:
     Core() = default;

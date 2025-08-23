@@ -1,5 +1,5 @@
 #include "TFW_core.h"
-#include "TFW_interface.h"
+#include "../interface/TFW_interface.h"
 #include "TFW_core_log.h"
 #include <string>
 #include <unordered_map>

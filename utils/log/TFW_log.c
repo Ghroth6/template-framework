@@ -110,28 +110,33 @@ int TFW_LOG_IMPL(int module, int level, const char* file, int line,
         return -1; // 鏈垵濮嬪寲
     }
 
-    // 妫€鏌ユ棩蹇楃瓑绾?    if (level < g_logLevel) {
-        return 0; // 浣庝簬褰撳墠璁剧疆鐨勭瓑绾э紝涓嶈緭鍑?    }
+    // 妫€鏌ユ棩蹇楃瓑绾?
+    if (level < g_logLevel) {
+        return 0; // 浣庝簬褰撳墠璁剧疆鐨勭瓑绾э紝涓嶈緭鍑?
+    }
 
     // 鏋勫缓鏃ュ織娑堟伅
     char logMessage[2048];
     int offset = 0;
 
-    // 娣诲姞鏃堕棿鎴?    offset += snprintf(logMessage + offset, sizeof(logMessage) - offset,
+    // 娣诲姞鏃堕棿鎴?
+    offset += snprintf(logMessage + offset, sizeof(logMessage) - offset,
                       "[%s] ", get_timestamp());
 
     // 娣诲姞杩涚▼ID鍜岀嚎绋婭D
     offset += snprintf(logMessage + offset, sizeof(logMessage) - offset,
                       "[PID:%d][TID:%lu] ", get_process_id(), get_thread_id());
 
-    // 娣诲姞妯″潡鍜岀瓑绾?    offset += snprintf(logMessage + offset, sizeof(logMessage) - offset,
+    // 娣诲姞妯″潡鍜岀瓑绾?
+    offset += snprintf(logMessage + offset, sizeof(logMessage) - offset,
                       "[%s][%s] ", get_module_string(module), get_level_string(level));
 
     // 娣诲姞鏂囦欢鍚嶅拰琛屽彿
     offset += snprintf(logMessage + offset, sizeof(logMessage) - offset,
                       "[%s:%d] ", get_file_name(file), line);
 
-    // 娣诲姞鍑芥暟鍚?    if (function) {
+    // 娣诲姞鍑芥暟鍚?
+    if (function) {
         offset += snprintf(logMessage + offset, sizeof(logMessage) - offset,
                           "[%s] ", function);
     }
@@ -152,7 +157,8 @@ int TFW_LOG_IMPL(int module, int level, const char* file, int line,
  * 鍒濆鍖栨棩蹇楃郴缁? */
 int TFW_LOG_INITIALIZE() {
     if (g_logInitialized) {
-        return -1; // 宸茬粡鍒濆鍖?    }
+        return -1; // 宸茬粡鍒濆鍖?
+    }
 
     g_logInitialized = 1;
     return 0;
@@ -167,7 +173,8 @@ int TFW_LOG_SET_LEVEL(int level) {
     }
 
     if (level < TFW_LOG_LEVEL_TRACE || level > TFW_LOG_LEVEL_FATAL) {
-        return -2; // 鏃犳晥鐨勬棩蹇楃瓑绾?    }
+        return -2; // 鏃犳晥鐨勬棩蹇楃瓑绾?
+    }
 
     g_logLevel = level;
     return 0;
