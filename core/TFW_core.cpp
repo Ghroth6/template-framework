@@ -1,4 +1,4 @@
-﻿#include "TFW_core.h"
+#include "TFW_core.h"
 #include "TFW_interface.h"
 #include "TFW_core_log.h"
 #include <string>
@@ -17,9 +17,10 @@ ErrorCode Core::Initialize() {
     }
 
     try {
-        // 鍒濆鍖栦富绫诲瀷
+        // 初始化主类型
         if (mainType_.Initialize()) {
-            // 鍒濆鍖栨帴鍙?            auto result = CoreInterface::GetInstance().Initialize();
+            // 初始化接口
+            auto result = CoreInterface::GetInstance().Initialize();
             if (result == ErrorCode::Success) {
                 initialized_ = true;
                 TFW_LOGI_CORE("Core initialized successfully");
@@ -44,9 +45,11 @@ ErrorCode Core::Exit() {
     }
 
     try {
-        // 娓呯悊涓荤被鍨?        mainType_.Cleanup();
+        // 清理主类型
+        mainType_.Cleanup();
 
-        // 閫€鍑烘帴鍙?        auto result = CoreInterface::GetInstance().Exit();
+        // 退出接口
+        auto result = CoreInterface::GetInstance().Exit();
         if (result == ErrorCode::Success) {
             initialized_ = false;
             TFW_LOGI_CORE("Core exited successfully");
@@ -74,7 +77,7 @@ ErrorCode Core::GetValue(const std::string& key, std::string& value) {
     try {
         TFW_LOGI_CORE("Getting value for key: %s", key.c_str());
 
-        // 绠€鍗曠殑閿€煎瀛樺偍
+        // 简单的键值对存储
         auto it = keyValueStore_.find(key);
         if (it != keyValueStore_.end()) {
             value = it->second;
@@ -99,7 +102,7 @@ ErrorCode Core::SetValue(const std::string& key, const std::string& value) {
     try {
         TFW_LOGI_CORE("Setting value for key: %s", key.c_str());
 
-        // 绠€鍗曠殑閿€煎瀛樺偍
+        // 简单的键值对存储
         keyValueStore_[key] = value;
 
         TFW_LOGI_CORE("Value set successfully for key: %s", key.c_str());
@@ -119,8 +122,9 @@ ErrorCode Core::Action(const std::string& action) {
     try {
         TFW_LOGI_CORE("Executing action: %s", action.c_str());
 
-        // 绌哄疄鐜扮殑鍔ㄤ綔鍑芥暟
-        // 杩欓噷鍙互鏍规嵁action鍙傛暟鎵ц涓嶅悓鐨勫姩浣?        // 褰撳墠鍙槸璁板綍鏃ュ織骞惰繑鍥炴垚鍔?
+        // 空实现的动作函数
+        // 这里可以根据action参数执行不同的动作
+        // 当前只是记录日志并返回成功
         TFW_LOGI_CORE("Action executed successfully: %s", action.c_str());
         return ErrorCode::Success;
     } catch (...) {

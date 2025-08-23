@@ -100,16 +100,16 @@ typedef enum {
     TFW_ERROR_INVALID_PARAM,        // 无效参数
     TFW_ERROR_NULL_POINTER,         // 空指针
     TFW_ERROR_MEMORY_ALLOCATION,    // 内存分配失败
-    
+
     // 任务错误 (-200 到 -101)
     TFW_ERROR_TASK_FAIL = -200,     // 任务失败
     TFW_ERROR_TASK_TIMEOUT,         // 任务超时
-    
+
     // 系统错误 (-100 到 -1)
     TFW_ERROR_SYSTEM = -100,        // 系统错误
     TFW_ERROR_NOT_INITIALIZED,      // 未初始化
     TFW_ERROR_ALREADY_INITIALIZED,  // 已初始化
-    
+
     // 成功
     TFW_SUCCESS = 0                 // 成功
 } TFW_ErrorCode;
@@ -158,10 +158,10 @@ int main() {
     if (result != TFW_SUCCESS) {
         return result;
     }
-    
+
     // 使用功能
     TFW_CORE_ACTION();
-    
+
     // 清理
     TFW_CORE_EXIT();
     return TFW_SUCCESS;

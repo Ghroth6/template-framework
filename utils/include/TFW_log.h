@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 // ============================================================================
-// 鏃ュ織绛夌骇瀹氫箟
+// 日志等级定义
 // ============================================================================
 enum TFW_LogLevel {
     TFW_LOG_LEVEL_TRACE = 0,    // 璺熻釜淇℃伅
@@ -17,13 +17,13 @@ enum TFW_LogLevel {
 };
 
 // ============================================================================
-// 鏃ュ織妯″潡鍒嗙被
+// 日志模块分类
 // ============================================================================
 enum TFW_LogModule {
-    TFW_LOG_MODULE_CORE = 0,    // 鏍稿績妯″潡
-    TFW_LOG_MODULE_UTILS = 1,   // 宸ュ叿妯″潡
-    TFW_LOG_MODULE_SDK = 2,     // SDK妯″潡
-    TFW_LOG_MODULE_SYSTEM = 3   // 绯荤粺妯″潡
+    TFW_LOG_MODULE_CORE = 0,    // 核心模块
+    TFW_LOG_MODULE_UTILS = 1,   // 工具模块
+    TFW_LOG_MODULE_SDK = 2,     // SDK模块
+    TFW_LOG_MODULE_SYSTEM = 3   // 系统模块
 };
 
 // ============================================================================
@@ -32,7 +32,7 @@ enum TFW_LogModule {
 // 鍩虹鏃ュ織瀹?#define TFW_LOG_INNER(module, level, fmt, ...) \
     (void)TFW_LOG_IMPL(module, level, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
 
-// 绛夌骇鏃ュ織瀹?#define TFW_LOGT(module, fmt, ...) \
+// 等级日志宏#define TFW_LOGT(module, fmt, ...) \
     TFW_LOG_INNER(module, TFW_LOG_LEVEL_TRACE, fmt, ##__VA_ARGS__)
 
 #define TFW_LOGD(module, fmt, ...) \
