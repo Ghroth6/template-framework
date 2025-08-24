@@ -14,8 +14,7 @@ extern "C" {
 // 基础类型模板
 typedef struct {
     int32_t id;
-    char* name;
-    void* data;
+    int32_t data;
 } TFW_Type;
 
 #ifdef __cplusplus

@@ -41,13 +41,6 @@ typedef int32_t TFW_Result;
 
 #ifdef __cplusplus
 }
-
-// C++命名空间别名，保持向后兼容
-namespace TFW {
-    using ErrorCode = TFW_ErrorCode;
-    using Result = TFW_Result;
-}
-
 #endif
 
 #endif // TFW_ERRORNO_H

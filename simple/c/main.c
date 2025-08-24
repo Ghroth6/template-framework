@@ -17,15 +17,6 @@ int main() {
 
     printf("TFW core initialized successfully\n");
 
-    // 检查初始化状态
-    int isInit = TFW_CORE_IS_INITIALIZED();
-    if (isInit) {
-        printf("Core is initialized\n");
-    } else {
-        printf("Core is not initialized\n");
-        return -1;
-    }
-
     // 执行简单操作
     printf("Executing simple action...\n");
     result = TFW_CORE_ACTION("test_action");
@@ -36,25 +27,10 @@ int main() {
         printf("Action failed, error code: %d\n", result);
     }
 
-    // 设置和获取值
-    printf("Setting key-value pair...\n");
-    result = TFW_CORE_SET_VALUE("test_key", "test_value");
-
-    if (result == TFW_SUCCESS) {
-        printf("Value set successfully\n");
-
-        // 获取值
-        char value[256];
-        result = TFW_CORE_GET_VALUE("test_key", value, sizeof(value));
-
-        if (result == TFW_SUCCESS) {
-            printf("Retrieved value: %s\n", value);
-        } else {
-            printf("Failed to get value, error code: %d\n", result);
-        }
-    } else {
-        printf("Failed to set value, error code: %d\n", result);
-    }
+    // 测试类型数据操作（通过接口层）
+    printf("Testing type data operations...\n");
+    printf("Note: GetValue and SetValue methods have been removed\n");
+    printf("Type data operations are now handled directly in Core class\n");
 
     // 退出TFW核心
     printf("Exiting TFW core...\n");

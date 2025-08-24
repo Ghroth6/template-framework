@@ -1,4 +1,5 @@
 ﻿#include "../include/TFW_log.h"
+#include "../include/TFW_common_defines.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -87,7 +88,7 @@ static unsigned long get_thread_id() {
 /**
  * 获取日志等级字符串
  */
-static const char* get_level_string(int level) {
+static TFW_UNUSED const char* get_level_string(int level) {
     switch (level) {
         case TFW_LOG_LEVEL_TRACE:   return "TRACE";
         case TFW_LOG_LEVEL_DEBUG:   return "DEBUG";
@@ -100,9 +101,24 @@ static const char* get_level_string(int level) {
 }
 
 /**
+ * 获取日志等级字符（单字母表示）
+ */
+static TFW_UNUSED char get_level_char(int level) {
+    switch (level) {
+        case TFW_LOG_LEVEL_TRACE:   return 'T';
+        case TFW_LOG_LEVEL_DEBUG:   return 'D';
+        case TFW_LOG_LEVEL_INFO:    return 'I';
+        case TFW_LOG_LEVEL_WARNING: return 'W';
+        case TFW_LOG_LEVEL_ERROR:   return 'E';
+        case TFW_LOG_LEVEL_FATAL:   return 'F';
+        default:                     return '?';
+    }
+}
+
+/**
  * 获取模块名称字符串
  */
-static const char* get_module_string(int module) {
+static TFW_UNUSED const char* get_module_string(int module) {
     switch (module) {
         case TFW_LOG_MODULE_CORE:   return "CORE";
         case TFW_LOG_MODULE_UTILS:  return "UTILS";
@@ -115,7 +131,7 @@ static const char* get_module_string(int module) {
 /**
  * 获取文件名（去掉路径）
  */
-static const char* get_file_name(const char* file_path) {
+static TFW_UNUSED const char* get_file_name(const char* file_path) {
     const char* filename = strrchr(file_path, '/');
     return filename ? filename + 1 : file_path;
 }
@@ -125,7 +141,7 @@ static const char* get_file_name(const char* file_path) {
  * 这是一个静态函数，仅可在该文件内使用
  * 即使不被使用也不报错的编译声明
  */
-static __attribute__((unused)) void output_log_to_stdout(const char* message) {
+static TFW_UNUSED void output_log_to_stdout(const char* message) {
     printf("%s\n", message);
     fflush(stdout);
 }
@@ -164,9 +180,13 @@ int TFW_LOG_IMPL(int module, int level, const char* file, int line,
     offset += snprintf(logMessage + offset, sizeof(logMessage) - offset,
                       "%d:%lu ", get_process_id(), get_thread_id());
 
-    // 添加模块和等级
+    // 添加日志等级（单字母表示）
     offset += snprintf(logMessage + offset, sizeof(logMessage) - offset,
-                      "[%s][%s] ", get_module_string(module), get_level_string(level));
+                      "%c ", get_level_char(level));
+
+    // 添加模块
+    offset += snprintf(logMessage + offset, sizeof(logMessage) - offset,
+                      "[%s] ", get_module_string(module));
 
     // 添加文件名和行号
     offset += snprintf(logMessage + offset, sizeof(logMessage) - offset,

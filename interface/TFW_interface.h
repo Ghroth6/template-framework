@@ -13,31 +13,23 @@ public:
     static CoreInterface* GetInstance();
 
     // 初始化接口
-    TFW_Result Initialize();
+    int32_t Initialize();
 
     // 退出接口
-    TFW_Result Exit();
-
-    // 检查状态接口
-    bool IsInitialized() const;
+    int32_t Exit();
 
     // 执行操作接口
-    TFW_Result ExecuteOperation(const std::string& operation);
+    int32_t ExecuteOperation(const std::string& operation);
 
-    // 获取值接口
-    TFW_Result GetValue(const std::string& key, std::string& value);
+    int32_t GetData();
 
-    // 设置值接口
-    TFW_Result SetValue(const std::string& key, const std::string& value);
+    int32_t SetData(const int32_t data);
 
 private:
     CoreInterface() = default;
     ~CoreInterface() = default;
     CoreInterface(const CoreInterface&) = delete;
     CoreInterface& operator=(const CoreInterface&) = delete;
-
-    bool initialized_ = false;
-    TFW_Type mainType_;
 };
 
 
