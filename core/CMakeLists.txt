@@ -1,4 +1,5 @@
 ﻿# Core模块构建配置
+cmake_minimum_required(VERSION 3.20)
 project(TFW_core)
 
 # 源文件

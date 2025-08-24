@@ -16,6 +16,7 @@ CoreInterface* CoreInterface::GetInstance() {
 
 TFW_Result CoreInterface::Initialize() {
     try {
+        initialized_ = true;  // 设置初始化标志
         TFW_LOGI_CORE("CoreInterface initialized");
         return TFW_SUCCESS;
     } catch (...) {
@@ -26,6 +27,7 @@ TFW_Result CoreInterface::Initialize() {
 
 TFW_Result CoreInterface::Exit() {
     try {
+        initialized_ = false;  // 重置初始化标志
         TFW_LOGI_CORE("CoreInterface exited");
         return TFW_SUCCESS;
     } catch (...) {

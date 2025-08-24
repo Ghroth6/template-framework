@@ -1,4 +1,5 @@
 ﻿# C++版本示例构建配置
+cmake_minimum_required(VERSION 3.20)
 project(TFW_Simple_CPP)
 
 # 设置C++标准
@@ -25,8 +26,8 @@ target_include_directories(tfw_simple_cpp PRIVATE
 
 # 链接库
 target_link_libraries(tfw_simple_cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../core/libTFW_core.a
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/libTFW_utils.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../out/lib/libTFW_core.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../out/lib/libTFW_utils.a
 )
 
 # 设置输出名称

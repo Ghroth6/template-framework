@@ -5,6 +5,7 @@
 #include "../interface/TFW_types.h"
 #include <string>
 #include <unordered_map>
+#include <cstring>
 
 namespace TFW {
 

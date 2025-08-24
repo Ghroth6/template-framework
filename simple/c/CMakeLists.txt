@@ -1,5 +1,6 @@
 ﻿# C版本示例构建配置
-project(TFW_Simple_C)
+cmake_minimum_required(VERSION 3.20)
+project(TFW_Simple_C C CXX)  # 同时支持C和C++
 
 # 设置输出目录
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../out/c)
@@ -21,9 +22,16 @@ target_include_directories(tfw_simple_c PRIVATE
 
 # 链接库
 target_link_libraries(tfw_simple_c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../core/libTFW_core.a
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/libTFW_utils.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../out/lib/libTFW_core.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../out/lib/libTFW_utils.a
 )
+
+# 强制链接C++标准库
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
+    target_link_libraries(tfw_simple_c stdc++)
+elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+    target_link_libraries(tfw_simple_c cpp)
+endif()
 
 # 设置输出名称
 set_target_properties(tfw_simple_c PROPERTIES

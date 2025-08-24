@@ -13,7 +13,23 @@ fi
 cd build
 
 # 创建输出目录
-mkdir -p out/c out/cpp
+mkdir -p out/c out/cpp out/lib
+
+# 首先构建核心库和工具库
+echo "Building core libraries..."
+cmake -B core_libs -S ..
+if [ $? -eq 0 ]; then
+    cmake --build core_libs --config Release
+    if [ $? -eq 0 ]; then
+        echo "Core libraries built successfully"
+    else
+        echo "Failed to build core libraries"
+        exit 1
+    fi
+else
+    echo "Failed to configure core libraries"
+    exit 1
+fi
 
 # 构建C版本
 echo "Building C version..."
@@ -56,13 +72,13 @@ echo "Creating symbolic links in root directory..."
 rm -f tfw_simple_c tfw_simple_cpp
 
 # 创建软链接
-ln -sf build/out/c/tfw_simple_c tfw_simple_c
-ln -sf build/out/cpp/tfw_simple_cpp tfw_simple_cpp
+ln -sf out/c/tfw_simple_c tfw_simple_c
+ln -sf out/cpp/tfw_simple_cpp tfw_simple_cpp
 
 echo "=== All examples built successfully ==="
 echo "Output files:"
-echo "  C version: build/out/c/tfw_simple_c"
-echo "  C++ version: build/out/cpp/tfw_simple_cpp"
+echo "  C version: out/c/tfw_simple_c"
+echo "  C++ version: out/cpp/tfw_simple_cpp"
 echo "Symbolic links created in root directory:"
-echo "  tfw_simple_c -> build/out/c/tfw_simple_c"
-echo "  tfw_simple_cpp -> build/out/cpp/tfw_simple_cpp"
+echo "  tfw_simple_c -> out/c/tfw_simple_c"
+echo "  tfw_simple_cpp -> out/cpp/tfw_simple_cpp"
