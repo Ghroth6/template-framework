@@ -1,10 +1,10 @@
 ﻿#!/bin/bash
 
-# TFW Simple 示例项目构建脚本 (从根目录执行)
+# TFW Simple Example Project Build Script (Execute from root directory)
 
 echo "=== Building TFW Simple Examples ==="
 
-# 确保在根目录的build目录中
+# Ensure we are in the build directory under root
 if [ ! -d "build" ]; then
     echo "Creating build directory..."
     mkdir -p build
@@ -12,14 +12,14 @@ fi
 
 cd build
 
-# 创建输出目录
+# Create output directories
 mkdir -p out/c out/cpp out/lib
 
-# 首先构建核心库和工具库
+# Build core libraries first
 echo "Building core libraries..."
-cmake -B core_libs -S ..
+cmake -B core_build -S ../core
 if [ $? -eq 0 ]; then
-    cmake --build core_libs --config Release
+    cmake --build core_build --config Release
     if [ $? -eq 0 ]; then
         echo "Core libraries built successfully"
     else
@@ -31,7 +31,23 @@ else
     exit 1
 fi
 
-# 构建C版本
+# Build utils library
+echo "Building utils library..."
+cmake -B utils_build -S ../utils
+if [ $? -eq 0 ]; then
+    cmake --build utils_build --config Release
+    if [ $? -eq 0 ]; then
+        echo "Utils library built successfully"
+    else
+        echo "Failed to build utils library"
+        exit 1
+    fi
+else
+    echo "Failed to configure utils library"
+    exit 1
+fi
+
+# Build C version
 echo "Building C version..."
 cmake -B simple_c -S ../simple/c
 if [ $? -eq 0 ]; then
@@ -47,7 +63,7 @@ else
     exit 1
 fi
 
-# 构建C++版本
+# Build C++ version
 echo "Building C++ version..."
 cmake -B simple_cpp -S ../simple/cpp
 if [ $? -eq 0 ]; then
@@ -65,20 +81,20 @@ fi
 
 cd ..
 
-# 创建软链接到根目录
+# Create symbolic links in root directory
 echo "Creating symbolic links in root directory..."
 
-# 删除旧的软链接（如果存在）
+# Remove old symbolic links if they exist
 rm -f tfw_simple_c tfw_simple_cpp
 
-# 创建软链接
-ln -sf out/c/tfw_simple_c tfw_simple_c
-ln -sf out/cpp/tfw_simple_cpp tfw_simple_cpp
+# Create symbolic links
+ln -sf build/out/c/tfw_simple_c tfw_simple_c
+ln -sf build/out/cpp/tfw_simple_cpp tfw_simple_cpp
 
 echo "=== All examples built successfully ==="
 echo "Output files:"
-echo "  C version: out/c/tfw_simple_c"
-echo "  C++ version: out/cpp/tfw_simple_cpp"
+echo "  C version: build/out/c/tfw_simple_c"
+echo "  C++ version: build/out/cpp/tfw_simple_cpp"
 echo "Symbolic links created in root directory:"
-echo "  tfw_simple_c -> out/c/tfw_simple_c"
-echo "  tfw_simple_cpp -> out/cpp/tfw_simple_cpp"
+echo "  tfw_simple_c -> build/out/c/tfw_simple_c"
+echo "  tfw_simple_cpp -> build/out/cpp/tfw_simple_cpp"
