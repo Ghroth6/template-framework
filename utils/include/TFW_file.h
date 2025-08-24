@@ -8,41 +8,41 @@ extern "C" {
 #endif
 
 // ============================================================================
-// 文件路径相关函数声明
+// File path related function declarations
 // ============================================================================
 
 /**
- * 获取文件名（去掉路径）
- * @param file_path 完整文件路径
- * @return 文件名（不包含路径）
+ * Get file name (remove path)
+ * @param file_path Complete file path
+ * @return File name (without path)
  */
 const char* TFW_GetFileName(const char* file_path);
 
 /**
- * 获取文件扩展名
- * @param file_path 文件路径
- * @return 文件扩展名（包含点号），如果没有扩展名返回空字符串
+ * Get file extension
+ * @param file_path File path
+ * @return File extension (with dot), returns empty string if no extension
  */
 const char* TFW_GetFileExtension(const char* file_path);
 
 /**
- * 获取文件目录路径
- * @param file_path 完整文件路径
- * @return 目录路径（不包含文件名）
+ * Get file directory path
+ * @param file_path Complete file path
+ * @return Directory path (without filename)
  */
 const char* TFW_GetFileDirectory(const char* file_path);
 
 /**
- * 检查文件是否存在
- * @param file_path 文件路径
- * @return 1表示存在，0表示不存在
+ * Check if file exists
+ * @param file_path File path
+ * @return 1 for exists, 0 for not exists
  */
 int32_t TFW_FileExists(const char* file_path);
 
 /**
- * 检查路径是否为目录
- * @param path 路径
- * @return 1表示是目录，0表示不是目录
+ * Check if path is directory
+ * @param path Path
+ * @return 1 for directory, 0 for not directory
  */
 int32_t TFW_IsDirectory(const char* path);
 

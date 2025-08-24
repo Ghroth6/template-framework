@@ -1,31 +1,31 @@
 #include "../../include/TFW_mem.h"
-#include "../../include/TFW_log.h"
+#include "../../include/TFW_utils_log.h"
 #include "../../../interface/TFW_errorno.h"
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
 
 // ============================================================================
-// POSIX平台内存管理实现
+// POSIX platform memory management implementation
 // ============================================================================
 
-// 内存统计信息（线程安全）
+// Memory statistics (thread-safe)
 static uint64_t g_total_allocated = 0;
 static uint64_t g_total_freed = 0;
 static uint64_t g_current_used = 0;
 static pthread_mutex_t g_mem_stats_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void* TFW_Malloc(uint32_t size) {
-    // 检查内存大小限制
+    // Check memory size limit
     if (size == 0 || size > TFW_MAX_MALLOC_SIZE) {
         TFW_LOGE_UTILS("Invalid memory size: %u bytes", size);
         return NULL;
     }
     
-    // POSIX平台：使用 malloc
+    // POSIX platform: use malloc
     void* ptr = malloc(size);
     if (ptr != NULL) {
-        // 更新统计信息（线程安全）
+        // Update statistics (thread-safe)
         pthread_mutex_lock(&g_mem_stats_mutex);
         g_total_allocated += size;
         g_current_used += size;
@@ -40,16 +40,16 @@ void* TFW_Malloc(uint32_t size) {
 }
 
 void* TFW_Calloc(uint32_t size) {
-    // 检查内存大小限制
+    // Check memory size limit
     if (size == 0 || size > TFW_MAX_MALLOC_SIZE) {
         TFW_LOGE_UTILS("Invalid memory size: %u bytes", size);
         return NULL;
     }
     
-    // POSIX平台：使用 calloc
+    // POSIX platform: use calloc
     void* ptr = calloc(1, size);
     if (ptr != NULL) {
-        // 更新统计信息（线程安全）
+        // Update statistics (thread-safe)
         pthread_mutex_lock(&g_mem_stats_mutex);
         g_total_allocated += size;
         g_current_used += size;
@@ -68,13 +68,13 @@ void TFW_Free(void* ptr) {
         return;
     }
     
-    // POSIX平台：使用 free
-    // 注意：这里无法获取释放的内存大小，统计信息可能不准确
-    // 在实际应用中，可能需要维护一个内存块信息表
+    // POSIX platform: use free
+    // Note: Cannot get freed memory size here, statistics may be inaccurate
+    // In practical applications, may need to maintain a memory block info table
     free(ptr);
     
     TFW_LOGD_UTILS("Memory freed at %p", ptr);
-    // 注意：这里无法准确更新统计信息，因为不知道释放的内存大小
+    // Note: Cannot accurately update statistics here, as freed memory size is unknown
 }
 
 
