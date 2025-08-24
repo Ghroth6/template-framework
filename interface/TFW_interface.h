@@ -24,6 +24,12 @@ public:
     // 执行操作接口
     TFW_Result ExecuteOperation(const std::string& operation);
 
+    // 获取值接口
+    TFW_Result GetValue(const std::string& key, std::string& value);
+
+    // 设置值接口
+    TFW_Result SetValue(const std::string& key, const std::string& value);
+
 private:
     CoreInterface() = default;
     ~CoreInterface() = default;

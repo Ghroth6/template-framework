@@ -16,7 +16,7 @@ add_executable(tfw_simple_c ${C_SOURCES})
 # 包含目录
 target_include_directories(tfw_simple_c PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../../interface
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../core
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../core/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/include
 )
 

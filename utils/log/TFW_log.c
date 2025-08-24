@@ -94,8 +94,10 @@ static const char* get_file_name(const char* file_path) {
 
 /**
  * 输出日志到控制台
+ * 这是一个静态函数，仅可在该文件内使用
+ * 即使不被使用也不报错的编译声明
  */
-static void output_log(const char* message) {
+static __attribute__((unused)) void output_log_to_stdout(const char* message) {
     printf("%s\n", message);
     fflush(stdout);
 }
@@ -109,14 +111,18 @@ static void output_log(const char* message) {
  */
 int TFW_LOG_IMPL(int module, int level, const char* file, int line,
                   const char* function, const char* fmt, ...) {
+    // 自动初始化日志系统（如果还没有初始化）
     if (!g_logInitialized) {
-        return -1; // 未初始化
+        g_logInitialized = 1;
+        g_logLevel = TFW_LOG_LEVEL_INFO; // 默认设置为INFO级别
     }
 
     // 检查日志等级
     if (level < g_logLevel) {
         return 0; // 低于当前设置的等级，不输出
     }
+    
+
 
     // 构建日志消息
     char logMessage[2048];
@@ -150,8 +156,8 @@ int TFW_LOG_IMPL(int module, int level, const char* file, int line,
     offset += vsnprintf(logMessage + offset, sizeof(logMessage) - offset, fmt, args);
     va_end(args);
 
-    // 输出日志
-    output_log(logMessage);
+    // 输出日志到标准输出
+    output_log_to_stdout(logMessage);
 
     return 0;
 }

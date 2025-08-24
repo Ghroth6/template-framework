@@ -1,6 +1,8 @@
 ﻿#ifndef TFW_TYPES_H
 #define TFW_TYPES_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -11,7 +13,7 @@ extern "C" {
 
 // 基础类型模板
 typedef struct {
-    int id;
+    int32_t id;
     char* name;
     void* data;
 } TFW_Type;

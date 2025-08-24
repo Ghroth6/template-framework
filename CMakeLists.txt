@@ -13,7 +13,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/lib)
 # 包含目录
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/interface
-    ${CMAKE_CURRENT_SOURCE_DIR}/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/core/include
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/include
 )
 

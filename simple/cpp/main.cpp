@@ -1,8 +1,8 @@
 ﻿#include <iostream>
 #include <string>
-#include "../../core/TFW_core.h"
+#include "../../core/include/TFW_core.h"
 #include "../../interface/TFW_interface.h"
-#include "../../core/TFW_core_log.h"
+#include "../../core/include/TFW_core_log.h"
 
 using namespace TFW;
 

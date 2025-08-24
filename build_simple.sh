@@ -88,13 +88,13 @@ echo "Creating symbolic links in root directory..."
 rm -f tfw_simple_c tfw_simple_cpp
 
 # Create symbolic links
-ln -sf build/out/c/tfw_simple_c tfw_simple_c
-ln -sf build/out/cpp/tfw_simple_cpp tfw_simple_cpp
+ln -sf out/c/tfw_simple_c tfw_simple_c
+ln -sf out/cpp/tfw_simple_cpp tfw_simple_cpp
 
 echo "=== All examples built successfully ==="
 echo "Output files:"
-echo "  C version: build/out/c/tfw_simple_c"
-echo "  C++ version: build/out/cpp/tfw_simple_cpp"
+echo "  C version: out/c/tfw_simple_c"
+echo "  C++ version: out/cpp/tfw_simple_cpp"
 echo "Symbolic links created in root directory:"
-echo "  tfw_simple_c -> build/out/c/tfw_simple_c"
-echo "  tfw_simple_cpp -> build/out/cpp/tfw_simple_cpp"
+echo "  tfw_simple_c -> out/c/tfw_simple_c"
+echo "  tfw_simple_cpp -> out/cpp/tfw_simple_cpp"
