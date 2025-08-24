@@ -17,15 +17,19 @@ CoreInterface* CoreInterface::GetInstance() {
 
 TFW_Result CoreInterface::Initialize() {
     try {
+        TFW::Core::GetInstance().Initialize();
         initialized_ = true;  // 设置初始化标志
+        TFW_LOGI_CORE("CoreInterface initialized success");
         return TFW_SUCCESS;
     } catch (...) {
+        TFW_LOGE_CORE("CoreInterface initialized failed");
         return TFW_ERROR;
     }
 }
 
 TFW_Result CoreInterface::Exit() {
     try {
+        TFW::Core::GetInstance().Exit();
         initialized_ = false;  // 重置初始化标志
         return TFW_SUCCESS;
     } catch (...) {

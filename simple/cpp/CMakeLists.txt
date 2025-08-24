@@ -26,8 +26,9 @@ target_include_directories(tfw_simple_cpp PRIVATE
 
 # 链接库
 target_link_libraries(tfw_simple_cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../out/lib/libTFW_core.a
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../out/lib/libTFW_utils.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../build/core_build/libTFW_core_frame.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../build/core_build/libTFW_interface_lib.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../build/utils_build/libTFW_utils.a
 )
 
 # 设置输出名称

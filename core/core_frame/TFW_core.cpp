@@ -19,16 +19,9 @@ ErrorCode Core::Initialize() {
     try {
         // 初始化主类型
         if (mainType_.Initialize()) {
-            // 初始化接口
-            auto result = CoreInterface::GetInstance()->Initialize();
-            if (result == TFW_SUCCESS) {
-                initialized_ = true;
-                TFW_LOGI_CORE("Core initialized successfully");
-                return ErrorCode::TFW_SUCCESS;
-            } else {
-                TFW_LOGE_CORE("Core interface initialization failed");
-                return static_cast<ErrorCode>(result);
-            }
+            initialized_ = true;
+            TFW_LOGI_CORE("Core initialized successfully");
+            return ErrorCode::TFW_SUCCESS;
         } else {
             TFW_LOGE_CORE("Main type initialization failed");
             return ErrorCode::TFW_ERROR_OPERATION_FAIL;
@@ -48,16 +41,9 @@ ErrorCode Core::Exit() {
         // 清理主类型
         mainType_.Cleanup();
 
-        // 退出接口
-        auto result = CoreInterface::GetInstance()->Exit();
-        if (result == TFW_SUCCESS) {
-            initialized_ = false;
-            TFW_LOGI_CORE("Core exited successfully");
-            return ErrorCode::TFW_SUCCESS;
-        } else {
-            TFW_LOGE_CORE("Core interface exit failed");
-            return static_cast<ErrorCode>(result);
-        }
+        initialized_ = false;
+        TFW_LOGI_CORE("Core exited successfully");
+        return ErrorCode::TFW_SUCCESS;
     } catch (...) {
         TFW_LOGE_CORE("Exception during core exit");
         return ErrorCode::TFW_ERROR_OPERATION_FAIL;

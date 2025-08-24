@@ -22,8 +22,10 @@ target_include_directories(tfw_simple_c PRIVATE
 
 # 链接库
 target_link_libraries(tfw_simple_c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../out/lib/libTFW_core.a
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../out/lib/libTFW_utils.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../build/core_build/libTFW_c_interface_lib.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../build/core_build/libTFW_interface_lib.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../build/core_build/libTFW_core_frame.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../build/utils_build/libTFW_utils.a
 )
 
 # 强制链接C++标准库

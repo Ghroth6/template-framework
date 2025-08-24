@@ -1,7 +1,7 @@
 ﻿#ifndef TFW_UTILS_LOG_H
 #define TFW_UTILS_LOG_H
 
-#include "include/TFW_log.h"
+#include "TFW_log.h"
 
 // ============================================================================
 // Utils模块专用日志宏

@@ -11,6 +11,7 @@
 #else
 #include <pthread.h>
 #include <unistd.h>
+#include <sys/time.h>
 #endif
 
 // ============================================================================
@@ -27,10 +28,37 @@ static int g_logInitialized = 0;
  * 获取当前时间戳字符串
  */
 static const char* get_timestamp() {
-    static char timestamp[32];
-    time_t now = time(NULL);
+    static char timestamp[64];
+    
+#ifdef _WIN32
+    // Windows平台
+    SYSTEMTIME st;
+    GetSystemTime(&st);
+    snprintf(timestamp, sizeof(timestamp), "%04d-%02d-%02d %02d:%02d:%02d.%03d",
+             st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+#elif defined(__APPLE__)
+    // macOS平台
+    struct timeval tv;
+    struct timezone tz;
+    gettimeofday(&tv, &tz);
+    time_t now = tv.tv_sec;
     struct tm* tm_info = localtime(&now);
     strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", tm_info);
+    char ms_part[16];
+    snprintf(ms_part, sizeof(ms_part), ".%03ld", tv.tv_usec / 1000);
+    strcat(timestamp, ms_part);
+#else
+    // Linux/Unix平台
+    struct timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    time_t now = ts.tv_sec;
+    struct tm* tm_info = localtime(&now);
+    strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", tm_info);
+    char ms_part[16];
+    snprintf(ms_part, sizeof(ms_part), ".%03ld", ts.tv_nsec / 1000000);
+    strcat(timestamp, ms_part);
+#endif
+    
     return timestamp;
 }
 
@@ -130,11 +158,11 @@ int TFW_LOG_IMPL(int module, int level, const char* file, int line,
 
     // 添加时间戳
     offset += snprintf(logMessage + offset, sizeof(logMessage) - offset,
-                      "[%s] ", get_timestamp());
+                      "%s ", get_timestamp());
 
     // 添加进程ID和线程ID
     offset += snprintf(logMessage + offset, sizeof(logMessage) - offset,
-                      "[PID:%d][TID:%lu] ", get_process_id(), get_thread_id());
+                      "%d:%lu ", get_process_id(), get_thread_id());
 
     // 添加模块和等级
     offset += snprintf(logMessage + offset, sizeof(logMessage) - offset,
