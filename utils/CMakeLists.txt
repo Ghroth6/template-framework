@@ -5,12 +5,13 @@ project(TFW_utils)
 # 源文件
 set(UTILS_SOURCES
     log/TFW_log.c
+    thread/TFW_thread_safe.c
 )
 
 # 根据平台选择平台特定实现
 if(WIN32)
     # Windows平台实现
-    list(APPEND UTILS_SOURCES 
+    list(APPEND UTILS_SOURCES
         thread/win32/TFW_thread_impl.c
         timer/win32/TFW_timer_impl.c
         file/win32/TFW_file_impl.c
@@ -18,7 +19,7 @@ if(WIN32)
     )
 elseif(APPLE)
     # macOS平台实现
-    list(APPEND UTILS_SOURCES 
+    list(APPEND UTILS_SOURCES
         thread/posix/TFW_thread_impl.c
         timer/macos/TFW_timer_impl.c
         file/posix/TFW_file_impl.c
@@ -26,7 +27,7 @@ elseif(APPLE)
     )
 else()
     # Linux/Unix平台实现
-    list(APPEND UTILS_SOURCES 
+    list(APPEND UTILS_SOURCES
         thread/posix/TFW_thread_impl.c
         timer/posix/TFW_timer_impl.c
         file/posix/TFW_file_impl.c

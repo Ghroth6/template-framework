@@ -127,36 +127,32 @@ TFW_LOGE_UTILS("Utils模块出现错误: %s", error_msg);
 - **Utils模块**: `-3000 到 -2001`
 - **其他模块**: 依此类推，每模块1000个槽位
 
-### 新增错误码
-```c
-typedef enum {
-    // 内存管理相关
-    TFW_ERROR_LOCK_FAILED = -1050,    // 锁操作失败
-    TFW_ERROR_NO_MEMORY = -1051,      // 内存不足
-    
-    // 其他错误码...
-} TFW_ErrorCode;
-```
-
 ### 主要错误码
 ```c
 typedef enum {
-    // 通用错误 (-1000 到 -1)
+    // 通用错误码 (-1000 到 -1)
     TFW_ERROR = -1000,              // 标准错误
     TFW_ERROR_INVALID_PARAM,        // 无效参数
-    TFW_ERROR_NULL_POINTER,         // 空指针
-    TFW_ERROR_MEMORY_ALLOCATION,    // 内存分配失败
+    TFW_ERROR_NOT_INIT,             // 未初始化
+    TFW_ERROR_ALREADY_INIT,         // 已经初始化
+    TFW_ERROR_OPERATION_FAIL,       // 操作失败
 
-    // 任务错误 (-200 到 -101)
+    // 任务错误码 (-200 到 -101)
     TFW_ERROR_TASK_FAIL = -200,     // 任务失败
-    TFW_ERROR_TASK_TIMEOUT,         // 任务超时
+    TFW_ERROR_TIMEOUT,              // 超时错误
+    TFW_ERROR_NOT_FOUND,            // 未找到
 
-    // 系统错误 (-100 到 -1)
+    // 锁相关错误码 (-300 到 -201)
+    TFW_ERROR_LOCK_FAILED = -300,   // 锁操作失败
+    TFW_ERROR_NO_MEMORY = -301,     // 内存不足
+
+    // 系统错误码 (-100 到 -1)
     TFW_ERROR_SYSTEM = -100,        // 系统错误
-    TFW_ERROR_NOT_INITIALIZED,      // 未初始化
-    TFW_ERROR_ALREADY_INITIALIZED,  // 已初始化
+    TFW_ERROR_MEMORY,               // 内存错误
+    TFW_ERROR_FILE,                 // 文件错误
+    TFW_ERROR_NETWORK,              // 网络错误
 
-    // 成功
+    // 成功码
     TFW_SUCCESS = 0                 // 成功
 } TFW_ErrorCode;
 ```

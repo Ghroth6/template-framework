@@ -23,38 +23,13 @@ static inline bool TFW_CheckMutexIsNull(const TFW_Mutex_t* mutex)
     return (mutex == NULL) || ((void *)(*mutex) == NULL);
 }
 
-// 宏定义的安全锁操作
-#define TFW_Mutex_Lock(mutex)                                                        \
-({                                                                                   \
-    int32_t ret = TFW_SUCCESS;                                                       \
-    if (TFW_CheckMutexIsNull(mutex)) {                                               \
-        TFW_LOGD_UTILS("TFW_Mutex_Lock mutex is null");                             \
-        ret = TFW_ERROR_INVALID_PARAM;                                               \
-    } else {                                                                         \
-        ret = TFW_Mutex_Lock_Inner(mutex);                                           \
-        if (ret != 0) {                                                              \
-            TFW_LOGE_UTILS("TFW_Mutex_Lock failed, ret=%d", ret);                   \
-            ret = TFW_ERROR_LOCK_FAILED;                                              \
-        }                                                                            \
-    }                                                                                \
-    ret;                                                                             \
-})
+// 安全锁操作函数声明（替代原来的GCC语句表达式宏）
+int32_t TFW_Mutex_Lock_Safe(TFW_Mutex_t* mutex);
+int32_t TFW_Mutex_Unlock_Safe(TFW_Mutex_t* mutex);
 
-#define TFW_Mutex_Unlock(mutex)                                                      \
-({                                                                                   \
-    int32_t ret = TFW_SUCCESS;                                                       \
-    if (TFW_CheckMutexIsNull(mutex)) {                                               \
-        TFW_LOGE_UTILS("TFW_Mutex_Unlock mutex is null");                           \
-        ret = TFW_ERROR_INVALID_PARAM;                                               \
-    } else {                                                                         \
-        ret = TFW_Mutex_Unlock_Inner(mutex);                                         \
-        if (ret != 0) {                                                              \
-            TFW_LOGE_UTILS("TFW_Mutex_Unlock failed, ret=%d", ret);                 \
-            ret = TFW_ERROR_LOCK_FAILED;                                              \
-        }                                                                            \
-    }                                                                                \
-    ret;                                                                             \
-})
+// 宏定义的安全锁操作（调用安全函数）
+#define TFW_Mutex_Lock(mutex) TFW_Mutex_Lock_Safe(mutex)
+#define TFW_Mutex_Unlock(mutex) TFW_Mutex_Unlock_Safe(mutex)
 
 // ============================================================================
 // 进程和线程相关函数声明
