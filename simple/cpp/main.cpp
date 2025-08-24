@@ -1,8 +1,7 @@
 ﻿#include <iostream>
 #include <string>
-#include "../../core/include/TFW_core.h"
 #include "../../interface/TFW_interface.h"
-#include "../../core/include/TFW_core_log.h"
+#include "../../interface/TFW_errorno.h"
 
 using namespace TFW;
 
@@ -34,7 +33,7 @@ int main() {
 
         // 测试类型数据操作
         std::cout << "Testing type data operations..." << std::endl;
-        
+
         // 设置类型数据
         result = interface->SetData(100);
         if (result == TFW_SUCCESS) {
@@ -66,5 +65,15 @@ int main() {
     }
 
     std::cout << "=== Example completed ===" << std::endl;
+
+    // Windows下暂停，等待用户按键
+#ifdef _WIN32
+    std::cout << "\n按任意键继续..." << std::endl;
+    system("pause");
+#else
+    std::cout << "\n按回车键继续..." << std::endl;
+    std::cin.get();
+#endif
+
     return 0;
 }

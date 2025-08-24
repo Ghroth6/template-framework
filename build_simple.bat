@@ -89,9 +89,9 @@ REM Remove old shortcuts if they exist
 if exist "tfw_simple_c.exe.lnk" del "tfw_simple_c.exe.lnk"
 if exist "tfw_simple_cpp.exe.lnk" del "tfw_simple_cpp.exe.lnk"
 
-REM Use PowerShell to create shortcuts
-powershell -Command "$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut('tfw_simple_c.exe.lnk'); $Shortcut.TargetPath = 'out\c\tfw_simple_c.exe'; $Shortcut.Save()"
-powershell -Command "$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut('tfw_simple_cpp.exe.lnk'); $Shortcut.TargetPath = 'out\cpp\tfw_simple_cpp.exe'; $Shortcut.Save()"
+REM Use PowerShell to create shortcuts with absolute paths
+powershell -Command "$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut('%CD%\tfw_simple_c.exe.lnk'); $Shortcut.TargetPath = '%CD%\out\c\Release\tfw_simple_c.exe'; $Shortcut.Save()"
+powershell -Command "$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut('%CD%\tfw_simple_cpp.exe.lnk'); $Shortcut.TargetPath = '%CD%\out\cpp\Release\tfw_simple_cpp.exe'; $Shortcut.Save()"
 
 echo === All examples built successfully ===
 echo Output files:

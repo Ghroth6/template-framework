@@ -43,7 +43,8 @@ target_link_libraries(tfw_simple_c
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     target_link_libraries(tfw_simple_c stdc++)
 elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
-    target_link_libraries(tfw_simple_c cpp)
+    # MSVC 下不需要额外链接，编译器会自动处理
+    # target_link_libraries(tfw_simple_c msvcrt)
 endif()
 
 # 设置输出名称

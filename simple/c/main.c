@@ -43,5 +43,15 @@ int main() {
     }
 
     printf("=== Example completed ===\n");
+
+    // Windows下暂停，等待用户按键
+#ifdef _WIN32
+    printf("\n按任意键继续...\n");
+    system("pause");
+#else
+    printf("\n按回车键继续...\n");
+    getchar();
+#endif
+
     return 0;
 }
