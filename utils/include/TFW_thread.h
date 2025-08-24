@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include "TFW_errorno.h"
+#include "TFW_utils_log.h"
 
 typedef uintptr_t TFW_Mutex_t;
 typedef uintptr_t TFW_MutexAttr_t;

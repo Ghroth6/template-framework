@@ -40,4 +40,6 @@ add_library(TFW_utils STATIC ${UTILS_SOURCES})
 # 包含目录
 target_include_directories(TFW_utils PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../interface
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
 )

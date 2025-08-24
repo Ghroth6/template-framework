@@ -1,6 +1,8 @@
 ﻿#ifndef TFW_LOG_H
 #define TFW_LOG_H
 
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
