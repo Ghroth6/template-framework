@@ -5,7 +5,7 @@ project(TFW_utils)
 # 源文件
 set(UTILS_SOURCES
     log/TFW_log.c
-    thread/TFW_thread_safe.c
+    thread/TFW_thread.c
 )
 
 # 根据平台选择平台特定实现

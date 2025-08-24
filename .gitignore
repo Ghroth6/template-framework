@@ -45,5 +45,5 @@ desktop.ini
 # 构建生成的软链接（根目录中的可执行文件链接）
 tfw_simple_c
 tfw_simple_cpp
-# 通用模式：以tfw_开头的可执行文件链接
-tfw_*
+# 通用模式：以tfw_开头的可执行文件链接（仅限根目录）
+/tfw_*
