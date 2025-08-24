@@ -1,19 +1,12 @@
 ﻿#include "../include/TFW_log.h"
 #include "../include/TFW_common_defines.h"
+#include "../include/TFW_timer.h"
+#include "../include/TFW_thread.h"
+#include "../include/TFW_file.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include <stdarg.h>
-
-#ifdef _WIN32
-#include <windows.h>
-#include <process.h>
-#else
-#include <pthread.h>
-#include <unistd.h>
-#include <sys/time.h>
-#endif
 
 // ============================================================================
 // 全局变量
@@ -29,60 +22,21 @@ static int g_logInitialized = 0;
  * 获取当前时间戳字符串
  */
 static const char* get_timestamp() {
-    static char timestamp[64];
-    
-#ifdef _WIN32
-    // Windows平台
-    SYSTEMTIME st;
-    GetSystemTime(&st);
-    snprintf(timestamp, sizeof(timestamp), "%04d-%02d-%02d %02d:%02d:%02d.%03d",
-             st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
-#elif defined(__APPLE__)
-    // macOS平台
-    struct timeval tv;
-    struct timezone tz;
-    gettimeofday(&tv, &tz);
-    time_t now = tv.tv_sec;
-    struct tm* tm_info = localtime(&now);
-    strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", tm_info);
-    char ms_part[16];
-    snprintf(ms_part, sizeof(ms_part), ".%03ld", tv.tv_usec / 1000);
-    strcat(timestamp, ms_part);
-#else
-    // Linux/Unix平台
-    struct timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts);
-    time_t now = ts.tv_sec;
-    struct tm* tm_info = localtime(&now);
-    strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", tm_info);
-    char ms_part[16];
-    snprintf(ms_part, sizeof(ms_part), ".%03ld", ts.tv_nsec / 1000000);
-    strcat(timestamp, ms_part);
-#endif
-    
-    return timestamp;
+    return TFW_GetTimestamp();
 }
 
 /**
  * 获取当前进程ID
  */
 static int get_process_id() {
-#ifdef _WIN32
-    return _getpid();
-#else
-    return getpid();
-#endif
+    return (int)TFW_GetProcessId();
 }
 
 /**
  * 获取当前线程ID
  */
 static unsigned long get_thread_id() {
-#ifdef _WIN32
-    return (unsigned long)GetCurrentThreadId();
-#else
-    return (unsigned long)pthread_self();
-#endif
+    return (unsigned long)TFW_GetThreadId();
 }
 
 /**
@@ -132,8 +86,7 @@ static TFW_UNUSED const char* get_module_string(int module) {
  * 获取文件名（去掉路径）
  */
 static TFW_UNUSED const char* get_file_name(const char* file_path) {
-    const char* filename = strrchr(file_path, '/');
-    return filename ? filename + 1 : file_path;
+    return TFW_GetFileName(file_path);
 }
 
 /**

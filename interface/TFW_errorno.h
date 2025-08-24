@@ -24,6 +24,11 @@ typedef enum {
     TFW_ERROR_TASK_FAIL = -200,  // 任务失败
     TFW_ERROR_TIMEOUT,           // 超时错误
     TFW_ERROR_NOT_FOUND,         // 未找到
+    
+    // 锁相关错误码
+    TFW_ERROR_LOCK_FAILED = -300, // 锁操作失败
+    TFW_ERROR_NO_MEMORY = -301,   // 内存不足
+    
     // 系统错误码
     TFW_ERROR_SYSTEM = -100,     // 系统错误
     TFW_ERROR_MEMORY,            // 内存错误
