@@ -20,6 +20,12 @@ else()
     set(BUILD_CONFIG_DIR "")
 endif()
 
+if (MSVC)
+    # 强制编译器将源文件解释为 UTF-8
+    add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+    add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+endif()
+
 # 源文件
 set(CPP_SOURCES
     main.cpp
