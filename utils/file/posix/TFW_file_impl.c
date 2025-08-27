@@ -79,3 +79,16 @@ int32_t TFW_IsDirectory(const char* path) {
     
     return S_ISDIR(st.st_mode) ? 1 : 0;
 }
+
+int32_t TFW_CreateDirectory(const char* path) {
+    if (path == NULL) {
+        return 0;
+    }
+    
+    // POSIX平台：使用 mkdir 函数
+    if (mkdir(path, 0755) == 0) {
+        return 1;
+    }
+    
+    return 0;
+}

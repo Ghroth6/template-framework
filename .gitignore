@@ -47,3 +47,24 @@ tfw_simple_c
 tfw_simple_cpp
 # 通用模式：以tfw_开头的可执行文件链接（仅限根目录）
 /tfw_*
+
+# Runtime directories and files
+runtime/
+runtime/*/
+runtime/*/*.log
+runtime/*/*.json
+runtime/*/*.cache
+
+# Generated configuration files
+*.config
+*.ini
+*.json
+
+# Log files
+*.log
+logs/
+logs/*/
+
+# Cache files
+cache/
+*.cache

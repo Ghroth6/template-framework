@@ -93,3 +93,16 @@ int32_t TFW_IsDirectory(const char* path) {
 
     return (attrs & FILE_ATTRIBUTE_DIRECTORY) ? 1 : 0;
 }
+
+int32_t TFW_CreateDirectory(const char* path) {
+    if (path == NULL) {
+        return 0;
+    }
+
+    // Windows平台：使用 CreateDirectoryA
+    if (CreateDirectoryA(path, NULL)) {
+        return 1;
+    }
+
+    return 0;
+}

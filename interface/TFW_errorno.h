@@ -19,6 +19,7 @@ typedef enum {
     TFW_ERROR_NOT_INIT,          // 未初始化
     TFW_ERROR_ALREADY_INIT,      // 已经初始化
     TFW_ERROR_OPERATION_FAIL,    // 操作失败
+    TFW_ERROR_INIT_FAIL,         // 初始化失败
 
     // 任务错误码
     TFW_ERROR_TASK_FAIL = -200,  // 任务失败

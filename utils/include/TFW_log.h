@@ -1,7 +1,7 @@
 ﻿#ifndef TFW_LOG_H
 #define TFW_LOG_H
 
-
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,8 +56,19 @@ enum TFW_LogModule {
 #define TFW_LOGF(module, fmt, ...) \
     TFW_LOG_INNER(module, TFW_LOG_LEVEL_FATAL, fmt, ##__VA_ARGS__)
 
+// ============================================================================
+// 日志文件输出接口
+// ============================================================================
+
+// 日志系统初始化（从配置文件读取配置）
+int32_t TFW_Log_InitializeFromConfig(void);
+
+// 日志系统退出
+int32_t TFW_Log_Exit(void);
+
+
 // 日志实现函数声明（由log目录下的实现文件提供）
-int TFW_LOG_IMPL(int module, int level, const char* file, int line,
+int32_t TFW_LOG_IMPL(int32_t module, int32_t level, const char* file, int32_t line,
                   const char* function, const char* fmt, ...);
 
 #ifdef __cplusplus

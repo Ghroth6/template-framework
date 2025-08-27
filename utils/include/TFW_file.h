@@ -46,6 +46,13 @@ int32_t TFW_FileExists(const char* file_path);
  */
 int32_t TFW_IsDirectory(const char* path);
 
+/**
+ * Create directory
+ * @param path Directory path to create
+ * @return 1 for success, 0 for failure
+ */
+int32_t TFW_CreateDirectory(const char* path);
+
 #ifdef __cplusplus
 }
 #endif
