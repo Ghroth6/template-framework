@@ -8,6 +8,8 @@
     #define TFW_UNUSED __attribute__((unused))
 #endif
 
-#define TFW_CONFIG_FILE_PATH "runtime/TFW_config.json"
+#define TFW_CONFIG_FILE_PATH "runtime"
+#define TFW_CONFIG_FILE_NAME "TFW_config.json"
+#define TFW_PATH_LEN_MAX 512
 
 #endif // TFW_COMMON_DEFINES_H

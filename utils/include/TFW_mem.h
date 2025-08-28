@@ -2,6 +2,7 @@
 #define TFW_MEM_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,6 +47,12 @@ void TFW_Free(void* ptr);
  * @return 0 for success, negative value for failure
  */
 int32_t TFW_GetMemoryStats(uint64_t* total_allocated, uint64_t* total_freed, uint64_t* current_used);
+
+// 安全函数包装器
+int32_t TFW_Memset_S(void* dest, size_t destSize, int32_t c, size_t count);
+int32_t TFW_Memcpy_S(void* dest, size_t destSize, const void* src, size_t count);
+int32_t TFW_Strcpy_S(char* dest, size_t destSize, const char* src);
+int32_t TFW_Strcat_S(char* dest, size_t destSize, const char* src);
 
 #ifdef __cplusplus
 }

@@ -4,6 +4,7 @@
 #include "../interface/TFW_errorno.h"
 #include "../interface/TFW_types.h"
 #include "../../utils/include/TFW_config.h"
+#include "../../utils/include/TFW_common_defines.h"
 #include <string>
 #include <cstring>
 #include <vector> // Added for std::vector
@@ -28,7 +29,7 @@ struct ConfigStatus {
         totalKeys = cStatus.totalKeys;
         
         // 不再有多个配置文件，只有一个JSON文件
-        loadedConfigs.push_back("TFW_config.json");
+        loadedConfigs.push_back(TFW_CONFIG_FILE_PATH);
     }
 };
 
