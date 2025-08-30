@@ -1,3 +1,6 @@
+# TFW项目构建和输出文件忽略配置
+# 基于编码规范9.4节"编译流程控制"要求
+
 # 构建目录
 build/
 out/
@@ -23,7 +26,6 @@ Makefile
 *.lnk
 
 # IDE和编辑器文件
-.vscode/
 .idea/
 .cursor/
 *.swp
@@ -37,34 +39,46 @@ desktop.ini
 
 # 日志文件
 *.log
+logs/
+runtime/logs/
 
 # 临时文件
 *.tmp
 *.temp
+*.cache
 
-# 构建生成的软链接（根目录中的可执行文件链接）
+# 构建生成的软链接
 tfw_simple_c
 tfw_simple_cpp
-# 通用模式：以tfw_开头的可执行文件链接（仅限根目录）
 /tfw_*
 
-# Runtime directories and files
+# Runtime directories
 runtime/
-runtime/*/
-runtime/*/*.log
-runtime/*/*.json
-runtime/*/*.cache
 
 # Generated configuration files
 *.config
 *.ini
 *.json
 
-# Log files
-*.log
-logs/
-logs/*/
+# 平台特定文件
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.suo
+*.user
 
-# Cache files
-cache/
-*.cache
+# 测试和覆盖率文件
+*.gcov
+*.gcda
+*.gcno
+coverage/
+
+# 文档生成文件
+docs/_build/
+docs/html/
+docs/latex/
+
+# 包管理文件
+vcpkg_installed/
+conan/
