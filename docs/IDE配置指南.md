@@ -29,7 +29,7 @@
 
 ## 概述
 
-本文档提供了在VSCode或Cursor中配置TFW项目的完整指南，包括代码格式化、质量检查、构建和调试等功能的配置方法。特别针对跨平台开发环境进行了优化，确保在Windows、Linux、macOS和WSL中都能正常工作。
+本文档提供了在VSCode或Cursor中配置TFW项目的完整指南，包括代码格式化、质量检查、构建等核心功能的配置方法。调试功能作为可选功能提供简要说明。特别针对跨平台开发环境进行了优化，确保在Windows、Linux、macOS和WSL中都能正常工作。
 
 ## 兼容性说明
 
@@ -368,12 +368,35 @@ CheckOptions:
             }
         },
         {
-            "label": "格式化代码",
+            "label": "检查代码格式",
+            "type": "shell",
+            "group": "test",
+            "detail": "检查代码格式，不修改文件（安全检查）",
+
+            // 跨平台格式检查命令（不修改文件）
+            "windows": {
+                "command": "powershell.exe",
+                "args": [
+                    "-Command",
+                    "Get-ChildItem -Recurse -Include *.c,*.cpp,*.h,*.hpp | ForEach-Object { clang-format $_.FullName }"
+                ]
+            },
+            "linux": {
+                "command": "find",
+                "args": [".", "-name", "*.c", "-o", "-name", "*.cpp", "-o", "-name", "*.h", "-o", "-name", "*.hpp", "-exec", "clang-format", "{}", "+"]
+            },
+            "osx": {
+                "command": "find",
+                "args": [".", "-name", "*.c", "-o", "-name", "*.cpp", "-o", "-name", "*.h", "-o", "-name", "*.hpp", "-exec", "clang-format", "{}", "+"]
+            }
+        },
+        {
+            "label": "格式化代码（会修改文件）",
             "type": "shell",
             "group": "build",
-            "detail": "使用clang-format格式化所有C/C++文件",
+            "detail": "使用clang-format格式化所有C/C++文件（⚠️ 会直接修改源文件）",
 
-            // 跨平台格式化命令
+            // 跨平台格式化命令（会修改文件）
             "windows": {
                 "command": "powershell.exe",
                 "args": [
@@ -393,12 +416,37 @@ CheckOptions:
         {
             "label": "代码质量检查",
             "type": "shell",
-            "command": "clang-tidy",
-            "args": ["-p", "build/compile_commands.json"],
             "group": "test",
             "detail": "使用clang-tidy检查代码质量",
-            "options": {
-                "cwd": "${workspaceFolder}"
+
+            "windows": {
+                "command": "powershell.exe",
+                "args": [
+                    "-Command",
+                    "Get-ChildItem -Recurse -Include *.c,*.cpp,*.h,*.hpp | ForEach-Object { clang-tidy -p build/compile_commands.json $_.FullName }"
+                ]
+            },
+            "linux": {
+                "command": "find",
+                "args": [
+                    ".",
+                    "-name", "*.c", "-o",
+                    "-name", "*.cpp", "-o",
+                    "-name", "*.h", "-o",
+                    "-name", "*.hpp",
+                    "-exec", "clang-tidy", "-p", "build/compile_commands.json", "{}", "+"
+                ]
+            },
+            "osx": {
+                "command": "find",
+                "args": [
+                    ".",
+                    "-name", "*.c", "-o",
+                    "-name", "*.cpp", "-o",
+                    "-name", "*.h", "-o",
+                    "-name", "*.hpp",
+                    "-exec", "clang-tidy", "-p", "build/compile_commands.json", "{}", "+"
+                ]
             }
         },
         {
@@ -445,52 +493,30 @@ CheckOptions:
 }
 ```
 
-### .vscode/launch.json
+### .vscode/launch.json (可选)
 
-调试配置，支持程序调试和断点设置。
+调试配置文件，支持程序调试和断点设置。**注意：此文件为可选配置，仅在需要调试功能时创建。**
 
-```json
-{
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "调试程序",
-            "type": "cppdbg",              // C++调试器类型
-            "request": "launch",            // 启动新程序
-            "program": "${workspaceFolder}/out/bin/your_program", // 程序路径
-            "args": [],                    // 命令行参数
-            "stopAtEntry": false,          // 不在入口点停止
-            "cwd": "${workspaceFolder}",   // 工作目录
-            "environment": [],              // 环境变量
-            "externalConsole": false,      // 不使用外部控制台
-            "MIMode": "gdb",               // 使用GDB调试器
-            "setupCommands": [             // GDB设置命令
-                {
-                    "description": "为 gdb 启用整齐打印",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ],
-            "preLaunchTask": "构建项目",   // 启动前执行的任务
-            "detail": "调试主程序"
-        },
-        {
-            "name": "调试测试",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/out/bin/test_runner",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "preLaunchTask": "构建项目",
-            "detail": "调试测试程序"
-        }
-    ]
-}
-```
+**功能说明**：
+- 支持C/C++程序调试
+- 支持断点设置和单步执行
+- 支持变量查看和内存检查
+- 跨平台调试器支持（Windows/Linux用GDB，macOS用LLDB）
+
+**创建方法**：
+1. 在`.vscode`目录下创建`launch.json`
+2. 配置可执行文件路径和调试参数
+3. 选择对应的调试器类型
+
+**使用场景**：
+- 开发阶段需要调试可执行文件
+- 需要详细的程序执行跟踪
+- 问题排查和性能分析
+
+**注意事项**：
+- 需要先配置构建任务
+- 需要正确的调试器环境
+- 建议在项目相对稳定后再配置
 
 ## 使用方法
 
@@ -501,8 +527,8 @@ CheckOptions:
 | 格式化代码 | `Shift + Alt + F` | 格式化当前文件 |
 | 构建项目 | `Ctrl + Shift + P` → "Tasks: Run Task" → "构建项目" | 运行构建任务 |
 | 清理项目 | `Ctrl + Shift + P` → "Tasks: Run Task" → "清理项目" | 运行清理任务 |
-| 调试程序 | `F5` | 启动调试器 |
-| 设置断点 | `F9` | 在当前行设置/取消断点 |
+| 调试程序 | `F5` | 启动调试器 (需要launch.json) |
+| 设置断点 | `F9` | 在当前行设置/取消断点 (需要launch.json) |
 
 ### 常用命令
 
@@ -552,14 +578,16 @@ clang-tidy -p build/compile_commands.json
 2. 确认安装了必要的构建工具
 3. 检查CMakeLists.txt语法
 
-#### 4. 调试器不工作
+#### 4. 调试器不工作 (可选功能)
 **症状**：无法启动调试器
 **解决方案**：
 1. 确认程序已构建成功
 2. 检查`launch.json`中的程序路径
 3. 确认安装了GDB或LLDB
 
-### 调试技巧
+**注意**：调试功能为可选功能，如果不需要可以跳过此步骤。
+
+### 调试技巧 (可选功能)
 
 #### 查看编译输出
 1. 打开终端（Ctrl + `）
@@ -596,7 +624,7 @@ clang-tidy -p build/compile_commands.json
 - ✅ 自动代码格式化
 - ✅ 智能代码提示
 - ✅ 实时错误检查
-- ✅ 便捷的构建和调试
+- ✅ 便捷的构建和调试 (调试为可选功能)
 - ✅ 统一的代码风格
 - ✅ 高效的开发体验
 
@@ -617,7 +645,7 @@ project_root/
 └── .vscode/
     ├── settings.json        # 跨平台编辑器设置
     ├── tasks.json           # 跨平台任务配置
-    └── launch.json          # 调试配置
+    └── launch.json          # 调试配置 (可选)
 ```
 
 ### 脚本选择建议

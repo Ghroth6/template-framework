@@ -1,100 +1,143 @@
-﻿#!/bin/bash
+#!/bin/bash
 
-# TFW Simple Example Project Build Script (Execute from root directory)
+# TFW项目构建脚本 (Linux/macOS/WSL)
+# 基于编码规范9.4节要求
 
-echo "=== Building TFW Simple Examples ==="
+set -e  # 遇到错误立即退出
 
-# Ensure we are in the build directory under root
-if [ ! -d "build" ]; then
-    echo "Creating build directory..."
+# 颜色定义
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# 打印带颜色的消息
+print_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# 检查必要的工具
+check_requirements() {
+    print_info "检查构建工具..."
+
+    if ! command -v cmake &> /dev/null; then
+        print_error "CMake未安装，请先安装CMake"
+        exit 1
+    fi
+
+    if ! command -v make &> /dev/null; then
+        print_error "Make未安装，请先安装Make"
+        exit 1
+    fi
+
+    print_success "构建工具检查完成"
+}
+
+# 创建必要的目录
+create_directories() {
+    print_info "创建构建目录..."
+
     mkdir -p build
-fi
+    mkdir -p out/bin
+    mkdir -p out/lib
 
-cd build
+    print_success "目录创建完成"
+}
 
-# Create output directories
-mkdir -p out/c out/cpp out/lib
+# 配置CMake项目
+configure_project() {
+    print_info "配置CMake项目..."
 
-# Build core libraries first
-echo "Building core libraries..."
-cmake -B core_build -S ../core
-if [ $? -eq 0 ]; then
-    cmake --build core_build --config Release
-    if [ $? -eq 0 ]; then
-        echo "Core libraries built successfully"
+    cd build
+
+    # 根据平台选择生成器
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        print_info "检测到macOS，使用Unix Makefiles生成器"
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
     else
-        echo "Failed to build core libraries"
-        exit 1
+        # Linux/WSL
+        print_info "检测到Linux/WSL，使用Unix Makefiles生成器"
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
     fi
-else
-    echo "Failed to configure core libraries"
-    exit 1
-fi
 
-# Build utils library
-echo "Building utils library..."
-cmake -B utils_build -S ../utils
-if [ $? -eq 0 ]; then
-    cmake --build utils_build --config Release
-    if [ $? -eq 0 ]; then
-        echo "Utils library built successfully"
+    cd ..
+    print_success "CMake配置完成"
+}
+
+# 编译项目
+build_project() {
+    print_info "开始编译项目..."
+
+    cd build
+
+    # 使用多核编译
+    local cpu_count=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+    print_info "使用 $cpu_count 个核心进行编译"
+
+    make -j$cpu_count
+
+    cd ..
+    print_success "编译完成"
+}
+
+# 显示构建结果
+show_results() {
+    print_info "构建结果："
+
+    if [ -f "build/compile_commands.json" ]; then
+        print_success "✓ 编译数据库已生成 (build/compile_commands.json)"
+        print_info "  IDE可以自动加载此文件进行智能提示"
     else
-        echo "Failed to build utils library"
-        exit 1
+        print_warning "⚠ 编译数据库未生成"
     fi
-else
-    echo "Failed to configure utils library"
-    exit 1
-fi
 
-# Build C version
-echo "Building C version..."
-cmake -B simple_c -S ../simple/c
-if [ $? -eq 0 ]; then
-    cmake --build simple_c --config Release
-    if [ $? -eq 0 ]; then
-        echo "C version built successfully"
+    if [ -d "out/bin" ] && [ "$(ls -A out/bin 2>/dev/null)" ]; then
+        print_success "✓ 可执行文件已生成 (out/bin/)"
+        ls -la out/bin/
     else
-        echo "Failed to build C version"
-        exit 1
+        print_warning "⚠ 可执行文件未生成"
     fi
-else
-    echo "Failed to configure C version"
-    exit 1
-fi
 
-# Build C++ version
-echo "Building C++ version..."
-cmake -B simple_cpp -S ../simple/cpp
-if [ $? -eq 0 ]; then
-    cmake --build simple_cpp --config Release
-    if [ $? -eq 0 ]; then
-        echo "C++ version built successfully"
+    if [ -d "out/lib" ] && [ "$(ls -A out/lib 2>/dev/null)" ]; then
+        print_success "✓ 库文件已生成 (out/lib/)"
+        ls -la out/lib/
     else
-        echo "Failed to build C++ version"
-        exit 1
+        print_warning "⚠ 库文件未生成"
     fi
-else
-    echo "Failed to configure C++ version"
-    exit 1
+}
+
+# 主函数
+main() {
+    print_info "开始构建TFW项目..."
+    print_info "构建类型: Release"
+    print_info "输出目录: out/"
+
+    check_requirements
+    create_directories
+    configure_project
+    build_project
+    show_results
+
+    print_success "TFW项目构建完成！"
+    print_info "可执行文件位置: out/bin/"
+    print_info "库文件位置: out/lib/"
+}
+
+# 脚本入口
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
 fi
-
-cd ..
-
-# Create symbolic links in root directory
-echo "Creating symbolic links in root directory..."
-
-# Remove old symbolic links if they exist
-rm -f tfw_simple_c tfw_simple_cpp
-
-# Create symbolic links
-ln -sf out/c/tfw_simple_c tfw_simple_c
-ln -sf out/cpp/tfw_simple_cpp tfw_simple_cpp
-
-echo "=== All examples built successfully ==="
-echo "Output files:"
-echo "  C version: out/c/tfw_simple_c"
-echo "  C++ version: out/cpp/tfw_simple_cpp"
-echo "Symbolic links created in root directory:"
-echo "  tfw_simple_c -> out/c/tfw_simple_c"
-echo "  tfw_simple_cpp -> out/cpp/tfw_simple_cpp"

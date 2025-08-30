@@ -2,6 +2,9 @@
 cmake_minimum_required(VERSION 3.20)
 project(TFW_utils)
 
+# 构建选项
+option(BUILD_UTILS_MODULAR "Build utils as separate modules" ON)
+
 # 源文件
 set(UTILS_SOURCES
     log/TFW_log.c
@@ -37,8 +40,40 @@ else()
     )
 endif()
 
-# 创建静态库
-add_library(TFW_utils STATIC ${UTILS_SOURCES})
+# 根据全局设置决定库类型
+if(BUILD_SHARED_LIBS)
+    add_library(TFW_utils SHARED ${UTILS_SOURCES})
+    message(STATUS "Creating shared library for TFW_utils")
+
+    # 动态库特定属性
+    set_target_properties(TFW_utils PROPERTIES
+        VERSION 1.0.0
+        SOVERSION 1
+        CXX_VISIBILITY_PRESET hidden
+        VISIBILITY_INLINES_HIDDEN ON
+    )
+
+    if(WIN32)
+        set_target_properties(TFW_utils PROPERTIES
+            WINDOWS_EXPORT_ALL_SYMBOLS ON
+        )
+    elseif(APPLE)
+        # macOS平台动态库设置
+        set_target_properties(TFW_utils PROPERTIES
+            MACOSX_BUNDLE FALSE
+            INSTALL_NAME_DIR "@rpath"
+        )
+    else()
+        # Linux/Unix平台动态库设置
+        set_target_properties(TFW_utils PROPERTIES
+            INSTALL_RPATH_USE_LINK_PATH TRUE
+            BUILD_WITH_INSTALL_RPATH TRUE
+        )
+    endif()
+else()
+    add_library(TFW_utils STATIC ${UTILS_SOURCES})
+    message(STATUS "Creating static library for TFW_utils")
+endif()
 
 # 包含目录
 target_include_directories(TFW_utils PUBLIC
@@ -46,3 +81,23 @@ target_include_directories(TFW_utils PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../interface
     ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
+
+# 如果启用模块化构建，创建子模块库
+if(BUILD_UTILS_MODULAR)
+    # 日志模块
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/log/CMakeLists.txt")
+        add_subdirectory(log)
+    endif()
+
+    # 线程模块
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/thread/CMakeLists.txt")
+        add_subdirectory(thread)
+    endif()
+
+    # 配置模块
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/config/CMakeLists.txt")
+        add_subdirectory(config)
+    endif()
+
+    message(STATUS "Utils modular build enabled")
+endif()
