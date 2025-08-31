@@ -15,6 +15,7 @@
 #ifndef TFW_TYPES_H
 #define TFW_TYPES_H
 
+#include <inttypes.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -37,4 +38,4 @@ typedef struct {
 }
 #endif
 
-#endif // TFW_TYPES_H
+#endif  // TFW_TYPES_H

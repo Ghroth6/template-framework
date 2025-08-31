@@ -9,35 +9,40 @@ extern "C" {
 
 // ============================================================================
 // 日志等级定义
+// Log level definition
 // ============================================================================
-enum TFW_LogLevel {
-    TFW_LOG_LEVEL_TRACE = 0,    // 追踪信息
-    TFW_LOG_LEVEL_DEBUG = 1,    // 调试信息
-    TFW_LOG_LEVEL_INFO = 2,     // 一般信息
-    TFW_LOG_LEVEL_WARNING = 3,  // 警告信息
-    TFW_LOG_LEVEL_ERROR = 4,    // 错误信息
-    TFW_LOG_LEVEL_FATAL = 5     // 致命错误
-};
+typedef enum {
+    TFW_LOG_LEVEL_TRACE = 0,    // 追踪信息/Trace information
+    TFW_LOG_LEVEL_DEBUG,    // 调试信息/Debug information
+    TFW_LOG_LEVEL_INFO,     // 一般信息/Information
+    TFW_LOG_LEVEL_WARNING,  // 警告信息/Warning information
+    TFW_LOG_LEVEL_ERROR,    // 错误信息/Error information
+    TFW_LOG_LEVEL_FATAL     // 致命错误/Fatal error
+} TFW_LogLevel;
 
 // ============================================================================
 // 日志模块分类
+// Log module classification
 // ============================================================================
-enum TFW_LogModule {
-    TFW_LOG_MODULE_CORE = 0,    // 核心模块
-    TFW_LOG_MODULE_UTILS = 1,   // 工具模块
-    TFW_LOG_MODULE_SDK = 2,     // SDK模块
-    TFW_LOG_MODULE_SYSTEM = 3   // 系统模块
-};
+typedef enum {
+    TFW_LOG_MODULE_CORE = 0,    // 核心模块/Core module
+    TFW_LOG_MODULE_UTILS,      // 工具模块/Utils module
+    TFW_LOG_MODULE_SDK,     // SDK模块/SDK module
+    TFW_LOG_MODULE_SYSTEM   // 系统模块/System module
+} TFW_LogModule;
 
 // ============================================================================
 // 日志宏定义
+// Log macro definition
 // ============================================================================
 
 // 基础日志宏
+// Basic log macro
 #define TFW_LOG_INNER(module, level, fmt, ...) \
     (void)TFW_LOG_IMPL(module, level, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
 
 // 等级日志宏
+// Level log macro
 #define TFW_LOGT(module, fmt, ...) \
     TFW_LOG_INNER(module, TFW_LOG_LEVEL_TRACE, fmt, ##__VA_ARGS__)
 
@@ -56,18 +61,17 @@ enum TFW_LogModule {
 #define TFW_LOGF(module, fmt, ...) \
     TFW_LOG_INNER(module, TFW_LOG_LEVEL_FATAL, fmt, ##__VA_ARGS__)
 
-// ============================================================================
-// 日志文件输出接口
-// ============================================================================
-
 // 日志系统初始化（从配置文件读取配置）
-int32_t TFW_Log_InitializeFromConfig(void);
+// Log system initialization (read configuration from configuration file)
+int32_t TFW_Log_Init(void);
 
-// 日志系统退出
-int32_t TFW_Log_Exit(void);
+// 日志系统反初始化
+// Log system deinit
+int32_t TFW_Log_Deinit(void);
 
 
 // 日志实现函数声明（由log目录下的实现文件提供）
+// Log implementation function declaration (provided by the implementation file in the log directory)
 int32_t TFW_LOG_IMPL(int32_t module, int32_t level, const char* file, int32_t line,
                   const char* function, const char* fmt, ...);
 

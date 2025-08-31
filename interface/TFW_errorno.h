@@ -39,6 +39,7 @@ typedef enum {
     TFW_ERROR_NOT_INIT,                // Not initialized / 未初始化
     TFW_ERROR_ALREADY_INIT,            // Already initialized / 已经初始化
     TFW_ERROR_DEINIT_FAIL,             // Deinitialization failed / 反初始化失败
+    TFW_ERROR_MALLOC_ERR,              // Memory allocation error / 内存分配错误
     TFW_ERROR_LOCK_FAILED,             // Lock operation failed / 锁定操作失败
     TFW_ERROR_FILE_ERROR,              // File operation error / 文件操作错误
 

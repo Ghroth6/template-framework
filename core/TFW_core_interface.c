@@ -14,35 +14,36 @@
 #include "TFW_types.h"
 #include "TFW_errorno.h"
 #include "TFW_core_interface.h"
+#include "TFW_core_log.h"
 
 // ============================================================================
 // public interface implementation
 // ============================================================================
 
 int32_t TFW_CoreInit(void) {
-    printf("[TFW_CORE_C] 初始化核心模块...\n");
+    TFW_LOGI_CORE("init core module...");
 
     // call C++ implementation for initialization
     int32_t result = TFW_CoreInterfaceInit();
     if (result != TFW_SUCCESS) {
-        printf("[TFW_CORE_C] 错误：C++初始化失败\n");
+        TFW_LOGE_CORE("error: C++ init failed");
         return result;
     }
 
-    printf("[TFW_CORE_C] 核心模块初始化成功\n");
+    TFW_LOGI_CORE("core module init success");
     return TFW_SUCCESS;
 }
 
 int32_t TFW_CoreDeinit(void) {
-    printf("[TFW_CORE_C] 反初始化核心模块...\n");
+    TFW_LOGI_CORE("deinit core module...");
 
     // call C++ implementation for deinitialization
     int32_t result = TFW_CoreInterfaceDeinit();
     if (result != TFW_SUCCESS) {
-        printf("[TFW_CORE_C] 错误：C++反初始化失败\n");
+        TFW_LOGE_CORE("error: C++ deinit failed");
         return result;
     }
 
-    printf("[TFW_CORE_C] 核心模块反初始化成功\n");
+    TFW_LOGI_CORE("core module deinit success");
     return TFW_SUCCESS;
 }

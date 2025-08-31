@@ -7,16 +7,17 @@
 
 // 1. system headers
 #include <iostream>
-#include <string>
 #include <memory>
 #include <mutex>
+#include <string>
 
 // 2. project headers
-#include "TFW_interface.h"
 #include "TFW_c_interface.h"
-#include "TFW_types.h"
-#include "TFW_errorno.h"
 #include "TFW_core_interface.h"
+#include "TFW_core_log.h"
+#include "TFW_errorno.h"
+#include "TFW_interface.h"
+#include "TFW_types.h"
 
 // ============================================================================
 // TFW::CoreInterface implementation
@@ -29,14 +30,14 @@ static std::unique_ptr<CoreInterface> g_coreInstance = nullptr;
 static std::mutex g_coreInterfaceMutex;
 
 CoreInterface::CoreInterface() {
-    std::cout << "[TFW_CORE_CPP] CoreInterface constructor called" << std::endl;
+    TFW_LOGI_CORE("CoreInterface constructor called");
     isInitialized_ = false;
 }
 
 CoreInterface::~CoreInterface() {
-    std::cout << "[TFW_CORE_CPP] CoreInterface destructor called" << std::endl;
+    TFW_LOGI_CORE("CoreInterface destructor called");
     if (isInitialized_) {
-        std::cout << "[TFW_CORE_CPP] Warning: Destroying initialized instance" << std::endl;
+        TFW_LOGW_CORE("Warning: Destroying initialized instance");
     }
 }
 
@@ -49,7 +50,7 @@ CoreInterface* CoreInterface::GetInstance() {
 
     // 安全检查：确保返回的指针有效
     if (g_coreInstance == nullptr) {
-        std::cerr << "[TFW_CORE_CPP] Warning: Failed to create core instance" << std::endl;
+        TFW_LOGE_CORE("Warning: Failed to create core instance");
         return nullptr;
     }
 
@@ -60,43 +61,43 @@ void CoreInterface::DestroyInstance() {
     std::lock_guard<std::mutex> lock(g_coreInterfaceMutex);
 
     if (g_coreInstance == nullptr) {
-        std::cout << "[TFW_CORE_CPP] Core instance already destroyed or not created" << std::endl;
+        TFW_LOGW_CORE("Core instance already destroyed or not created");
         return;
     }
 
     // 检查实例状态，如果已初始化，建议先反初始化
     if (g_coreInstance->IsInitialized()) {
-        std::cout << "[TFW_CORE_CPP] Warning: Destroying initialized instance, consider calling Deinit first" << std::endl;
+        TFW_LOGW_CORE("Warning: Destroying initialized instance, consider calling Deinit first");
         g_coreInstance->Deinit();
     }
 
     g_coreInstance.reset();  // unique_ptr的reset方法
-    std::cout << "[TFW_CORE_CPP] Core instance destroyed via C++ interface" << std::endl;
+    TFW_LOGI_CORE("Core instance destroyed via C++ interface");
 }
 
 int32_t CoreInterface::Init() {
+    TFW_LOGI_CORE("Initializing core...");
     if (isInitialized_) {
-        std::cout << "[TFW_CORE_CPP] Core already initialized" << std::endl;
+        TFW_LOGW_CORE("Core already initialized");
         return TFW_SUCCESS;
     }
 
-    std::cout << "[TFW_CORE_CPP] Initializing core..." << std::endl;
     // TODO: 实际的初始化逻辑
     isInitialized_ = true;
-    std::cout << "[TFW_CORE_CPP] Core initialized successfully" << std::endl;
+    TFW_LOGI_CORE("Core initialized successfully");
     return TFW_SUCCESS;
 }
 
 int32_t CoreInterface::Deinit() {
+    TFW_LOGI_CORE("Deinitializing core...");
     if (!isInitialized_) {
-        std::cout << "[TFW_CORE_CPP] Core not initialized" << std::endl;
+        TFW_LOGI_CORE("Core not initialized");
         return TFW_SUCCESS;
     }
 
-    std::cout << "[TFW_CORE_CPP] Deinitializing core..." << std::endl;
     // TODO: 实际的清理逻辑
     isInitialized_ = false;
-    std::cout << "[TFW_CORE_CPP] Core deinitialized successfully" << std::endl;
+    TFW_LOGI_CORE("Core deinitialized successfully");
     return TFW_SUCCESS;
 }
 
@@ -104,52 +105,52 @@ bool CoreInterface::IsInitialized() const {
     return isInitialized_;
 }
 
-} // namespace TFW
+}  // namespace TFW
 
 // C接口实现
 extern "C" {
 
 int32_t TFW_CoreInterfaceInit(void) {
-    std::cout << "[TFW_CORE_C] TFW_CoreInterfaceInit called" << std::endl;
+    TFW_LOGI_CORE("TFW_CoreInterfaceInit called");
 
     TFW::CoreInterface* coreInstance = TFW::CoreInterface::GetInstance();
     if (coreInstance == nullptr) {
-        std::cerr << "[TFW_CORE_C] Failed to get core instance" << std::endl;
+        TFW_LOGE_CORE("Failed to get core instance");
         return TFW_ERROR_NOT_INIT;
     }
 
     // 检查是否已经初始化
     if (coreInstance->IsInitialized()) {
-        std::cout << "[TFW_CORE_C] Core already initialized, returning success" << std::endl;
+        TFW_LOGI_CORE("Core already initialized, returning success");
         return TFW_SUCCESS;
     }
 
     // 调用C++实现进行初始化
     int32_t result = coreInstance->Init();
     if (result == TFW_SUCCESS) {
-        std::cout << "[TFW_CORE_C] Core initialization successful" << std::endl;
+        TFW_LOGI_CORE("Core initialization successful");
     } else {
-        std::cerr << "[TFW_CORE_C] Core initialization failed with error: " << result << std::endl;
+        TFW_LOGE_CORE("Core initialization failed with error: %d", result);
     }
 
     return result;
 }
 
 int32_t TFW_CoreInterfaceDeinit(void) {
-    std::cout << "[TFW_CORE_C] TFW_CoreInterfaceDeinit called" << std::endl;
+    TFW_LOGI_CORE("TFW_CoreInterfaceDeinit called");
 
     TFW::CoreInterface* coreInstance = TFW::CoreInterface::GetInstance();
     if (coreInstance == nullptr) {
-        std::cerr << "[TFW_CORE_C] Failed to get core instance" << std::endl;
+        TFW_LOGE_CORE("Failed to get core instance");
         return TFW_ERROR;
     }
 
     // 调用C++实现进行反初始化
     int32_t result = coreInstance->Deinit();
     if (result == TFW_SUCCESS) {
-        std::cout << "[TFW_CORE_C] Core deinitialization successful" << std::endl;
+        TFW_LOGI_CORE("Core deinitialization successful");
     } else {
-        std::cerr << "[TFW_CORE_C] Core deinitialization failed with error: " << result << std::endl;
+        TFW_LOGE_CORE("Core deinitialization failed with error: %d", result);
     }
 
     // 销毁实例
@@ -158,4 +159,4 @@ int32_t TFW_CoreInterfaceDeinit(void) {
     return result;
 }
 
-} // extern "C"
+}  // extern "C"

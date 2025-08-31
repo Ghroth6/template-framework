@@ -126,6 +126,15 @@ endif()
 #     message(STATUS "Utils module has been configured")
 # endif()
 
+# 添加utils模块
+# Add utils module
+if(EXISTS "${CMAKE_SOURCE_DIR}/utils/CMakeLists.txt")
+    add_subdirectory(utils)
+    message(STATUS "Utils module has been configured")
+else()
+    message(STATUS "Utils module configuration does not exist, skip configuration")
+endif()
+
 # 添加core模块
 # Add core module
 if(EXISTS "${CMAKE_SOURCE_DIR}/core/CMakeLists.txt")
@@ -160,6 +169,13 @@ add_executable(TFW_cli
 target_include_directories(TFW_cli PRIVATE
     ${CMAKE_SOURCE_DIR}/interface
 )
+
+# 链接utils模块库（如果utils模块已配置）
+# Link utils module library (if utils module is configured)
+if(TARGET TFW_utils)
+    target_link_libraries(TFW_cli PRIVATE TFW_utils)
+    message(STATUS "CLI tool linked with utils module")
+endif()
 
 # 链接core模块库（如果core模块已配置）
 # Link core module library (if core module is configured)

@@ -1,5 +1,8 @@
 # TFW项目IDE配置指南
 
+## 注意
+该配置需要再次整理，暂仅作参考
+
 ## 适用范围
 
 本配置指南适用于以下开发环境：
@@ -223,53 +226,79 @@ cmake --build . --config Release
 
 ```yaml
 ---
-# 基于Google风格，适配TFW编码规范
+---
+# TFW项目代码格式化配置
+# 基于编码规范3.1-3.3节要求
+# TFW project code formatting configuration
+# Based on the requirements of the coding standard 3.1-3.3 sections
+
 Language: Cpp
 BasedOnStyle: Google
 
-# 缩进设置
-AccessModifierOffset: -4                   # 访问修饰符偏移量
-IndentWidth: 4                             # 缩进宽度为4个空格
-TabWidth: 4                                # Tab宽度为4个空格
-UseTab: Never                              # 不使用Tab，只使用空格
+# 缩进设置（编码规范3.1节）
+# indentation settings (coding standard 3.1 section)
+AccessModifierOffset: -4
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
 
-# 大括号风格（K&R风格）
+# 大括号风格（编码规范3.2节 - K&R风格）
+# brace wrapping (coding standard 3.2 section - K&R style)
 BraceWrapping:
-  AfterClass: false                        # 类后不换行
-  AfterControlStatement: false             # 控制语句后不换行
-  AfterFunction: false                     # 函数后不换行
-  AfterNamespace: false                    # 命名空间后不换行
-  AfterStruct: false                       # 结构体后不换行
-  AfterUnion: false                        # 联合体后不换行
-  BeforeCatch: false                       # catch前不换行
-  BeforeElse: false                        # else前不换行
-  IndentBraces: false                      # 大括号不缩进
-  SplitEmptyFunction: false                # 空函数不分割
+  AfterClass: false
+  AfterControlStatement: false
+  AfterFunction: false
+  AfterNamespace: false
+  AfterStruct: false
+  AfterUnion: false
+  BeforeCatch: false
+  BeforeElse: false
+  IndentBraces: false
+  SplitEmptyFunction: false
 
-# 行长度限制
-ColumnLimit: 120                           # 最大行长度为120字符
+# 行长度限制（编码规范3.3节）
+# line length limit (coding standard 3.3 section)
+ColumnLimit: 120
 
 # 函数和类设置
-AllowShortFunctionsOnASingleLine: Empty    # 空函数允许单行
-AllowShortIfStatementsOnASingleLine: false # if语句不允许单行
-AllowShortLoopsOnASingleLine: false        # 循环不允许单行
-AlwaysBreakAfterReturnType: None           # 返回类型后不强制换行
+# function and class settings
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakAfterReturnType: None
 
 # 指针和对齐
-PointerAlignment: Left                     # 指针符号靠左对齐
-DerivePointerAlignment: false              # 不自动推导指针对齐
+# pointer and alignment
+PointerAlignment: Left
+DerivePointerAlignment: false
 
 # 命名空间和模板
-NamespaceIndentation: None                 # 命名空间不缩进
-AlwaysBreakTemplateDeclarations: Yes       # 模板声明总是换行
+# namespace and template
+NamespaceIndentation: None
+AlwaysBreakTemplateDeclarations: Yes
 
 # 注释设置
-ReflowComments: true                       # 重新格式化注释
-FixNamespaceComments: true                 # 修复命名空间注释
+# comment settings
+ReflowComments: true
+FixNamespaceComments: true
 
 # 包含文件排序
-SortIncludes: true                         # 排序包含文件
-SortUsingDeclarations: true                # 排序using声明
+# include file sorting
+SortIncludes: true
+SortUsingDeclarations: true
+
+# 强制换行设置
+# force line break settings
+BinPackArguments: false
+BinPackParameters: false
+PackConstructorInitializers: NextLine
+AllowAllParametersOfDeclarationOnNextLine: false
+
+# 结构体成员对齐
+# struct member alignment
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+AlignConsecutiveMacros: true
 ```
 
 ### .clang-tidy

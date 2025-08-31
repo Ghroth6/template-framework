@@ -1,17 +1,18 @@
 #include "TFW_config.h"
-#include "TFW_common_defines.h"
-#include "TFW_file.h"
-#include "TFW_timer.h"
-#include "TFW_thread.h"
-#include "TFW_log.h"
-#include "TFW_errorno.h"
-#include "../../core/include/TFW_core_log.h"
-#include "TFW_mem.h"
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
+
+#include "TFW_core_log.h"
+#include "TFW_common_defines.h"
+#include "TFW_errorno.h"
+#include "TFW_file.h"
+#include "TFW_log.h"
+#include "TFW_mem.h"
+#include "TFW_thread.h"
+#include "TFW_timer.h"
 
 // 配置管理器结构
 typedef struct {
@@ -35,12 +36,20 @@ static const char* GetDefaultValue(TFW_ConfigKey key);
 static TFW_ConfigValueType GetKeyType(TFW_ConfigKey key);
 
 // 配置键名称映射表
-static const char* g_configKeyNames[] = {
-    "main.version", "main.debug", "main.log_level",
-    "logging.level", "logging.output", "logging.file_path", "logging.file_prefix", "logging.max_file_size", "logging.max_retention_days",
-    "resources.auto_update", "resources.update_interval", "resources.cache_path",
-    "system.max_threads", "system.timeout"
-};
+static const char* g_configKeyNames[] = {"main.version",
+                                         "main.debug",
+                                         "main.log_level",
+                                         "logging.level",
+                                         "logging.output",
+                                         "logging.file_path",
+                                         "logging.file_prefix",
+                                         "logging.max_file_size",
+                                         "logging.max_retention_days",
+                                         "resources.auto_update",
+                                         "resources.update_interval",
+                                         "resources.cache_path",
+                                         "system.max_threads",
+                                         "system.timeout"};
 
 // 配置管理接口实现
 int32_t TFW_Config_Initialize(const char* configPath) {
@@ -56,12 +65,12 @@ int32_t TFW_Config_Initialize(const char* configPath) {
     TFW_MutexAttr_t mutexAttr;
     if (TFW_MutexAttr_Init(&mutexAttr) != TFW_SUCCESS) {
         TFW_LOGE_CORE("Failed to initialize mutex attributes");
-        return TFW_ERROR_OPERATION_FAIL;
+        return TFW_ERROR;
     }
 
     if (TFW_Mutex_Init(&g_configManager.configMutex, &mutexAttr) != TFW_SUCCESS) {
         TFW_LOGE_CORE("Failed to initialize config mutex");
-        return TFW_ERROR_OPERATION_FAIL;
+        return TFW_ERROR;
     }
 
     // 设置配置路径
@@ -79,11 +88,12 @@ int32_t TFW_Config_Initialize(const char* configPath) {
     if (g_configManager.configs == NULL) {
         TFW_LOGE_CORE("Failed to allocate config array");
         TFW_Mutex_Destroy(&g_configManager.configMutex);
-        return TFW_ERROR_OPERATION_FAIL;
+        return TFW_ERROR;
     }
 
     // 初始化所有配置项
-    TFW_Memset_S(g_configManager.configs, TFW_CONFIG_KEY_COUNT * sizeof(TFW_ConfigItem), 0, TFW_CONFIG_KEY_COUNT * sizeof(TFW_ConfigItem));
+    TFW_Memset_S(g_configManager.configs, TFW_CONFIG_KEY_COUNT * sizeof(TFW_ConfigItem), 0,
+                 TFW_CONFIG_KEY_COUNT * sizeof(TFW_ConfigItem));
     for (int i = 0; i < TFW_CONFIG_KEY_COUNT; i++) {
         g_configManager.configs[i].key = (TFW_ConfigKey)i;
         g_configManager.configs[i].type = GetKeyType((TFW_ConfigKey)i);
@@ -197,7 +207,7 @@ int32_t TFW_Config_SetString(TFW_ConfigKey key, const char* value) {
         char* newValue = (char*)TFW_Malloc(len);
         if (!newValue) {
             TFW_Mutex_Unlock(&g_configManager.configMutex);
-            return TFW_ERROR_NO_MEMORY;
+            return TFW_ERROR_MALLOC_ERR;
         }
 
         strncpy(newValue, value, len);
@@ -341,8 +351,6 @@ int32_t TFW_Config_SetFloat(TFW_ConfigKey key, float value) {
     return TFW_ERROR_INVALID_PARAM;
 }
 
-
-
 int32_t TFW_Config_GetStatus(TFW_ConfigStatus* status) {
     if (!g_configManager.initialized || !status) {
         return TFW_ERROR_INVALID_PARAM;
@@ -365,7 +373,7 @@ int32_t TFW_Config_LoadConfig(void) {
     ret = snprintf(filePath, sizeof(filePath), "%s/%s", g_configManager.configPath, TFW_CONFIG_FILE_NAME);
     if (ret < 0 || ret >= (int32_t)sizeof(filePath)) {
         TFW_LOGE_CORE("Failed to format config file path");
-        return TFW_ERROR_OPERATION_FAIL;
+        return TFW_ERROR;
     }
 
     if (TFW_FileExists(filePath) == 0) {
@@ -388,10 +396,10 @@ int32_t TFW_Config_SaveConfig(void) {
     }
 
     char filePath[TFW_PATH_LEN_MAX];
-    int32_t ret = snprintf(filePath, sizeof(filePath), "%s/%s", g_configManager.configPath, TFW_CONFIG_FILE_NAME  );
+    int32_t ret = snprintf(filePath, sizeof(filePath), "%s/%s", g_configManager.configPath, TFW_CONFIG_FILE_NAME);
     if (ret < 0 || ret >= (int32_t)sizeof(filePath)) {
         TFW_LOGE_CORE("Failed to format config file path");
-        return TFW_ERROR_OPERATION_FAIL;
+        return TFW_ERROR;
     }
 
     ret = WriteJsonConfig(filePath);
@@ -441,7 +449,8 @@ const char* TFW_Config_GetKeyName(TFW_ConfigKey key) {
 }
 
 TFW_ConfigKey TFW_Config_GetKeyFromName(const char* name) {
-    if (!name) return TFW_CONFIG_KEY_COUNT;
+    if (!name)
+        return TFW_CONFIG_KEY_COUNT;
 
     for (int i = 0; i < TFW_CONFIG_KEY_COUNT; i++) {
         if (strcmp(g_configKeyNames[i], name) == 0) {
@@ -463,8 +472,8 @@ static int32_t ParseJsonConfig(const char* filePath) {
     while (fgets(line, sizeof(line), file)) {
         // 去除行尾换行符
         size_t len = strlen(line);
-        if (len > 0 && (line[len-1] == '\n' || line[len-1] == '\r')) {
-            line[len-1] = '\0';
+        if (len > 0 && (line[len - 1] == '\n' || line[len - 1] == '\r')) {
+            line[len - 1] = '\0';
             len--;
         }
 
@@ -481,15 +490,21 @@ static int32_t ParseJsonConfig(const char* filePath) {
             char* value = colonPos + 1;
 
             // 去除引号和空格
-            while (*key && (*key == '"' || *key == ' ' || *key == '\t')) key++;
+            while (*key && (*key == '"' || *key == ' ' || *key == '\t'))
+                key++;
             char* keyEnd = key + strlen(key) - 1;
-            while (keyEnd > key && (*keyEnd == '"' || *keyEnd == ' ' || *keyEnd == '\t')) *keyEnd-- = '\0';
+            while (keyEnd > key && (*keyEnd == '"' || *keyEnd == ' ' || *keyEnd == '\t'))
+                *keyEnd-- = '\0';
 
-            while (*value && (*value == ' ' || *value == '\t')) value++;
+            while (*value && (*value == ' ' || *value == '\t'))
+                value++;
             char* valueEnd = value + strlen(value) - 1;
-            while (valueEnd > value && (*valueEnd == ' ' || *valueEnd == '\t' || *valueEnd == ',')) *valueEnd-- = '\0';
-            if (*valueEnd == '"') *valueEnd = '\0';
-            if (*value == '"') value++;
+            while (valueEnd > value && (*valueEnd == ' ' || *valueEnd == '\t' || *valueEnd == ','))
+                *valueEnd-- = '\0';
+            if (*valueEnd == '"')
+                *valueEnd = '\0';
+            if (*value == '"')
+                value++;
 
             if (strlen(key) > 0) {
                 TFW_ConfigKey configKey = TFW_Config_GetKeyFromName(key);
@@ -507,7 +522,7 @@ static int32_t ParseJsonConfig(const char* filePath) {
 static int32_t WriteJsonConfig(const char* filePath) {
     FILE* file = fopen(filePath, "w");
     if (!file) {
-        return TFW_ERROR_OPERATION_FAIL;
+        return TFW_ERROR;
     }
 
     fprintf(file, "{\n");
@@ -560,26 +575,41 @@ static int32_t CreateDirectories(const char* path) {
         return TFW_SUCCESS;
     }
 
-    return TFW_ERROR_OPERATION_FAIL;
+    return TFW_ERROR;
 }
 
 static const char* GetDefaultValue(TFW_ConfigKey key) {
     switch (key) {
-        case TFW_CONFIG_MAIN_VERSION: return "1.0.0";
-        case TFW_CONFIG_MAIN_DEBUG: return "false";
-        case TFW_CONFIG_MAIN_LOG_LEVEL: return "INFO";
-        case TFW_CONFIG_LOGGING_LEVEL: return "INFO";
-        case TFW_CONFIG_LOGGING_OUTPUT: return "console";
-        case TFW_CONFIG_LOGGING_FILE_PATH: return "logs/";
-        case TFW_CONFIG_LOGGING_FILE_PREFIX: return "TFW_log";
-        case TFW_CONFIG_LOGGING_MAX_FILE_SIZE: return "1024000"; // 1MB
-        case TFW_CONFIG_LOGGING_MAX_RETENTION_DAYS: return "7";
-        case TFW_CONFIG_RESOURCES_AUTO_UPDATE: return "true";
-        case TFW_CONFIG_RESOURCES_UPDATE_INTERVAL: return "3600";
-        case TFW_CONFIG_RESOURCES_CACHE_PATH: return "cache/";
-        case TFW_CONFIG_SYSTEM_MAX_THREADS: return "4";
-        case TFW_CONFIG_SYSTEM_TIMEOUT: return "30";
-        default: return "";
+        case TFW_CONFIG_MAIN_VERSION:
+            return "1.0.0";
+        case TFW_CONFIG_MAIN_DEBUG:
+            return "false";
+        case TFW_CONFIG_MAIN_LOG_LEVEL:
+            return "INFO";
+        case TFW_CONFIG_LOGGING_LEVEL:
+            return "INFO";
+        case TFW_CONFIG_LOGGING_OUTPUT:
+            return "console";
+        case TFW_CONFIG_LOGGING_FILE_PATH:
+            return "logs/";
+        case TFW_CONFIG_LOGGING_FILE_PREFIX:
+            return "TFW_log";
+        case TFW_CONFIG_LOGGING_MAX_FILE_SIZE:
+            return "1024000";  // 1MB
+        case TFW_CONFIG_LOGGING_MAX_RETENTION_DAYS:
+            return "7";
+        case TFW_CONFIG_RESOURCES_AUTO_UPDATE:
+            return "true";
+        case TFW_CONFIG_RESOURCES_UPDATE_INTERVAL:
+            return "3600";
+        case TFW_CONFIG_RESOURCES_CACHE_PATH:
+            return "cache/";
+        case TFW_CONFIG_SYSTEM_MAX_THREADS:
+            return "4";
+        case TFW_CONFIG_SYSTEM_TIMEOUT:
+            return "30";
+        default:
+            return "";
     }
 }
 

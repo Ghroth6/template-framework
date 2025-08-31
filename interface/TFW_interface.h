@@ -8,11 +8,13 @@
  *
  * Important Notes:
  * 重要说明：
- * 1. Memory Management: GetInstance() returns raw pointer, caller needs to ensure the object is not destroyed during use
+ * 1. Memory Management: GetInstance() returns raw pointer, caller needs to ensure the object is not destroyed during
+ * use
  *    1. 内存管理：GetInstance()返回原始指针，调用者需要确保对象在使用期间不被销毁
  * 2. Pointer Validation: It is recommended to validate the pointer before use to avoid accessing destroyed objects
  *    2. 指针验证：使用前建议验证指针是否有效，避免访问已销毁的对象
- * 3. Lifecycle Management: It is recommended to manage object lifecycle in the same thread to avoid multi-thread competition
+ * 3. Lifecycle Management: It is recommended to manage object lifecycle in the same thread to avoid multi-thread
+ * competition
  *    3. 生命周期管理：建议在同一线程中管理对象的生命周期，避免多线程竞争
  * 4. Usage Order: First call GetInstance() to get the instance, then call DestroyInstance() to destroy after use
  *    4. 使用顺序：先调用GetInstance()获取实例，使用完毕后调用DestroyInstance()销毁
@@ -41,10 +43,11 @@
 #ifndef TFW_INTERFACE_H
 #define TFW_INTERFACE_H
 
+#include <memory>
+#include <string>
+
 #include "TFW_errorno.h"
 #include "TFW_types.h"
-#include <string>
-#include <memory>
 
 namespace TFW {
 
@@ -172,6 +175,6 @@ private:
     mutable bool isInitialized_ = false;
 };
 
-} // namespace TFW
+}  // namespace TFW
 
-#endif // TFW_INTERFACE_H
+#endif  // TFW_INTERFACE_H
