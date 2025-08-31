@@ -43,6 +43,23 @@ project(TFW VERSION 1.0.0 LANGUAGES C CXX)
 option(BUILD_SHARED_LIBS "Build static libraries when developing" OFF)
 # option(BUILD_SHARED_LIBS "Build shared libraries when releasing" ON)
 
+# 设置MSVC编译器使用UTF-8编码，解决中文注释编译问题
+# Set MSVC compiler to use UTF-8 encoding to resolve Chinese comment compilation issues
+if(MSVC)
+    add_compile_options(/utf-8)
+
+    # 确保正确链接C++标准库
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+
+    # 设置运行时库类型
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
+    # 确保C++标准库正确链接
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
+
+    message(STATUS "MSVC UTF-8 encoding enabled for ${PROJECT_NAME}")
+endif()
+
 # ============================================================================
 # C/C++ standard configuration
 # C/C++ 标准配置

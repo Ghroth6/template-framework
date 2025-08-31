@@ -219,12 +219,6 @@ endif()
 # 链接库配置
 # ============================================================================
 
-# link standard library
-# 链接标准库
-target_link_libraries(${MODULE_NAME} PRIVATE
-    stdc++
-)
-
 # platform specific link library
 # 平台特定链接库
 if(WIN32)
@@ -241,6 +235,7 @@ elseif(APPLE)
     target_link_libraries(${MODULE_NAME} PRIVATE
         pthread
         System
+        stdc++
     )
 else()
     # Linux/Unix platform link library (default)
@@ -249,6 +244,7 @@ else()
         pthread
         rt
         dl
+        stdc++
     )
 endif()
 
