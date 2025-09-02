@@ -2,6 +2,7 @@
 #define TFW_TIMER_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,9 +29,11 @@ extern "C" {
 /**
  * Get current timestamp string
  * 获取当前时间戳字符串
- * @return Formatted timestamp string, format: YYYY-MM-DD HH:MM:SS.mmm
+ * @param timestamp Output buffer for timestamp string / 输出时间戳字符串的缓冲区
+ * @param buffer_size Size of the output buffer / 输出缓冲区大小
+ * @return TFW_SUCCESS on success, negative value on error / 成功返回TFW_SUCCESS，失败返回负值
  */
-const char* TFW_GetTimestamp();
+int32_t TFW_GetTimestamp(char* timestamp, size_t buffer_size);
 
 /**
  * Get current timestamp (millisecond precision)

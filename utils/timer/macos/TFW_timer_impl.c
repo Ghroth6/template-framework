@@ -5,28 +5,63 @@
 
 #include "TFW_log.h"
 #include "TFW_timer.h"
+#include "TFW_errorno.h"
+#include "TFW_mem.h"
+#include "TFW_common_defines.h"
 
 // ============================================================================
 // macOS平台时间实现
 // macOS platform time implementation
 // ============================================================================
 
-const char* TFW_GetTimestamp() {
-    static char timestamp[64];
+int32_t TFW_GetTimestamp(char* timestamp, size_t buffer_size) {
+    if (timestamp == NULL || buffer_size == 0) {
+        return TFW_ERROR_INVALID_PARAM;
+    }
 
     // macOS平台：使用 gettimeofday() 确保兼容性
     // macOS platform: use gettimeofday() to ensure compatibility
     struct timeval tv;
     struct timezone tz;
-    gettimeofday(&tv, &tz);
+    if (gettimeofday(&tv, &tz) != 0) {
+        return TFW_ERROR;
+    }
+
     time_t now = tv.tv_sec;
     struct tm* tm_info = localtime(&now);
-    strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", tm_info);
-    char ms_part[16];
-    snprintf(ms_part, sizeof(ms_part), ".%03ld", TFW_TIME_NS_TO_MS(tv.tv_usec));
-    strcat(timestamp, ms_part);
+    if (tm_info == NULL) {
+        return TFW_ERROR;
+    }
 
-    return timestamp;
+    // Format timestamp: YYYY-MM-DD HH:MM:SS.mmm
+    // 格式化时间戳：YYYY-MM-DD HH:MM:SS.mmm
+    char time_str[TFW_TIMESTAMP_LEN_MAX];
+    if (strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", tm_info) == 0) {
+        return TFW_ERROR;
+    }
+
+    char ms_part[16];  // ".mmm" + null terminator = 5 characters, 16 is safe
+    snprintf(ms_part, sizeof(ms_part), ".%03ld", TFW_TIME_NS_TO_MS(tv.tv_usec));
+
+    // Check if the combined string fits in the buffer
+    // 检查组合字符串是否适合缓冲区
+    size_t time_str_len = strlen(time_str);
+    size_t ms_part_len = strlen(ms_part);
+    size_t total_len = time_str_len + ms_part_len + 1;  // +1 for null terminator
+    if (total_len > buffer_size) {
+        return TFW_ERROR_INVALID_PARAM;  // Buffer too small
+    }
+
+    // Use TFW safe string functions
+    // 使用TFW安全字符串函数
+    if (TFW_Strcpy_S(timestamp, buffer_size, time_str) != TFW_SUCCESS) {
+        return TFW_ERROR;
+    }
+    if (TFW_Strcat_S(timestamp, buffer_size, ms_part) != TFW_SUCCESS) {
+        return TFW_ERROR;
+    }
+
+    return TFW_SUCCESS;
 }
 
 int64_t TFW_GetTimestampMs() {

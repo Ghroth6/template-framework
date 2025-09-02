@@ -40,6 +40,14 @@ void* TFW_Calloc(uint32_t size);
 void TFW_Free(void* ptr);
 
 /**
+ * Duplicate string using TFW memory management
+ * 使用TFW内存管理复制字符串
+ * @param src Source string / 源字符串
+ * @return Duplicated string pointer, NULL on failure / 复制的字符串指针，失败时返回NULL
+ */
+char* TFW_Strdup(const char* src);
+
+/**
  * Get memory usage statistics
  * @param total_allocated Total allocated memory size (output parameter)
  * @param total_freed Total freed memory size (output parameter)

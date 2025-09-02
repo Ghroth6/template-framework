@@ -2,23 +2,11 @@
 #define TFW_LOG_H
 
 #include <stdint.h>
+#include "TFW_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-// ============================================================================
-// 日志等级定义
-// Log level definition
-// ============================================================================
-typedef enum {
-    TFW_LOG_LEVEL_TRACE = 0,    // 追踪信息/Trace information
-    TFW_LOG_LEVEL_DEBUG,    // 调试信息/Debug information
-    TFW_LOG_LEVEL_INFO,     // 一般信息/Information
-    TFW_LOG_LEVEL_WARNING,  // 警告信息/Warning information
-    TFW_LOG_LEVEL_ERROR,    // 错误信息/Error information
-    TFW_LOG_LEVEL_FATAL     // 致命错误/Fatal error
-} TFW_LogLevel;
 
 // ============================================================================
 // 日志模块分类

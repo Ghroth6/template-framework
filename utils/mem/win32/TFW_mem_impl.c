@@ -70,6 +70,24 @@ void TFW_Free(void* ptr) {
     // Note: Cannot accurately update statistics here, as freed memory size is unknown
 }
 
+char* TFW_Strdup(const char* src) {
+    if (src == NULL) {
+        TFW_LOGE_UTILS("TFW_Strdup: source string is NULL");
+        return NULL;
+    }
+
+    size_t len = strlen(src);
+    char* dest = (char*)TFW_Malloc((uint32_t)(len + 1));
+    if (dest == NULL) {
+        TFW_LOGE_UTILS("TFW_Strdup: memory allocation failed for %zu bytes", len + 1);
+        return NULL;
+    }
+
+    strcpy(dest, src);
+    TFW_LOGD_UTILS("String duplicated: '%s' at %p", src, dest);
+    return dest;
+}
+
 
 
 int32_t TFW_GetMemoryStats(uint64_t* total_allocated, uint64_t* total_freed, uint64_t* current_used) {

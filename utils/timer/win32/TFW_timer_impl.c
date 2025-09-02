@@ -3,22 +3,33 @@
 
 #include "TFW_log.h"
 #include "TFW_timer.h"
+#include "TFW_errorno.h"
+#include "TFW_mem.h"
 // ============================================================================
 // Windows平台时间实现
 // Windows platform time implementation
 // ============================================================================
 
-const char* TFW_GetTimestamp() {
-    static char timestamp[64];
+int32_t TFW_GetTimestamp(char* timestamp, size_t buffer_size) {
+    if (timestamp == NULL || buffer_size == 0) {
+        return TFW_ERROR_INVALID_PARAM;
+    }
 
     // Windows平台：使用 GetSystemTime()
     // Windows platform: use GetSystemTime()
     SYSTEMTIME st;
     GetSystemTime(&st);
-    snprintf(timestamp, sizeof(timestamp), "%04d-%02d-%02d %02d:%02d:%02d.%03d", st.wYear, st.wMonth, st.wDay, st.wHour,
-             st.wMinute, st.wSecond, st.wMilliseconds);
 
-    return timestamp;
+    // Format timestamp: YYYY-MM-DD HH:MM:SS.mmm
+    // 格式化时间戳：YYYY-MM-DD HH:MM:SS.mmm
+    int ret = sprintf_s(timestamp, buffer_size, "%04d-%02d-%02d %02d:%02d:%02d.%03d",
+                       st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+
+    if (ret < 0 || (size_t)ret >= buffer_size) {
+        return TFW_ERROR_INVALID_PARAM;  // Buffer too small or formatting error
+    }
+
+    return TFW_SUCCESS;
 }
 
 int64_t TFW_GetTimestampMs() {

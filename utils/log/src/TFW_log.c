@@ -187,8 +187,10 @@ int32_t TFW_LOG_IMPL(int32_t module, int32_t level, const char *file,
 
   // 添加时间戳
   // add timestamp
-  offset += snprintf(logMessage + offset, sizeof(logMessage) - offset, "%s ",
-                     TFW_GetTimestamp());
+  char timestamp[TFW_TIMESTAMP_BUFFER_SIZE];
+  if (TFW_GetTimestamp(timestamp, sizeof(timestamp)) == TFW_SUCCESS) {
+    offset += snprintf(logMessage + offset, sizeof(logMessage) - offset, "%s ", timestamp);
+  }
 
   // 添加进程ID和线程ID
   // add process id and thread id

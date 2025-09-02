@@ -42,6 +42,7 @@ typedef enum {
     TFW_ERROR_MALLOC_ERR,              // Memory allocation error / 内存分配错误
     TFW_ERROR_LOCK_FAILED,             // Lock operation failed / 锁定操作失败
     TFW_ERROR_FILE_ERROR,              // File operation error / 文件操作错误
+    TFW_ERROR_NOT_FOUND,               // Not found / 未找到
 
     TFW_ERROR   = -1,                  // General error / 一般错误
     TFW_SUCCESS = 0                    // Success / 成功

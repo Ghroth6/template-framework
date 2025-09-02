@@ -170,37 +170,13 @@ endif()
 # Example program configuration (optional, adjust according to actual needs)
 #
 
-# Simple CLI tool (TFW_cli)
-# 简单 CLI 工具 (TFW_cli)
-# Note: This configuration will take effect after creating the TFW_cli.c file
-# 注意：此配置将在创建 TFW_cli.c 文件后生效
-add_executable(TFW_cli
-    ${CMAKE_SOURCE_DIR}/cli/TFW_cli.c  # CLI tool source file
-    # If you need other source files, add them here
-    # 如果您需要其他源文件，请在此处添加
-    # other_file.c
-)
-
-# 头文件目录
-# Include header file directory
-target_include_directories(TFW_cli PRIVATE
-    ${CMAKE_SOURCE_DIR}/interface
-)
-
-# 链接utils模块库（如果utils模块已配置）
-# Link utils module library (if utils module is configured)
-if(TARGET TFW_utils)
-    target_link_libraries(TFW_cli PRIVATE TFW_utils)
-    message(STATUS "CLI tool linked with utils module")
-endif()
-
-# 链接core模块库（如果core模块已配置）
-# Link core module library (if core module is configured)
-if(TARGET TFW_core)
-    target_link_libraries(TFW_cli PRIVATE TFW_core)
-    message(STATUS "CLI tool linked with core module")
+# 添加CLI模块
+# Add CLI module
+if(EXISTS "${CMAKE_SOURCE_DIR}/cli/CMakeLists.txt")
+    add_subdirectory(cli)
+    message(STATUS "CLI module has been configured")
 else()
-    message(STATUS "Core module not available, CLI tool will be built without core support")
+    message(STATUS "CLI module configuration does not exist, skip configuration")
 endif()
 
 # ============================================================================
