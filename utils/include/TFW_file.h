@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,17 +48,17 @@ int32_t TFW_GetFileDirectory(const char* file_path, char* directory, size_t buff
  * Check if file exists
  * 检查文件是否存在
  * @param file_path File path
- * @return 1 for exists, 0 for not exists
+ * @return true for exists, false for not exists
  */
-int32_t TFW_FileExists(const char* file_path);
+bool TFW_IsFileExists(const char* file_path);
 
 /**
  * Check if path is directory
  * 检查路径是否是目录
  * @param path Path
- * @return 1 for directory, 0 for not directory
+ * @return true for directory, false for not directory
  */
-int32_t TFW_IsDirectory(const char* path);
+bool TFW_IsDirectory(const char* path);
 
 /**
  * Create directory

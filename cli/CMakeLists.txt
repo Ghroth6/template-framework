@@ -44,7 +44,7 @@ add_executable(${MODULE_NAME} ${CLI_SOURCES})
 set_target_properties(${MODULE_NAME} PROPERTIES
     VERSION ${MODULE_VERSION}
     DESCRIPTION ${MODULE_DESCRIPTION}
-    OUTPUT_NAME "tfw-cli"
+    OUTPUT_NAME ${MODULE_NAME}
 )
 
 # ============================================================================
@@ -161,7 +161,7 @@ install(TARGETS ${MODULE_NAME}
 # 安装 CLI 文档（如果存在）
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/README.md)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/README.md
-        DESTINATION share/doc/tfw-cli
+        DESTINATION share/doc/${MODULE_NAME}
         COMPONENT cli
     )
 endif()
@@ -176,4 +176,4 @@ message(STATUS "  Module Name: ${MODULE_NAME}")
 message(STATUS "  Version: ${MODULE_VERSION}")
 message(STATUS "  Description: ${MODULE_DESCRIPTION}")
 message(STATUS "  Source Files: ${CLI_SOURCES}")
-message(STATUS "  Output Name: tfw-cli")
+message(STATUS "  Output Name: ${MODULE_NAME}")

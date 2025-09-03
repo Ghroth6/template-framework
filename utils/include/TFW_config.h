@@ -33,10 +33,9 @@ extern "C" {
 /**
  * Initialize configuration module
  * 初始化配置模块
- * @param config_path Configuration file path / 配置文件路径
  * @return TFW_SUCCESS on success, negative value on error / 成功返回TFW_SUCCESS，失败返回负值
  */
-int32_t TFW_Config_Init(const char* config_path);
+int32_t TFW_Config_Init(void);
 
 /**
  * Deinitialize configuration module
@@ -45,24 +44,7 @@ int32_t TFW_Config_Init(const char* config_path);
  */
 int32_t TFW_Config_Deinit(void);
 
-/**
- * Get configuration value by key
- * 根据键获取配置值
- * @param key Configuration key / 配置键
- * @param value Output value buffer / 输出值缓冲区
- * @param buffer_size Buffer size / 缓冲区大小
- * @return TFW_SUCCESS on success, negative value on error / 成功返回TFW_SUCCESS，失败返回负值
- */
-int32_t TFW_Config_GetValueByKey(TFW_ConfigKey key, char* value, size_t buffer_size);
 
-/**
- * Set configuration value by key
- * 根据键设置配置值
- * @param key Configuration key / 配置键
- * @param value Value to set / 要设置的值
- * @return TFW_SUCCESS on success, negative value on error / 成功返回TFW_SUCCESS，失败返回负值
- */
-int32_t TFW_Config_SetValueByKey(TFW_ConfigKey key, const char* value);
 
 // ============================================================================
 // Type-safe Configuration Access (Optional)

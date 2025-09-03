@@ -119,29 +119,29 @@ int32_t TFW_GetFileDirectory(const char* file_path, char* directory, size_t buff
     }
 }
 
-int32_t TFW_FileExists(const char* file_path) {
+bool TFW_IsFileExists(const char* file_path) {
     if (file_path == NULL) {
-        return 0;
+        return false;
     }
 
     // POSIX平台：使用 access 函数
     // POSIX platform: use access function
-    return (access(file_path, F_OK) == 0) ? 1 : 0;
+    return (access(file_path, F_OK) == 0) ? true : false;
 }
 
-int32_t TFW_IsDirectory(const char* path) {
+bool TFW_IsDirectory(const char* path) {
     if (path == NULL) {
-        return 0;
+        return false;
     }
 
     // POSIX平台：使用 stat 函数
     // POSIX platform: use stat function
     struct stat st;
     if (stat(path, &st) != 0) {
-        return 0;
+        return false;
     }
 
-    return S_ISDIR(st.st_mode) ? 1 : 0;
+    return S_ISDIR(st.st_mode) ? true : false;
 }
 
 int32_t TFW_CreateDirectory(const char* path) {

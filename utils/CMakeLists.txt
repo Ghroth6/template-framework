@@ -52,6 +52,8 @@ set(MODULE_DESCRIPTION "TFW framework utils module")
 set(UTILS_C_SOURCES
     log/src/TFW_log.c
     thread/src/TFW_thread.c
+    json/src/TFW_json.c
+    config/TFW_config.c
 )
 
 # 根据平台选择平台特定实现
@@ -95,6 +97,8 @@ set(UTILS_HEADERS
     include/TFW_file.h
     include/TFW_mem.h
     include/TFW_sdk_log.h
+    include/TFW_config.h
+    json/include/TFW_json.h
 )
 
 # ============================================================================
@@ -174,6 +178,7 @@ target_include_directories(${MODULE_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/thread/include
     ${CMAKE_CURRENT_SOURCE_DIR}/file/include
     ${CMAKE_CURRENT_SOURCE_DIR}/mem/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/json/include
 )
 
 # ============================================================================

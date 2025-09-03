@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 #include <string.h>
 #include <windows.h>
 
@@ -129,31 +129,30 @@ int32_t TFW_GetFileDirectory(const char* file_path, char* directory, size_t buff
         return TFW_SUCCESS;
     }
 }
-
-int32_t TFW_FileExists(const char* file_path) {
+bool TFW_IsFileExists(const char* file_path) {
     if (file_path == NULL) {
-        return 0;
+        return false;
     }
 
     // Windows平台：使用 GetFileAttributes
     // Windows platform: use GetFileAttributes
     DWORD attrs = GetFileAttributesA(file_path);
-    return (attrs != INVALID_FILE_ATTRIBUTES) ? 1 : 0;
+    return (attrs != INVALID_FILE_ATTRIBUTES) ? true : false;
 }
 
-int32_t TFW_IsDirectory(const char* path) {
+bool TFW_IsDirectory(const char* path) {
     if (path == NULL) {
-        return 0;
+        return false;
     }
 
     // Windows平台：使用 GetFileAttributes
     // Windows platform: use GetFileAttributes
     DWORD attrs = GetFileAttributesA(path);
     if (attrs == INVALID_FILE_ATTRIBUTES) {
-        return 0;
+        return false;
     }
 
-    return (attrs & FILE_ATTRIBUTE_DIRECTORY) ? 1 : 0;
+    return (attrs & FILE_ATTRIBUTE_DIRECTORY) ? true : false;
 }
 
 int32_t TFW_CreateDirectory(const char* path) {
