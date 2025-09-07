@@ -53,6 +53,7 @@ set(UTILS_C_SOURCES
     log/src/TFW_log.c
     thread/src/TFW_thread.c
     json/TFW_json.c
+    config/TFW_config.c
 )
 
 # 根据平台选择平台特定实现
@@ -97,6 +98,7 @@ set(UTILS_HEADERS
     include/TFW_mem.h
     include/TFW_sdk_log.h
     include/TFW_json.h
+    include/TFW_config.h
 )
 
 # ============================================================================
@@ -158,6 +160,7 @@ target_include_directories(${MODULE_NAME} PUBLIC
 target_include_directories(${MODULE_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../third_party
 )
+
 # Note: The cjson include directory has been removed as it should be handled by the package configuration
 
 # set library properties
