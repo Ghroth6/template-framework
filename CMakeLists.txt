@@ -143,6 +143,15 @@ endif()
 #     message(STATUS "Utils module has been configured")
 # endif()
 
+# 添加第三方库管理
+# Add third party libraries management
+if(EXISTS "${CMAKE_SOURCE_DIR}/third_party/CMakeLists.txt")
+    add_subdirectory(third_party)
+    message(STATUS "Third party libraries management has been configured")
+else()
+    message(STATUS "Third party libraries management does not exist, skip configuration")
+endif()
+
 # 添加utils模块
 # Add utils module
 if(EXISTS "${CMAKE_SOURCE_DIR}/utils/CMakeLists.txt")

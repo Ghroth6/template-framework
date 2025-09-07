@@ -67,11 +67,11 @@ configure_project() {
     if [[ "$OSTYPE" == "darwin"* ]]; then
         # macOS
         print_info "检测到macOS，使用Unix Makefiles生成器"
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
     else
         # Linux/WSL
         print_info "检测到Linux/WSL，使用Unix Makefiles生成器"
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
     fi
 
     cd ..
@@ -123,7 +123,7 @@ show_results() {
 # 主函数
 main() {
     print_info "开始构建TFW项目..."
-    print_info "构建类型: Release"
+    print_info "构建类型: Debug"
     print_info "输出目录: out/"
 
     check_requirements

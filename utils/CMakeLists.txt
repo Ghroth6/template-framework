@@ -1,4 +1,4 @@
-﻿# ============================================================================
+# ============================================================================
 # TFW Utils Module CMake Configuration
 # TFW 工具模块 CMake 配置
 # ============================================================================
@@ -52,8 +52,6 @@ set(MODULE_DESCRIPTION "TFW framework utils module")
 set(UTILS_C_SOURCES
     log/src/TFW_log.c
     thread/src/TFW_thread.c
-    json/src/TFW_json.c
-    config/TFW_config.c
 )
 
 # 根据平台选择平台特定实现
@@ -97,8 +95,6 @@ set(UTILS_HEADERS
     include/TFW_file.h
     include/TFW_mem.h
     include/TFW_sdk_log.h
-    include/TFW_config.h
-    json/include/TFW_json.h
 )
 
 # ============================================================================
@@ -224,6 +220,7 @@ endif()
 # 链接库配置
 # ============================================================================
 
+
 # platform specific link library
 # 平台特定链接库
 if(WIN32)
@@ -252,6 +249,7 @@ else()
         stdc++
     )
 endif()
+
 
 # ============================================================================
 # build information output

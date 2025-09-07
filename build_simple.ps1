@@ -209,7 +209,7 @@ function Show-BuildResults {
 
 function Main {
     Write-Info "Starting TFW project build..."
-    Write-Info "Build type: Release"
+    Write-Info "Build type: Debug"
     Write-Info "Output directory: out\"
 
     Test-Requirements

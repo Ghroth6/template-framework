@@ -19,7 +19,6 @@
 #include "TFW_errorno.h"
 #include "TFW_interface.h"
 #include "TFW_types.h"
-#include "TFW_config.h"
 #include "TFW_common_defines.h"
 
 // ============================================================================
@@ -86,30 +85,23 @@ int32_t CoreInterface::Init() {
     }
 
     // TODO: 实际的初始化逻辑
-    int32_t ret = TFW_Config_Init();
-    if (ret != TFW_SUCCESS) {
-        TFW_LOGE_CORE("Failed to initialize config");
-        return ret;
-    }
+
     isInitialized_ = true;
     TFW_LOGI_CORE("Core initialized successfully");
     return TFW_SUCCESS;
 }
 
 int32_t CoreInterface::Deinit() {
-    TFW_LOGI_CORE("Deinitializing core...");
+    TFW_LOGI_CORE("DeInitializing core...");
     if (!isInitialized_) {
         TFW_LOGI_CORE("Core not initialized");
         return TFW_SUCCESS;
     }
 
     // TODO: 实际的清理逻辑
-    int32_t ret = TFW_Config_Deinit();
-    if (ret != TFW_SUCCESS) {
-        TFW_LOGE_CORE("Failed to deinitialize config");
-    }
+
     isInitialized_ = false;
-    TFW_LOGI_CORE("Core deinitialized successfully");
+    TFW_LOGI_CORE("Core deInitialized successfully");
     return TFW_SUCCESS;
 }
 
