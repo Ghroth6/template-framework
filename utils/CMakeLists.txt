@@ -52,6 +52,7 @@ set(MODULE_DESCRIPTION "TFW framework utils module")
 set(UTILS_C_SOURCES
     log/src/TFW_log.c
     thread/src/TFW_thread.c
+    json/TFW_json.c
 )
 
 # 根据平台选择平台特定实现
@@ -95,6 +96,7 @@ set(UTILS_HEADERS
     include/TFW_file.h
     include/TFW_mem.h
     include/TFW_sdk_log.h
+    include/TFW_json.h
 )
 
 # ============================================================================
@@ -144,6 +146,19 @@ else()
     )
     message(STATUS "Creating static library for ${MODULE_NAME}")
 endif()
+
+# 设置库包含目录
+# Set library include directories
+target_include_directories(${MODULE_NAME} PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+# 设置第三方库包含目录
+# Set third party library include directories
+target_include_directories(${MODULE_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../third_party
+)
+# Note: The cjson include directory has been removed as it should be handled by the package configuration
 
 # set library properties
 # 设置库属性
@@ -250,6 +265,9 @@ else()
     )
 endif()
 
+# Link third party libraries
+# 链接第三方库
+target_link_libraries(${MODULE_NAME} PRIVATE thirdparty::cjson)
 
 # ============================================================================
 # build information output

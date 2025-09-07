@@ -8,7 +8,6 @@ set(TFW_BUILD_SHARED_LIBS_OLD ${BUILD_SHARED_LIBS})
 
 # 检查并添加cjson库
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/cjson/CMakeLists.txt")
-
     # 根据项目BUILD_SHARED_LIBS设置决定cjson构建方式
     # 项目规范：开发时使用静态库，发布时使用动态库
     if(BUILD_SHARED_LIBS)
@@ -30,6 +29,12 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/cjson/CMakeLists.txt")
     # 创建导入库目标别名，便于统一引用
     if(TARGET cjson)
         add_library(thirdparty::cjson ALIAS cjson)
+        # 设置cjson的PUBLIC包含目录，使依赖它的模块能自动找到头文件
+        # 使用相对路径避免CMake的源目录前缀限制
+        target_include_directories(cjson PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/cjson>
+            $<INSTALL_INTERFACE:include/cjson>
+        )
         message(STATUS "Third party library cjson added as target thirdparty::cjson")
     endif()
 else()

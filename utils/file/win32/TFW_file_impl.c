@@ -168,3 +168,440 @@ int32_t TFW_CreateDirectory(const char* path) {
 
     return 0;
 }
+
+// ============================================================================
+// 新增的文件操作函数实现
+// Implementation of new file operation functions
+// ============================================================================
+
+int32_t TFW_ReadFile(int32_t fd, void *readBuf, uint32_t maxLen) {
+    if (readBuf == NULL || maxLen == 0) {
+        TFW_LOGE_UTILS("Invalid parameter for TFW_ReadFile");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    HANDLE hFile = (HANDLE)_get_osfhandle(fd);
+    if (hFile == INVALID_HANDLE_VALUE) {
+        TFW_LOGE_UTILS("Invalid file handle for TFW_ReadFile");
+        return TFW_ERROR;
+    }
+
+    DWORD bytesRead = 0;
+    if (!ReadFile(hFile, readBuf, maxLen, &bytesRead, NULL)) {
+        TFW_LOGE_UTILS("Failed to read from file handle, error code: %lu", GetLastError());
+        return TFW_ERROR;
+    }
+
+    return (int32_t)bytesRead;
+}
+
+int32_t TFW_ReadFullFile(const char *fileName, char *readBuf, uint32_t maxLen) {
+    if (fileName == NULL || readBuf == NULL || maxLen == 0) {
+        TFW_LOGE_UTILS("Invalid parameter for TFW_ReadFullFile");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    HANDLE hFile = CreateFileA(
+        fileName,
+        GENERIC_READ,
+        FILE_SHARE_READ,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
+
+    if (hFile == INVALID_HANDLE_VALUE) {
+        TFW_LOGE_UTILS("Failed to open file %s, error code: %lu", fileName, GetLastError());
+        return TFW_ERROR;
+    }
+
+    DWORD fileSize = GetFileSize(hFile, NULL);
+    if (fileSize == INVALID_FILE_SIZE) {
+        TFW_LOGE_UTILS("Failed to get file size for %s, error code: %lu", fileName, GetLastError());
+        CloseHandle(hFile);
+        return TFW_ERROR;
+    }
+
+    if (fileSize >= maxLen) {
+        TFW_LOGE_UTILS("Buffer too small for file %s", fileName);
+        CloseHandle(hFile);
+        return TFW_ERROR;
+    }
+
+    DWORD bytesRead = 0;
+    if (!ReadFile(hFile, readBuf, fileSize, &bytesRead, NULL)) {
+        TFW_LOGE_UTILS("Failed to read file %s, error code: %lu", fileName, GetLastError());
+        CloseHandle(hFile);
+        return TFW_ERROR;
+    }
+
+    readBuf[bytesRead] = '\0'; // 确保字符串终止
+    CloseHandle(hFile);
+    return (int32_t)bytesRead;
+}
+
+int32_t TFW_WriteFile(const char *fileName, const char *writeBuf, uint32_t len) {
+    if (fileName == NULL || writeBuf == NULL || len == 0) {
+        TFW_LOGE_UTILS("Invalid parameter for TFW_WriteFile");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    HANDLE hFile = CreateFileA(
+        fileName,
+        GENERIC_WRITE,
+        0,
+        NULL,
+        CREATE_ALWAYS,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
+
+    if (hFile == INVALID_HANDLE_VALUE) {
+        TFW_LOGE_UTILS("Failed to open file %s, error code: %lu", fileName, GetLastError());
+        return TFW_ERROR;
+    }
+
+    DWORD bytesWritten = 0;
+    if (!WriteFile(hFile, writeBuf, len, &bytesWritten, NULL)) {
+        TFW_LOGE_UTILS("Failed to write to file %s, error code: %lu", fileName, GetLastError());
+        CloseHandle(hFile);
+        return TFW_ERROR;
+    }
+
+    CloseHandle(hFile);
+    return (int32_t)bytesWritten;
+}
+
+int32_t TFW_WriteFileFd(int32_t fd, const char *writeBuf, uint32_t len) {
+    if (writeBuf == NULL || len == 0) {
+        TFW_LOGE_UTILS("Invalid parameter for TFW_WriteFileFd");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    HANDLE hFile = (HANDLE)_get_osfhandle(fd);
+    if (hFile == INVALID_HANDLE_VALUE) {
+        TFW_LOGE_UTILS("Invalid file handle for TFW_WriteFileFd");
+        return TFW_ERROR;
+    }
+
+    DWORD bytesWritten = 0;
+    if (!WriteFile(hFile, writeBuf, len, &bytesWritten, NULL)) {
+        TFW_LOGE_UTILS("Failed to write to file handle, error code: %lu", GetLastError());
+        return TFW_ERROR;
+    }
+
+    return (int32_t)bytesWritten;
+}
+
+int32_t TFW_OpenFile(const char *fileName, int32_t flags) {
+    if (fileName == NULL) {
+        TFW_LOGE_UTILS("Invalid parameter for TFW_OpenFile");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    // 将TFW标志转换为Windows标志
+    DWORD desiredAccess = 0;
+    DWORD creationDisposition = 0;
+
+    if (flags & TFW_O_RDONLY) desiredAccess |= GENERIC_READ;
+    if (flags & TFW_O_WRONLY) desiredAccess |= GENERIC_WRITE;
+    if (flags & TFW_O_RDWR) {
+        desiredAccess |= GENERIC_READ | GENERIC_WRITE;
+    }
+
+    if (flags & TFW_O_CREATE) {
+        creationDisposition = OPEN_ALWAYS;
+    } else if (flags & TFW_O_TRUNC) {
+        creationDisposition = TRUNCATE_EXISTING;
+    } else {
+        creationDisposition = OPEN_EXISTING;
+    }
+
+    HANDLE hFile = CreateFileA(
+        fileName,
+        desiredAccess,
+        FILE_SHARE_READ | FILE_SHARE_WRITE,
+        NULL,
+        creationDisposition,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
+
+    if (hFile == INVALID_HANDLE_VALUE) {
+        TFW_LOGE_UTILS("Failed to open file %s, error code: %lu", fileName, GetLastError());
+        return TFW_ERROR;
+    }
+
+    // 将HANDLE转换为文件描述符
+    int fd = _open_osfhandle((intptr_t)hFile, 0);
+    if (fd == -1) {
+        TFW_LOGE_UTILS("Failed to convert handle to file descriptor for %s", fileName);
+        CloseHandle(hFile);
+        return TFW_ERROR;
+    }
+
+    return fd;
+}
+
+int32_t TFW_OpenFileWithPerms(const char *fileName, int32_t flags, int32_t perms) {
+    if (fileName == NULL) {
+        TFW_LOGE_UTILS("Invalid parameter for TFW_OpenFileWithPerms");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    // Windows中权限处理与POSIX略有不同，这里简化处理
+    // 将TFW标志转换为Windows标志
+    DWORD desiredAccess = 0;
+    DWORD creationDisposition = 0;
+
+    if (flags & TFW_O_RDONLY) desiredAccess |= GENERIC_READ;
+    if (flags & TFW_O_WRONLY) desiredAccess |= GENERIC_WRITE;
+    if (flags & TFW_O_RDWR) {
+        desiredAccess |= GENERIC_READ | GENERIC_WRITE;
+    }
+
+    if (flags & TFW_O_CREATE) {
+        creationDisposition = OPEN_ALWAYS;
+    } else if (flags & TFW_O_TRUNC) {
+        creationDisposition = TRUNCATE_EXISTING;
+    } else {
+        creationDisposition = OPEN_EXISTING;
+    }
+
+    HANDLE hFile = CreateFileA(
+        fileName,
+        desiredAccess,
+        FILE_SHARE_READ | FILE_SHARE_WRITE,
+        NULL,
+        creationDisposition,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
+
+    if (hFile == INVALID_HANDLE_VALUE) {
+        TFW_LOGE_UTILS("Failed to open file %s, error code: %lu", fileName, GetLastError());
+        return TFW_ERROR;
+    }
+
+    // 将HANDLE转换为文件描述符
+    int fd = _open_osfhandle((intptr_t)hFile, 0);
+    if (fd == -1) {
+        TFW_LOGE_UTILS("Failed to convert handle to file descriptor for %s", fileName);
+        CloseHandle(hFile);
+        return TFW_ERROR;
+    }
+
+    return fd;
+}
+
+void TFW_RemoveFile(const char *fileName) {
+    if (fileName == NULL) {
+        TFW_LOGE_UTILS("Invalid parameter for TFW_RemoveFile");
+        return;
+    }
+
+    if (!DeleteFileA(fileName)) {
+        TFW_LOGE_UTILS("Failed to remove file %s, error code: %lu", fileName, GetLastError());
+    }
+}
+
+void TFW_CloseFile(int32_t fd) {
+    if (fd < 0) {
+        TFW_LOGE_UTILS("Invalid file descriptor for TFW_CloseFile");
+        return;
+    }
+
+    HANDLE hFile = (HANDLE)_get_osfhandle(fd);
+    if (hFile == INVALID_HANDLE_VALUE) {
+        TFW_LOGE_UTILS("Invalid file handle for TFW_CloseFile");
+        return;
+    }
+
+    if (!CloseHandle(hFile)) {
+        TFW_LOGE_UTILS("Failed to close file handle, error code: %lu", GetLastError());
+    }
+}
+
+int64_t TFW_PreadFile(int32_t fd, void *buf, uint64_t readBytes, uint64_t offset) {
+    if (buf == NULL || readBytes == 0) {
+        TFW_LOGE_UTILS("Invalid parameter for TFW_PreadFile");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    HANDLE hFile = (HANDLE)_get_osfhandle(fd);
+    if (hFile == INVALID_HANDLE_VALUE) {
+        TFW_LOGE_UTILS("Invalid file handle for TFW_PreadFile");
+        return TFW_ERROR;
+    }
+
+    // 设置文件指针位置
+    LARGE_INTEGER liDistanceToMove;
+    liDistanceToMove.QuadPart = offset;
+    if (!SetFilePointerEx(hFile, liDistanceToMove, NULL, FILE_BEGIN)) {
+        TFW_LOGE_UTILS("Failed to set file pointer, error code: %lu", GetLastError());
+        return TFW_ERROR;
+    }
+
+    DWORD bytesRead = 0;
+    if (!ReadFile(hFile, buf, (DWORD)readBytes, &bytesRead, NULL)) {
+        TFW_LOGE_UTILS("Failed to read from file handle, error code: %lu", GetLastError());
+        return TFW_ERROR;
+    }
+
+    return (int64_t)bytesRead;
+}
+
+int64_t TFW_PwriteFile(int32_t fd, const void *buf, uint64_t writeBytes, uint64_t offset) {
+    if (buf == NULL || writeBytes == 0) {
+        TFW_LOGE_UTILS("Invalid parameter for TFW_PwriteFile");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    HANDLE hFile = (HANDLE)_get_osfhandle(fd);
+    if (hFile == INVALID_HANDLE_VALUE) {
+        TFW_LOGE_UTILS("Invalid file handle for TFW_PwriteFile");
+        return TFW_ERROR;
+    }
+
+    // 设置文件指针位置
+    LARGE_INTEGER liDistanceToMove;
+    liDistanceToMove.QuadPart = offset;
+    if (!SetFilePointerEx(hFile, liDistanceToMove, NULL, FILE_BEGIN)) {
+        TFW_LOGE_UTILS("Failed to set file pointer, error code: %lu", GetLastError());
+        return TFW_ERROR;
+    }
+
+    DWORD bytesWritten = 0;
+    if (!WriteFile(hFile, buf, (DWORD)writeBytes, &bytesWritten, NULL)) {
+        TFW_LOGE_UTILS("Failed to write to file handle, error code: %lu", GetLastError());
+        return TFW_ERROR;
+    }
+
+    return (int64_t)bytesWritten;
+}
+
+int32_t TFW_AccessFile(const char *pathName, int32_t mode) {
+    if (pathName == NULL) {
+        TFW_LOGE_UTILS("Invalid parameter for TFW_AccessFile");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    DWORD fileAttributes = GetFileAttributesA(pathName);
+    if (fileAttributes == INVALID_FILE_ATTRIBUTES) {
+        return TFW_ERROR;
+    }
+
+    // Windows中权限检查与POSIX略有不同，这里简化处理
+    // 文件存在即返回成功
+    return TFW_SUCCESS;
+}
+
+int32_t TFW_MakeDir(const char *pathName, int32_t mode) {
+    if (pathName == NULL) {
+        TFW_LOGE_UTILS("Invalid parameter for TFW_MakeDir");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    // Windows中权限处理与POSIX略有不同，这里忽略mode参数
+    if (!CreateDirectoryA(pathName, NULL)) {
+        TFW_LOGE_UTILS("Failed to create directory %s, error code: %lu", pathName, GetLastError());
+        return TFW_ERROR;
+    }
+
+    return TFW_SUCCESS;
+}
+
+int32_t TFW_GetFileSize(const char *fileName, uint64_t *fileSize) {
+    if (fileName == NULL || fileSize == NULL) {
+        TFW_LOGE_UTILS("Invalid parameter for TFW_GetFileSize");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    HANDLE hFile = CreateFileA(
+        fileName,
+        GENERIC_READ,
+        FILE_SHARE_READ,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
+
+    if (hFile == INVALID_HANDLE_VALUE) {
+        TFW_LOGE_UTILS("Failed to open file %s, error code: %lu", fileName, GetLastError());
+        return TFW_ERROR;
+    }
+
+    LARGE_INTEGER liFileSize;
+    if (!GetFileSizeEx(hFile, &liFileSize)) {
+        TFW_LOGE_UTILS("Failed to get file size for %s, error code: %lu", fileName, GetLastError());
+        CloseHandle(hFile);
+        return TFW_ERROR;
+    }
+
+    *fileSize = liFileSize.QuadPart;
+    CloseHandle(hFile);
+    return TFW_SUCCESS;
+}
+
+char *TFW_RealPath(const char *path, char *absPath) {
+    if (path == NULL || absPath == NULL) {
+        TFW_LOGE_UTILS("Invalid parameter for TFW_RealPath");
+        return NULL;
+    }
+
+    DWORD result = GetFullPathNameA(path, MAX_PATH, absPath, NULL);
+    if (result == 0) {
+        TFW_LOGE_UTILS("Failed to get real path for %s, error code: %lu", path, GetLastError());
+        return NULL;
+    }
+
+    return absPath;
+}
+
+int32_t TFW_ReadFullFileAndSize(const char *fileName, char *readBuf, uint32_t maxLen, int32_t *size) {
+    if (fileName == NULL || readBuf == NULL || size == NULL || maxLen == 0) {
+        TFW_LOGE_UTILS("Invalid parameter for TFW_ReadFullFileAndSize");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    uint64_t fileSize;
+    int32_t ret = TFW_GetFileSize(fileName, &fileSize);
+    if (ret != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to get file size for %s", fileName);
+        return ret;
+    }
+
+    if (fileSize >= maxLen) {
+        TFW_LOGE_UTILS("Buffer too small for file %s", fileName);
+        return TFW_ERROR;
+    }
+
+    HANDLE hFile = CreateFileA(
+        fileName,
+        GENERIC_READ,
+        FILE_SHARE_READ,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
+
+    if (hFile == INVALID_HANDLE_VALUE) {
+        TFW_LOGE_UTILS("Failed to open file %s, error code: %lu", fileName, GetLastError());
+        return TFW_ERROR;
+    }
+
+    DWORD bytesRead = 0;
+    if (!ReadFile(hFile, readBuf, (DWORD)fileSize, &bytesRead, NULL)) {
+        TFW_LOGE_UTILS("Failed to read file %s, error code: %lu", fileName, GetLastError());
+        CloseHandle(hFile);
+        return TFW_ERROR;
+    }
+
+    readBuf[bytesRead] = '\0'; // 确保字符串终止
+    *size = (int32_t)bytesRead;
+    CloseHandle(hFile);
+    return TFW_SUCCESS;
+}
