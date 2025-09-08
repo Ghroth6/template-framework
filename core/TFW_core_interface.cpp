@@ -20,6 +20,7 @@
 #include "TFW_interface.h"
 #include "TFW_types.h"
 #include "TFW_common_defines.h"
+#include "TFW_config.h"
 
 // ============================================================================
 // TFW::CoreInterface implementation
@@ -85,6 +86,11 @@ int32_t CoreInterface::Init() {
     }
 
     // TODO: 实际的初始化逻辑
+    int32_t result = TFW_ConfigInit();
+    if (result != TFW_SUCCESS) {
+        TFW_LOGE_CORE("Failed to initialize config module, error: %d", result);
+        return result;
+    }
 
     isInitialized_ = true;
     TFW_LOGI_CORE("Core initialized successfully");
@@ -99,6 +105,11 @@ int32_t CoreInterface::Deinit() {
     }
 
     // TODO: 实际的清理逻辑
+    int32_t result = TFW_ConfigDeinit();
+    if (result != TFW_SUCCESS) {
+        TFW_LOGE_CORE("Failed to deinitialize config module, error: %d", result);
+        return result;
+    }
 
     isInitialized_ = false;
     TFW_LOGI_CORE("Core deInitialized successfully");
