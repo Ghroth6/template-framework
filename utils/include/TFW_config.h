@@ -63,7 +63,7 @@ int32_t TFW_ConfigRegisterUpdateCallback(TFW_ConfigModule module, TFW_ConfigUpda
  * @param callback 回调函数指针
  * @return 0表示成功，负值表示失败
  */
-int32_t TFW_ConfigUnregisterUpdateCallback(TFW_ConfigModule module, TFW_ConfigUpdateCallback callback);
+int32_t TFW_ConfigUnregisterUpdateCallback(TFW_ConfigModule module);
 
 // 读取全部配置
 /**
@@ -89,6 +89,13 @@ void TFW_ConfigFreeAll(TFW_ConfigItem *config_array);
  * @return 0表示成功，负值表示失败
  */
 int32_t TFW_ConfigGetItem(TFW_ConfigKey key, TFW_ConfigItem *item);
+
+// 释放单项配置内存
+/**
+ * @brief 释放通过TFW_ConfigGetItem获取的配置项内存
+ * @param item 配置项指针
+ */
+void TFW_ConfigFreeItem(TFW_ConfigItem* item);
 
 // 设置单项配置
 /**
