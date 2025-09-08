@@ -10,7 +10,26 @@ CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
 Makefile
-*.cmake
+# 更精确地忽略CMake生成的中间.cmake文件，而不是所有.cmake文件
+CMakeFiles/*.cmake
+build/*/*.cmake
+build/*/CMakeFiles/*.cmake
+
+# 例外规则 - 不忽略third_party目录下的重要构建文件
+!third_party/**/Makefile
+!third_party/**/*.cmake
+
+# 例外规则 - 不忽略third_party目录下的重要配置和源文件
+!third_party/**/*.h
+!third_party/**/*.c
+!third_party/**/*.cpp
+!third_party/**/*.hpp
+!third_party/**/CMakeLists.txt
+!third_party/**/*.md
+!third_party/**/*.txt
+!third_party/**/*.yml
+!third_party/**/*.yaml
+!third_party/**/*.json
 
 # 编译产物
 *.o
