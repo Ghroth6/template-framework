@@ -23,6 +23,7 @@
 #define TFW_CONFIG_FILE_NAME "TFW_config.json"
 
 // Buffer size limits / 缓冲区大小限制
+#define TFW_NORMAL_BUFFER_SIZE_MAX 256
 #define TFW_PATH_LEN_MAX 512
 #define TFW_FILENAME_LEN_MAX 256
 #define TFW_LOG_MAX_MESSAGE_LENGTH 2048

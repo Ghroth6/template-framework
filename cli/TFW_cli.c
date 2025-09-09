@@ -2,10 +2,17 @@
 #include "TFW_types.h"
 #include "TFW_c_interface.h"
 #include "TFW_sdk_log.h"
+#include "TFW_cli_common.h"
+#include "TFW_common_defines.h"
 #include <stddef.h>
 #include <stdio.h>
 
-int32_t ConfigTest(void)
+typedef struct {
+    char name[TFW_NORMAL_BUFFER_SIZE_MAX];
+    int32_t (*func)(void);
+} CliTestFunc;
+
+static int32_t ConfigTest(void)
 {
     int32_t result = TFW_SUCCESS;
     int32_t configNum = 0;
@@ -13,7 +20,7 @@ int32_t ConfigTest(void)
     result = TFW_CoreGetAllConfigItems(&configArray, (uint32_t*)&configNum);
     if (result != TFW_SUCCESS) {
         TFW_LOGE_SDK("TFW_CoreGetAllConfigItem failed, result = %d", result);
-        return -1;
+        return TFW_ERROR;
     }
     printf("config num = %d\n", configNum);
     for (int32_t i = 0; i < configNum; i++) {
@@ -37,7 +44,51 @@ int32_t ConfigTest(void)
         printf("\n");
     }
     TFW_CoreFreeAllConfigItems(configArray);
-    return 0;
+    return TFW_SUCCESS;
+}
+
+static CliTestFunc g_cliTestFuncs[] = {
+    {"config", ConfigTest},
+};
+
+#define TEST_NUM (int32_t)(sizeof(g_cliTestFuncs) / sizeof(CliTestFunc))
+
+static void PrintMenu(void)
+{
+    printf("Please select a test:\n");
+    for (int32_t i = 0; i < TEST_NUM; i++) {
+        printf("%d. %s\n", i + 1, g_cliTestFuncs[i].name);
+    }
+    printf("0. Exit\n");
+}
+
+static void TestEntry(void)
+{
+    printf("Welcome to TFW CLI Test!\n");
+    printf("This test will demonstrate basic configuration retrieval.\n");
+    printf("Press Enter to continue...\n");
+    printf("Please Select test mode\n");
+    int32_t choice = -1;
+    int32_t result = 0;
+    while (1) {
+        PrintMenu();
+        printf("Enter your choice (0-%d): ", TEST_NUM);
+        if (TFW_CliReadInteger(&choice) != TFW_SUCCESS || choice < 0 || choice > TEST_NUM) {
+            printf("Invalid input. Please enter a number between 0 and %d.\n", TEST_NUM);
+            continue;
+        }
+        if (choice == 0) {
+            printf("Exiting...\n");
+            break;
+        }
+        printf("Running test %s...\n", g_cliTestFuncs[choice - 1].name);
+        result = g_cliTestFuncs[choice - 1].func();
+        if (result != TFW_SUCCESS) {
+            printf("Test %s failed.\n", g_cliTestFuncs[choice - 1].name);
+            continue;
+        }
+        printf("Test %s passed.\n", g_cliTestFuncs[choice - 1].name);
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -47,10 +98,7 @@ int main(int argc, char *argv[]) {
         TFW_LOGE_SDK("cli test TFW_CoreInit failed");
         return result;
     }
-    result = ConfigTest();
-    if (result != TFW_SUCCESS) {
-        TFW_LOGE_SDK("cli test ConfigTest failed");
-    }
+    TestEntry();
 
     result = TFW_CoreDeinit();
     if (result != TFW_SUCCESS) {
@@ -58,5 +106,5 @@ int main(int argc, char *argv[]) {
         return result;
     }
     TFW_LOGI_SDK("cli test success");
-    return 0;
+    return TFW_SUCCESS;
 }
