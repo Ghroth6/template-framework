@@ -28,13 +28,6 @@ extern "C" {
 // 默认类型 - C语言兼容
 // ============================================================================
 
-// Basic type template
-// 基础类型模板
-typedef struct {
-    int32_t id;
-    int32_t value;
-} TFW_Type;
-
 // ============================================================================
 // Configuration types - Configuration management
 // 配置类型 - 配置管理

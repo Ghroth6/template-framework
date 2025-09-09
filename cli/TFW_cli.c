@@ -12,7 +12,7 @@ int32_t ConfigTest(void)
     TFW_ConfigItem *configArray = NULL;
     result = TFW_CoreGetAllConfigItems(&configArray, (uint32_t*)&configNum);
     if (result != TFW_SUCCESS) {
-        TFW_LOGE_SDK("cli test TFW_CoreGetAllConfigItem failed, result = %d", result);
+        TFW_LOGE_SDK("TFW_CoreGetAllConfigItem failed, result = %d", result);
         return -1;
     }
     printf("config num = %d\n", configNum);
