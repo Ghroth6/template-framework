@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file TFW_interface.h
  * @brief TFW Framework Core Interface Definition
  * @brief TFW框架核心接口定义
@@ -163,6 +163,47 @@ public:
      *    2. 未初始化的实例调用其他方法可能返回错误
      */
     bool IsInitialized() const;
+
+    /**
+     * Get all configuration items
+     * 获取所有配置项
+     *
+     * @param config_array Pointer to store the array of configuration items
+     * @param count Pointer to store the number of configuration items
+     * @return Returns TFW_SUCCESS on success, error code on failure
+     * @param config_array 存储配置项数组的指针
+     * @param count 存储配置项数量的指针
+     * @return 成功返回TFW_SUCCESS，失败返回错误码
+     *
+     * Important Notes:
+     * 注意事项：
+     * 1. The returned array must be freed by the caller using TFW_ConfigFreeAll()
+     *     1. 返回的数组必须使用TFW_ConfigFreeAll()由调用者释放
+     * */
+    int32_t GetAllConfigItems(TFW_ConfigItem **config_array, uint32_t *count);
+
+    /**
+     * Free all configuration items
+     * 释放所有配置项
+     *
+     * This function releases the memory of the configuration item array allocated by GetAllConfigItems()
+     * 该函数释放由GetAllConfigItems()分配的配置项数组的内存
+     *
+     * @param config_array Pointer to the configuration item array to be freed
+     * @param config_array 待释放的配置项数组指针
+     * @return Returns TFW_SUCCESS on success, error code on failure
+     * @return 成功返回TFW_SUCCESS，失败返回错误码
+     *
+     * Important Notes:
+     * 注意事项：
+     * 1. This function should only be called on arrays allocated by GetAllConfigItems()
+     *    1. 此函数只能对由GetAllConfigItems()分配的数组调用
+     * 2. After calling this function, the config_array pointer will become invalid
+     *    2. 调用此函数后，config_array指针将变为无效
+     * 3. Do not call this function multiple times on the same array
+     *    3. 不要对同一数组多次调用此函数
+     */
+    void FreeAllConfigItems(TFW_ConfigItem *config_array);
 
 private:
     // Disable copy constructor and assignment operator

@@ -120,6 +120,40 @@ bool CoreInterface::IsInitialized() const {
     return isInitialized_;
 }
 
+int32_t CoreInterface::GetAllConfigItems(TFW_ConfigItem **config_array, uint32_t *count)
+{
+    TFW_LOGD_CORE("TFW_CoreInterfaceGetAllConfigItems called");
+    if (config_array == nullptr || count == nullptr) {
+        TFW_LOGE_CORE("Invalid parameter for GetAllConfigItems");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+    if (!isInitialized_) {
+        TFW_LOGE_CORE("CoreInterface not initialized");
+        return TFW_ERROR_NOT_INIT;
+    }
+    int32_t result = TFW_ConfigGetAll(config_array, count);
+    if (result != TFW_SUCCESS) {
+        TFW_LOGE_CORE("TFW_ConfigGetAll failed with error: %d", result);
+        return result;
+    }
+    TFW_LOGD_CORE("GetAllConfigItems success, count=%u", *count);
+    return TFW_SUCCESS;
+}
+
+void CoreInterface::FreeAllConfigItems(TFW_ConfigItem *config_array)
+{
+    TFW_LOGD_CORE("TFW_CoreInterfaceFreeAllConfigItems called");
+    if (config_array == nullptr) {
+        TFW_LOGE_CORE("Invalid parameter for FreeAllConfigItems");
+        return;
+    }
+    if (!isInitialized_) {
+        TFW_LOGE_CORE("CoreInterface not initialized");
+    }
+    TFW_ConfigFreeAll(config_array);
+    return;
+}
+
 }  // namespace TFW
 
 // C接口实现
@@ -172,6 +206,37 @@ int32_t TFW_CoreInterfaceDeinit(void) {
     TFW::CoreInterface::DestroyInstance();
 
     return result;
+}
+
+int32_t TFW_CoreInterfaceGetAllConfigItems(TFW_ConfigItem **config_array, uint32_t *count) {
+    TFW_LOGD_CORE("TFW_CoreInterfaceGetAllConfigItems called");
+
+    TFW::CoreInterface* coreInstance = TFW::CoreInterface::GetInstance();
+    if (coreInstance == nullptr) {
+        TFW_LOGE_CORE("Failed to get core instance");
+        return TFW_ERROR;
+    }
+
+    // 调用C++实现获取配置项
+    int32_t result = coreInstance->GetAllConfigItems(config_array, count);
+    if (result != TFW_SUCCESS) {
+        TFW_LOGE_CORE("Failed to get all config items, error: %d", result);
+    }
+    return result;
+}
+
+void TFW_CoreInterfaceFreeAllConfigItems(TFW_ConfigItem *config_array) {
+    TFW_LOGD_CORE("TFW_CoreInterfaceFreeAllConfigItems called");
+
+    TFW::CoreInterface* coreInstance = TFW::CoreInterface::GetInstance();
+    if (coreInstance == nullptr) {
+        TFW_LOGE_CORE("Failed to get core instance");
+        return;
+    }
+
+    // 调用C++实现释放配置项
+    coreInstance->FreeAllConfigItems(config_array);
+    return;
 }
 
 }  // extern "C"

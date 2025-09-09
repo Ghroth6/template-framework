@@ -47,3 +47,18 @@ int32_t TFW_CoreDeinit(void) {
     TFW_LOGI_CORE("core module deinit success");
     return TFW_SUCCESS;
 }
+
+int32_t TFW_CoreGetAllConfigItems(TFW_ConfigItem **config_array, uint32_t *count) {
+    TFW_LOGI_CORE("get all config items...");
+    int32_t result = TFW_CoreInterfaceGetAllConfigItems(config_array, count);
+    if (result != TFW_SUCCESS) {
+        TFW_LOGE_CORE("error: get all config items failed");
+        return result;
+    }
+    TFW_LOGI_CORE("get all config items success, count=%u", *count);
+    return TFW_SUCCESS;
+}
+void TFW_CoreFreeAllConfigItems(TFW_ConfigItem *config_array) {
+    TFW_LOGI_CORE("free all config items...");
+    TFW_CoreInterfaceFreeAllConfigItems(config_array);
+}
