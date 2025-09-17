@@ -18,6 +18,7 @@ set(MODULE_DESCRIPTION "TFW Command Line Interface Tool")
 # CLI 工具源文件
 set(CLI_SOURCES
     TFW_cli.c
+    TFW_cli_config.c
     # If you need other source files, add them here
     # 如果您需要其他源文件，请在此处添加
     # other_file.c

@@ -6,10 +6,26 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "TFW_errorno.h"
+#include "TFW_common_defines.h"
+#include "TFW_sdk_log.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct {
+    char name[TFW_NORMAL_BUFFER_SIZE_MAX];
+    int32_t (*func)(void);
+} CliTestFunc;
+
+typedef struct {
+    const char* name;
+    const char* description;
+    CliTestFunc* functions;
+    int32_t func_count;
+} CliTestModule;
+
+typedef CliTestModule* (*ModuleGetterFunc)(void);
 
 // ============================================================================
 // CLI utility functions
