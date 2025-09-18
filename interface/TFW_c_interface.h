@@ -78,22 +78,103 @@ int32_t TFW_CoreGetAllConfigItems(TFW_ConfigItem **config_array, uint32_t *count
  */
 void TFW_CoreFreeAllConfigItems(TFW_ConfigItem *config_array);
 
+/**
+ * Get integer configuration value by key
+ * 根据键获取整型配置值
+ *
+ * @param key   Configuration key / 配置键
+ * @param value Pointer to store the integer value / 指向存储整型值的指针
+ * @return TFW_SUCCESS means success, negative means error
+ *         TFW_SUCCESS表示成功，负值表示错误
+ */
 int32_t TFW_CoreGetIntConfigValue(TFW_ConfigKey key, int32_t *value);
 
+/**
+ * Set integer configuration value by key
+ * 根据键设置整型配置值
+ *
+ * @param key   Configuration key / 配置键
+ * @param value Integer value to set / 要设置的整型值
+ * @return TFW_SUCCESS means success, negative means error
+ *         TFW_SUCCESS表示成功，负值表示错误
+ */
 int32_t TFW_CoreSetIntConfigValue(TFW_ConfigKey key, int32_t value);
 
+/**
+ * Get float configuration value by key
+ * 根据键获取浮点型配置值
+ *
+ * @param key   Configuration key / 配置键
+ * @param value Pointer to store the float value / 指向存储浮点值的指针
+ * @return TFW_SUCCESS means success, negative means error
+ *         TFW_SUCCESS表示成功，负值表示错误
+ */
 int32_t TFW_CoreGetFloatConfigValue(TFW_ConfigKey key, float *value);
 
+/**
+ * Set float configuration value by key
+ * 根据键设置浮点型配置值
+ *
+ * @param key   Configuration key / 配置键
+ * @param value Float value to set / 要设置的浮点值
+ * @return TFW_SUCCESS means success, negative means error
+ *         TFW_SUCCESS表示成功，负值表示错误
+ */
 int32_t TFW_CoreSetFloatConfigValue(TFW_ConfigKey key, float value);
 
+/**
+ * Get boolean configuration value by key
+ * 根据键获取布尔型配置值
+ *
+ * @param key   Configuration key / 配置键
+ * @param value Pointer to store the boolean value / 指向存储布尔值的指针
+ * @return TFW_SUCCESS means success, negative means error
+ *         TFW_SUCCESS表示成功，负值表示错误
+ */
 int32_t TFW_CoreGetBoolConfigValue(TFW_ConfigKey key, bool *value);
 
+/**
+ * Set boolean configuration value by key
+ * 根据键设置布尔型配置值
+ *
+ * @param key   Configuration key / 配置键
+ * @param value Boolean value to set / 要设置的布尔值
+ * @return TFW_SUCCESS means success, negative means error
+ *         TFW_SUCCESS表示成功，负值表示错误
+ */
 int32_t TFW_CoreSetBoolConfigValue(TFW_ConfigKey key, bool value);
 
+/**
+ * Get string configuration value by key
+ * 根据键获取字符串配置值
+ *
+ * @param key   Configuration key / 配置键
+ * @param value Pointer to store the string value / 指向存储字符串值的指针
+ * @return TFW_SUCCESS means success, negative means error
+ *         TFW_SUCCESS表示成功，负值表示错误
+ */
 int32_t TFW_CoreGetStringConfigValue(TFW_ConfigKey key, const char **value);
 
+/**
+ * Set string configuration value by key
+ * 根据键设置字符串配置值
+ *
+ * @param key   Configuration key / 配置键
+ * @param value String value to set / 要设置的字符串值
+ * @return TFW_SUCCESS means success, negative means error
+ *         TFW_SUCCESS表示成功，负值表示错误
+ */
 int32_t TFW_CoreSetStringConfigValue(TFW_ConfigKey key, const char *value);
 
+/**
+ * Get configuration value type by key
+ * 根据键获取配置值类型
+ *
+ * @param key  Configuration key / 配置键
+ * @param type Pointer to store the configuration value type / 指向存储配置值类型的指针
+ * @return TFW_SUCCESS means success, negative means error
+ *         TFW_SUCCESS表示成功，负值表示错误
+ */
 int32_t TFW_CoreGetConfigValueTypeByKey(TFW_ConfigKey key, TFW_ConfigValueType *type);
 
 #ifdef __cplusplus

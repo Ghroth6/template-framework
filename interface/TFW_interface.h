@@ -205,22 +205,169 @@ public:
      */
     void FreeAllConfigItems(TFW_ConfigItem *config_array);
 
+    /**
+     * Get integer configuration value by key
+     * 根据键获取整数配置值
+     *
+     * @param key Configuration key to query / 要查询的配置键
+     * @param value Pointer to store the retrieved integer value / 存储获取的整数值的指针
+     * @return Returns TFW_SUCCESS on success, error code on failure / 成功返回TFW_SUCCESS，失败返回错误码
+     *
+     * Important Notes:
+     * 注意事项：
+     * 1. The value pointer must not be null
+     *    1. value指针不能为空
+     * 2. The configuration key must be valid
+     *    2. 配置键必须有效
+     * 3. The configuration item type must be TFW_CONFIG_TYPE_INT
+     *    3. 配置项类型必须为TFW_CONFIG_TYPE_INT
+     */
     int32_t GetIntConfigValue(TFW_ConfigKey key, int32_t *value);
 
+    /**
+     * Set integer configuration value by key
+     * 根据键设置整数配置值
+     *
+     * @param key Configuration key to set / 要设置的配置键
+     * @param value Integer value to set / 要设置的整数值
+     * @return Returns TFW_SUCCESS on success, error code on failure / 成功返回TFW_SUCCESS，失败返回错误码
+     *
+     * Important Notes:
+     * 注意事项：
+     * 1. The configuration key must be valid
+     *    1. 配置键必须有效
+     * 2. The configuration item type must be TFW_CONFIG_TYPE_INT
+     *    2. 配置项类型必须为TFW_CONFIG_TYPE_INT
+     */
     int32_t SetIntConfigValue(TFW_ConfigKey key, int32_t value);
 
+    /**
+     * Get float configuration value by key
+     * 根据键获取浮点数配置值
+     *
+     * @param key Configuration key to query / 要查询的配置键
+     * @param value Pointer to store the retrieved float value / 存储获取的浮点数值的指针
+     * @return Returns TFW_SUCCESS on success, error code on failure / 成功返回TFW_SUCCESS，失败返回错误码
+     *
+     * Important Notes:
+     * 注意事项：
+     * 1. The value pointer must not be null
+     *    1. value指针不能为空
+     * 2. The configuration key must be valid
+     *    2. 配置键必须有效
+     * 3. The configuration item type must be TFW_CONFIG_TYPE_FLOAT
+     *    3. 配置项类型必须为TFW_CONFIG_TYPE_FLOAT
+     */
     int32_t GetFloatConfigValue(TFW_ConfigKey key, float *value);
 
+    /**
+     * Set float configuration value by key
+     * 根据键设置浮点数配置值
+     *
+     * @param key Configuration key to set / 要设置的配置键
+     * @param value Float value to set / 要设置的浮点数值
+     * @return Returns TFW_SUCCESS on success, error code on failure / 成功返回TFW_SUCCESS，失败返回错误码
+     *
+     * Important Notes:
+     * 注意事项：
+     * 1. The configuration key must be valid
+     *    1. 配置键必须有效
+     * 2. The configuration item type must be TFW_CONFIG_TYPE_FLOAT
+     *    2. 配置项类型必须为TFW_CONFIG_TYPE_FLOAT
+     */
     int32_t SetFloatConfigValue(TFW_ConfigKey key, float value);
 
+    /**
+     * Get boolean configuration value by key
+     * 根据键获取布尔配置值
+     *
+     * @param key Configuration key to query / 要查询的配置键
+     * @param value Pointer to store the retrieved boolean value / 存储获取的布尔值的指针
+     * @return Returns TFW_SUCCESS on success, error code on failure / 成功返回TFW_SUCCESS，失败返回错误码
+     *
+     * Important Notes:
+     * 注意事项：
+     * 1. The value pointer must not be null
+     *    1. value指针不能为空
+     * 2. The configuration key must be valid
+     *    2. 配置键必须有效
+     * 3. The configuration item type must be TFW_CONFIG_TYPE_BOOL
+     *    3. 配置项类型必须为TFW_CONFIG_TYPE_BOOL
+     */
     int32_t GetBoolConfigValue(TFW_ConfigKey key, bool *value);
 
+    /**
+     * Set boolean configuration value by key
+     * 根据键设置布尔配置值
+     *
+     * @param key Configuration key to set / 要设置的配置键
+     * @param value Boolean value to set / 要设置的布尔值
+     * @return Returns TFW_SUCCESS on success, error code on failure / 成功返回TFW_SUCCESS，失败返回错误码
+     *
+     * Important Notes:
+     * 注意事项：
+     * 1. The configuration key must be valid
+     *    1. 配置键必须有效
+     * 2. The configuration item type must be TFW_CONFIG_TYPE_BOOL
+     *    2. 配置项类型必须为TFW_CONFIG_TYPE_BOOL
+     */
     int32_t SetBoolConfigValue(TFW_ConfigKey key, bool value);
 
+    /**
+     * Get string configuration value by key
+     * 根据键获取字符串配置值
+     *
+     * @param key Configuration key to query / 要查询的配置键
+     * @param value Pointer to store the retrieved string value pointer / 存储获取的字符串值指针的指针
+     * @return Returns TFW_SUCCESS on success, error code on failure / 成功返回TFW_SUCCESS，失败返回错误码
+     *
+     * Important Notes:
+     * 注意事项：
+     * 1. The value pointer must not be null
+     *    1. value指针不能为空
+     * 2. The configuration key must be valid
+     *    2. 配置键必须有效
+     * 3. The configuration item type must be TFW_CONFIG_TYPE_STRING
+     *    3. 配置项类型必须为TFW_CONFIG_TYPE_STRING
+     * 4. The returned string is managed internally and should not be freed by the caller
+     *    4. 返回的字符串由内部管理，调用者不应释放
+     */
     int32_t GetStringConfigValue(TFW_ConfigKey key, const char **value);
 
+    /**
+     * Set string configuration value by key
+     * 根据键设置字符串配置值
+     *
+     * @param key Configuration key to set / 要设置的配置键
+     * @param value String value to set / 要设置的字符串值
+     * @return Returns TFW_SUCCESS on success, error code on failure / 成功返回TFW_SUCCESS，失败返回错误码
+     *
+     * Important Notes:
+     * 注意事项：
+     * 1. The configuration key must be valid
+     *    1. 配置键必须有效
+     * 2. The configuration item type must be TFW_CONFIG_TYPE_STRING
+     *    2. 配置项类型必须为TFW_CONFIG_TYPE_STRING
+     * 3. The string value is copied internally, so the caller can free the original after calling
+     *    3. 字符串值在内部被复制，因此调用者可以在调用后释放原始字符串
+     */
     int32_t SetStringConfigValue(TFW_ConfigKey key, const char *value);
 
+    /**
+     * Get configuration value type by key
+     * 根据键获取配置值类型
+     *
+     * @param key Configuration key to query / 要查询的配置键
+     * @param type Pointer to store the retrieved configuration value type / 存储获取的配置值类型的指针
+     * @return Returns TFW_SUCCESS on success, error code on failure / 成功返回TFW_SUCCESS，失败返回错误码
+     *
+     * Important Notes:
+     * 注意事项：
+     * 1. The type pointer must not be null
+     *    1. type指针不能为空
+     * 2. The configuration key must be valid
+     *    2. 配置键必须有效
+     */
     int32_t GetConfigValueTypeByKey(TFW_ConfigKey key, TFW_ConfigValueType *type);
 
 private:
