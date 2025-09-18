@@ -36,13 +36,8 @@ extern "C" {
 // Configuration key enumeration
 // 配置键枚举
 typedef enum {
-    // Main configuration / 主配置
-    TFW_CONFIG_MAIN_VERSION = 0,
-    TFW_CONFIG_MAIN_DEBUG,
-    TFW_CONFIG_MAIN_LOG_LEVEL,
-
     // Logging configuration / 日志配置
-    TFW_CONFIG_LOGGING_LEVEL,
+    TFW_CONFIG_LOGGING_LEVEL = 0,
     TFW_CONFIG_LOGGING_OUTPUT,
     TFW_CONFIG_LOGGING_FILE_PATH,
     TFW_CONFIG_LOGGING_FILE_PREFIX,

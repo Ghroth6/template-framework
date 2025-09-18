@@ -36,11 +36,17 @@ set(MODULE_NAME "TFW_utils")
 
 # set module version
 # 设置模块版本
-set(MODULE_VERSION "1.0.0")
+set(MODULE_VERSION ${TFW_VERSION_STRING})
 
 # set module description
 # 设置模块描述
 set(MODULE_DESCRIPTION "TFW framework utils module")
+
+# 配置构建信息头文件
+configure_file(
+    "${CMAKE_SOURCE_DIR}/utils/include/TFW_build_info.h.in"
+    "${CMAKE_SOURCE_DIR}/utils/include/TFW_build_info.h"
+)
 
 # ============================================================================
 # source file configuration

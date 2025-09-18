@@ -85,7 +85,6 @@ int32_t CoreInterface::Init() {
         return TFW_SUCCESS;
     }
 
-    // TODO: 实际的初始化逻辑
     int32_t result = TFW_ConfigInit();
     if (result != TFW_SUCCESS) {
         TFW_LOGE_CORE("Failed to initialize config module, error: %d", result);
@@ -104,7 +103,6 @@ int32_t CoreInterface::Deinit() {
         return TFW_SUCCESS;
     }
 
-    // TODO: 实际的清理逻辑
     int32_t result = TFW_ConfigDeinit();
     if (result != TFW_SUCCESS) {
         TFW_LOGE_CORE("Failed to deinitialize config module, error: %d", result);

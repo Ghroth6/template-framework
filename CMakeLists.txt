@@ -33,6 +33,63 @@
 cmake_minimum_required(VERSION 3.20)
 project(TFW VERSION 1.0.0 LANGUAGES C CXX)
 
+# 定义项目版本变量，供子模块使用
+set(TFW_VERSION_MAJOR ${CMAKE_PROJECT_VERSION_MAJOR})
+set(TFW_VERSION_MINOR ${CMAKE_PROJECT_VERSION_MINOR})
+set(TFW_VERSION_PATCH ${CMAKE_PROJECT_VERSION_PATCH})
+set(TFW_VERSION_STRING ${CMAKE_PROJECT_VERSION})
+
+# 收集构建信息
+string(TIMESTAMP TFW_BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
+
+# 获取Git信息（如果在Git仓库中）
+find_package(Git QUIET)
+if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        OUTPUT_VARIABLE TFW_GIT_COMMIT_HASH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} rev-parse --abbrev-ref HEAD
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        OUTPUT_VARIABLE TFW_GIT_BRANCH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} diff-index --quiet HEAD --
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        RESULT_VARIABLE TFW_GIT_DIRTY
+    )
+
+    if(TFW_GIT_DIRTY EQUAL 0)
+        set(TFW_GIT_DIRTY "false")
+    else()
+        set(TFW_GIT_DIRTY "true")
+    endif()
+else()
+    set(TFW_GIT_COMMIT_HASH "unknown")
+    set(TFW_GIT_BRANCH "unknown")
+    set(TFW_GIT_DIRTY "false")
+endif()
+
+# 编译器和平台信息
+set(TFW_COMPILER_ID ${CMAKE_CXX_COMPILER_ID})
+set(TFW_COMPILER_VERSION ${CMAKE_CXX_COMPILER_VERSION})
+set(TFW_BUILD_TYPE ${CMAKE_BUILD_TYPE})
+
+if(WIN32)
+    set(TFW_TARGET_PLATFORM "Windows")
+elseif(APPLE)
+    set(TFW_TARGET_PLATFORM "macOS")
+else()
+    set(TFW_TARGET_PLATFORM "Linux")
+endif()
+
+set(TFW_TARGET_ARCH ${CMAKE_SYSTEM_PROCESSOR})
 # ============================================================================
 # build options configuration
 # 构建选项配置

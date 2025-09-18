@@ -109,7 +109,7 @@ static TFW_UNUSED char TFW_Log_GetLevelChar(int32_t level) {
             return 'F';
         default:
             return '?';
-  }
+    }
 }
 
 /**
@@ -159,7 +159,13 @@ static TFW_UNUSED int32_t TFW_Log_GetFileName(const char *file_path, char *filen
 static TFW_UNUSED void TFW_Log_OutputToStdout(const char *message) {
     printf("%s\n", message);
     fflush(stdout);
-    }
+}
+
+// TODO: 实现日志写入文件的功能
+static TFW_UNUSED void TFW_Log_OutputToFile(const char *message) {
+    printf("Log to file: %s\n", message);
+    fflush(stdout);
+}
 
 // ============================================================================
 // 公共接口实现
@@ -246,9 +252,7 @@ int32_t TFW_LOG_IMPL(int32_t module, int32_t level, const char *file,
     // output log to file according to configuration
     if (g_logContext.logOutputMode == TFW_LOG_OUTPUT_FILE ||
         g_logContext.logOutputMode == TFW_LOG_OUTPUT_BOTH) {
-        // TODO: 输出到文件
-        // output to file
-        // TFW_Log_WriteToFile(logMessage);
+        TFW_Log_OutputToFile(logMessage);
     }
 
     return TFW_SUCCESS;

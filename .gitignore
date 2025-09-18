@@ -66,11 +66,6 @@ runtime/logs/
 *.temp
 *.cache
 
-# 构建生成的软链接
-tfw_simple_c
-tfw_simple_cpp
-/tfw_*
-
 # Runtime directories
 runtime/
 
@@ -101,3 +96,6 @@ docs/latex/
 # 包管理文件
 vcpkg_installed/
 conan/
+
+# 构建时生成的头文件
+utils/include/TFW_build_info.h

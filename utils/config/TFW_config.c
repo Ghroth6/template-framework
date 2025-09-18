@@ -678,22 +678,6 @@ static int32_t TFW_ConfigCreateDefault(void) {
     // 设置默认配置项
     TFW_ConfigItem item;
 
-    // Main configuration
-    item.key = TFW_CONFIG_MAIN_VERSION;
-    item.type = TFW_CONFIG_TYPE_INT;
-    item.value.int_value = 1;
-    TFW_ConfigSetItemInner(&item);
-
-    item.key = TFW_CONFIG_MAIN_DEBUG;
-    item.type = TFW_CONFIG_TYPE_BOOL;
-    item.value.bool_value = false;
-    TFW_ConfigSetItemInner(&item);
-
-    item.key = TFW_CONFIG_MAIN_LOG_LEVEL;
-    item.type = TFW_CONFIG_TYPE_INT;
-    item.value.int_value = 1;
-    TFW_ConfigSetItemInner(&item);
-
     // Logging configuration
     item.key = TFW_CONFIG_LOGGING_LEVEL;
     item.type = TFW_CONFIG_TYPE_INT;
@@ -723,23 +707,23 @@ static int32_t TFW_ConfigCreateDefault(void) {
 
     item.key = TFW_CONFIG_LOGGING_MAX_FILE_SIZE;
     item.type = TFW_CONFIG_TYPE_INT;
-    item.value.int_value = atoi(TFW_CONFIG_DEFAULT_LOGGING_MAX_FILE_SIZE);
+    item.value.int_value = TFW_CONFIG_DEFAULT_LOGGING_MAX_FILE_SIZE;
     TFW_ConfigSetItemInner(&item);
 
     item.key = TFW_CONFIG_LOGGING_MAX_RETENTION_DAYS;
     item.type = TFW_CONFIG_TYPE_INT;
-    item.value.int_value = atoi(TFW_CONFIG_DEFAULT_LOGGING_MAX_RETENTION_DAYS);
+    item.value.int_value = TFW_CONFIG_DEFAULT_LOGGING_MAX_RETENTION_DAYS;
     TFW_ConfigSetItemInner(&item);
 
     // Resources configuration
     item.key = TFW_CONFIG_RESOURCES_AUTO_UPDATE;
     item.type = TFW_CONFIG_TYPE_BOOL;
-    item.value.bool_value = (strcmp(TFW_CONFIG_DEFAULT_RESOURCES_AUTO_UPDATE, "true") == 0);
+    item.value.bool_value = TFW_CONFIG_DEFAULT_RESOURCES_AUTO_UPDATE;
     TFW_ConfigSetItemInner(&item);
 
     item.key = TFW_CONFIG_RESOURCES_UPDATE_INTERVAL;
     item.type = TFW_CONFIG_TYPE_INT;
-    item.value.int_value = atoi(TFW_CONFIG_DEFAULT_RESOURCES_UPDATE_INTERVAL);
+    item.value.int_value = TFW_CONFIG_DEFAULT_RESOURCES_UPDATE_INTERVAL;
     TFW_ConfigSetItemInner(&item);
 
     item.key = TFW_CONFIG_RESOURCES_CACHE_PATH;
@@ -752,12 +736,12 @@ static int32_t TFW_ConfigCreateDefault(void) {
     // System configuration
     item.key = TFW_CONFIG_SYSTEM_MAX_THREADS;
     item.type = TFW_CONFIG_TYPE_INT;
-    item.value.int_value = atoi(TFW_CONFIG_DEFAULT_SYSTEM_MAX_THREADS);
+    item.value.int_value = TFW_CONFIG_DEFAULT_SYSTEM_MAX_THREADS;
     TFW_ConfigSetItemInner(&item);
 
     item.key = TFW_CONFIG_SYSTEM_TIMEOUT;
     item.type = TFW_CONFIG_TYPE_INT;
-    item.value.int_value = atoi(TFW_CONFIG_DEFAULT_SYSTEM_TIMEOUT);
+    item.value.int_value = TFW_CONFIG_DEFAULT_SYSTEM_TIMEOUT;
     TFW_ConfigSetItemInner(&item);
 
     TFW_LOGI_UTILS("Default config created successfully");
@@ -775,12 +759,6 @@ static void TFW_ConfigNotifyUpdate(TFW_ConfigKey key, const TFW_ConfigItem *item
 
 static const char *TFW_ConfigKeyToString(TFW_ConfigKey key) {
     switch (key) {
-        case TFW_CONFIG_MAIN_VERSION:
-            return TFW_CONFIG_NAME_MAIN_VERSION;
-        case TFW_CONFIG_MAIN_DEBUG:
-            return TFW_CONFIG_NAME_MAIN_DEBUG;
-        case TFW_CONFIG_MAIN_LOG_LEVEL:
-            return TFW_CONFIG_NAME_MAIN_LOG_LEVEL;
         case TFW_CONFIG_LOGGING_LEVEL:
             return TFW_CONFIG_NAME_LOGGING_LEVEL;
         case TFW_CONFIG_LOGGING_OUTPUT:

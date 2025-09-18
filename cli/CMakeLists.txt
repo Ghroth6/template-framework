@@ -6,7 +6,7 @@
 # Module information
 # 模块信息
 set(MODULE_NAME "TFW_cli")
-set(MODULE_VERSION "1.0.0")
+set(MODULE_VERSION ${TFW_VERSION_STRING})
 set(MODULE_DESCRIPTION "TFW Command Line Interface Tool")
 
 # ============================================================================

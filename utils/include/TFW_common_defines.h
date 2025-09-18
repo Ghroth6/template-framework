@@ -12,11 +12,17 @@
 
 // Version information / 版本信息
 // Note: Update these values manually when releasing new versions
-// 注意：发布新版本时请手动更新这些值
-#define TFW_VERSION_MAJOR 1
+// 包含版本信息（如果构建系统生成了版本文件，则使用生成的版本）
+#if __has_include("TFW_build_info.h")
+#include "TFW_build_info.h"
+#else
+// 否则使用默认版本（用于 IDE 代码提示等场景）
+// 注意：发布新版本时更新这些值
+#define TFW_VERSION_MAJOR 0
 #define TFW_VERSION_MINOR 0
 #define TFW_VERSION_PATCH 0
-#define TFW_VERSION_STRING "1.0.0"
+#define TFW_VERSION_STRING "0.0.0"
+#endif
 
 // Configuration file settings / 配置文件设置
 #define TFW_CONFIG_FILE_PATH "runtime"
@@ -39,9 +45,6 @@
 // Configuration key names / 配置键名称
 // Note: These strings are used in configuration files and should be consistent
 // 注意：这些字符串用于配置文件，应保持一致
-#define TFW_CONFIG_NAME_MAIN_VERSION "main.version"
-#define TFW_CONFIG_NAME_MAIN_DEBUG "main.debug"
-#define TFW_CONFIG_NAME_MAIN_LOG_LEVEL "main.log_level"
 #define TFW_CONFIG_NAME_LOGGING_LEVEL "logging.level"
 #define TFW_CONFIG_NAME_LOGGING_OUTPUT "logging.output"
 #define TFW_CONFIG_NAME_LOGGING_FILE_PATH "logging.file_path"
@@ -57,19 +60,15 @@
 // Default configuration values / 默认配置值
 // Note: Log level configurations now use enum types, no string defaults needed
 // 注意：日志等级配置现在使用枚举类型，不需要字符串默认值
-#define TFW_CONFIG_DEFAULT_MAIN_VERSION "1"
-#define TFW_CONFIG_DEFAULT_MAIN_DEBUG "false"
-#define TFW_CONFIG_DEFAULT_MAIN_LOG_LEVEL "1"
-#define TFW_CONFIG_DEFAULT_LOGGING_LEVEL "1"
 #define TFW_CONFIG_DEFAULT_LOGGING_OUTPUT "console"
 #define TFW_CONFIG_DEFAULT_LOGGING_FILE_PATH TFW_CONFIG_FILE_PATH"/logs"
 #define TFW_CONFIG_DEFAULT_LOGGING_FILE_PREFIX "TFW"
-#define TFW_CONFIG_DEFAULT_LOGGING_MAX_FILE_SIZE "10485760"
-#define TFW_CONFIG_DEFAULT_LOGGING_MAX_RETENTION_DAYS "7"
-#define TFW_CONFIG_DEFAULT_RESOURCES_AUTO_UPDATE "true"
-#define TFW_CONFIG_DEFAULT_RESOURCES_UPDATE_INTERVAL "3600"
+#define TFW_CONFIG_DEFAULT_LOGGING_MAX_FILE_SIZE 10485760
+#define TFW_CONFIG_DEFAULT_LOGGING_MAX_RETENTION_DAYS 7
+#define TFW_CONFIG_DEFAULT_RESOURCES_AUTO_UPDATE true
+#define TFW_CONFIG_DEFAULT_RESOURCES_UPDATE_INTERVAL 3600
 #define TFW_CONFIG_DEFAULT_RESOURCES_CACHE_PATH "./cache"
-#define TFW_CONFIG_DEFAULT_SYSTEM_MAX_THREADS "10"
-#define TFW_CONFIG_DEFAULT_SYSTEM_TIMEOUT "30"
+#define TFW_CONFIG_DEFAULT_SYSTEM_MAX_THREADS 10
+#define TFW_CONFIG_DEFAULT_SYSTEM_TIMEOUT 30
 
 #endif  // TFW_COMMON_DEFINES_H

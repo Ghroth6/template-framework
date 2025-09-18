@@ -37,7 +37,7 @@ set(MODULE_NAME "TFW_core")
 
 # set module version
 # 设置模块版本
-set(MODULE_VERSION "1.0.0")
+set(MODULE_VERSION ${TFW_VERSION_STRING})
 
 # set module description
 # 设置模块描述
