@@ -62,3 +62,117 @@ void TFW_CoreFreeAllConfigItems(TFW_ConfigItem *config_array) {
     TFW_LOGI_CORE("free all config items...");
     TFW_CoreInterfaceFreeAllConfigItems(config_array);
 }
+
+int32_t TFW_CoreGetIntConfigValue(TFW_ConfigKey key, int32_t *value) {
+    TFW_LOGI_CORE("get int config value for key %d...", key);
+    if (value == NULL) {
+        TFW_LOGE_CORE("error: invalid parameter");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+    int32_t result = TFW_CoreInterfaceGetIntConfigValue(key, value);
+    if (result != TFW_SUCCESS) {
+        TFW_LOGE_CORE("error: get config item failed");
+        return result;
+    }
+    return TFW_SUCCESS;
+}
+
+int32_t TFW_CoreSetIntConfigValue(TFW_ConfigKey key, int32_t value) {
+    TFW_LOGI_CORE("set int config value for key %d...", key);
+    int32_t result = TFW_CoreInterfaceSetIntConfigValue(key, value);
+    if (result != TFW_SUCCESS) {
+        TFW_LOGE_CORE("error: set config item failed");
+        return result;
+    }
+    return TFW_SUCCESS;
+}
+
+int32_t TFW_CoreGetBoolConfigValue(TFW_ConfigKey key, bool *value) {
+    TFW_LOGI_CORE("get bool config value for key %d...", key);
+    if (value == NULL) {
+        TFW_LOGE_CORE("error: invalid parameter");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+    int32_t result = TFW_CoreInterfaceGetBoolConfigValue(key, value);
+    if (result != TFW_SUCCESS) {
+        TFW_LOGE_CORE("error: get config item failed");
+        return result;
+    }
+    return TFW_SUCCESS;
+}
+
+int32_t TFW_CoreSetBoolConfigValue(TFW_ConfigKey key, bool value) {
+    TFW_LOGI_CORE("set bool config value for key %d...", key);
+    int32_t result = TFW_CoreInterfaceSetBoolConfigValue(key, value);
+    if (result != TFW_SUCCESS) {
+        TFW_LOGE_CORE("error: set config item failed");
+        return result;
+    }
+    return TFW_SUCCESS;
+}
+
+int32_t TFW_CoreGetFloatConfigValue(TFW_ConfigKey key, float *value) {
+    TFW_LOGI_CORE("get float config value for key %d...", key);
+    if (value == NULL) {
+        TFW_LOGE_CORE("error: invalid parameter");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+    int32_t result = TFW_CoreInterfaceGetFloatConfigValue(key, value);
+    if (result != TFW_SUCCESS) {
+        TFW_LOGE_CORE("error: get config item failed");
+        return result;
+    }
+    return TFW_SUCCESS;
+}
+
+int32_t TFW_CoreSetFloatConfigValue(TFW_ConfigKey key, float value) {
+    TFW_LOGI_CORE("set float config value for key %d...", key);
+    int32_t result = TFW_CoreInterfaceSetFloatConfigValue(key, value);
+    if (result != TFW_SUCCESS) {
+        TFW_LOGE_CORE("error: set config item failed");
+        return result;
+    }
+    return TFW_SUCCESS;
+}
+
+int32_t TFW_CoreGetStringConfigValue(TFW_ConfigKey key, const char **value) {
+    TFW_LOGI_CORE("get string config value for key %d...", key);
+    if (value == NULL) {
+        TFW_LOGE_CORE("error: invalid parameter");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+    int32_t result = TFW_CoreInterfaceGetStringConfigValue(key, value);
+    if (result != TFW_SUCCESS) {
+        TFW_LOGE_CORE("error: get config item failed");
+        return result;
+    }
+    return TFW_SUCCESS;
+}
+
+int32_t TFW_CoreSetStringConfigValue(TFW_ConfigKey key, const char *value) {
+    TFW_LOGI_CORE("set string config value for key %d...", key);
+    if (value == NULL) {
+        TFW_LOGE_CORE("error: invalid parameter");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+    int32_t result = TFW_CoreInterfaceSetStringConfigValue(key, value);
+    if (result != TFW_SUCCESS) {
+        TFW_LOGE_CORE("error: set config item failed");
+        return result;
+    }
+    return TFW_SUCCESS;
+}
+
+int32_t TFW_CoreGetConfigValueTypeByKey(TFW_ConfigKey key, TFW_ConfigValueType *type) {
+    TFW_LOGI_CORE("get config value type for key %d...", key);
+    if (type == NULL) {
+        TFW_LOGE_CORE("error: invalid parameter");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+    int32_t result = TFW_CoreInterfaceGetConfigValueTypeByKey(key, type);
+    if (result != TFW_SUCCESS) {
+        TFW_LOGE_CORE("error: get config item type failed");
+        return result;
+    }
+    return TFW_SUCCESS;
+}

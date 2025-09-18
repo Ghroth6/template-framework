@@ -122,7 +122,7 @@ bool CoreInterface::IsInitialized() const {
 
 int32_t CoreInterface::GetAllConfigItems(TFW_ConfigItem **config_array, uint32_t *count)
 {
-    TFW_LOGD_CORE("TFW_CoreInterfaceGetAllConfigItems called");
+    TFW_LOGD_CORE("GetAllConfigItems called");
     if (config_array == nullptr || count == nullptr) {
         TFW_LOGE_CORE("Invalid parameter for GetAllConfigItems");
         return TFW_ERROR_INVALID_PARAM;
@@ -142,7 +142,7 @@ int32_t CoreInterface::GetAllConfigItems(TFW_ConfigItem **config_array, uint32_t
 
 void CoreInterface::FreeAllConfigItems(TFW_ConfigItem *config_array)
 {
-    TFW_LOGD_CORE("TFW_CoreInterfaceFreeAllConfigItems called");
+    TFW_LOGD_CORE("FreeAllConfigItems called");
     if (config_array == nullptr) {
         TFW_LOGE_CORE("Invalid parameter for FreeAllConfigItems");
         return;
@@ -152,6 +152,111 @@ void CoreInterface::FreeAllConfigItems(TFW_ConfigItem *config_array)
     }
     TFW_ConfigFreeAll(config_array);
     return;
+}
+
+int32_t CoreInterface::GetIntConfigValue(TFW_ConfigKey key, int32_t *value){
+    TFW_LOGD_CORE("GetIntConfigValue called");
+    if(value == nullptr) {
+        TFW_LOGE_CORE("Invalid parameter for GetIntConfigValue");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+    if(!isInitialized_) {
+        TFW_LOGE_CORE("CoreInterface not initialized");
+        return TFW_ERROR_NOT_INIT;
+    }
+    return TFW_ConfigGetInt(key, value);
+}
+
+int32_t CoreInterface::SetIntConfigValue(TFW_ConfigKey key, int32_t value){
+    TFW_LOGD_CORE("SetIntConfigValue called");
+    if(!isInitialized_) {
+        TFW_LOGE_CORE("CoreInterface not initialized");
+        return TFW_ERROR_NOT_INIT;
+    }
+    return TFW_ConfigSetInt(key, value);
+}
+
+int32_t CoreInterface::GetFloatConfigValue(TFW_ConfigKey key, float *value){
+    TFW_LOGD_CORE("GetFloatConfigValue called");
+    if(value == nullptr) {
+        TFW_LOGE_CORE("Invalid parameter for GetFloatConfigValue");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+    if(!isInitialized_) {
+        TFW_LOGE_CORE("CoreInterface not initialized");
+        return TFW_ERROR_NOT_INIT;
+    }
+    return TFW_ConfigGetFloat(key, value);
+}
+
+int32_t CoreInterface::SetFloatConfigValue(TFW_ConfigKey key, float value){
+    TFW_LOGD_CORE("SetFloatConfigValue called");
+    if(!isInitialized_) {
+        TFW_LOGE_CORE("CoreInterface not initialized");
+        return TFW_ERROR_NOT_INIT;
+    }
+    return TFW_ConfigSetFloat(key, value);
+}
+
+int32_t CoreInterface::GetBoolConfigValue(TFW_ConfigKey key, bool *value){
+    TFW_LOGD_CORE("GetBoolConfigValue called");
+    if(value == nullptr) {
+        TFW_LOGE_CORE("Invalid parameter for GetBoolConfigValue");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+    if(!isInitialized_) {
+        TFW_LOGE_CORE("CoreInterface not initialized");
+        return TFW_ERROR_NOT_INIT;
+    }
+    return TFW_ConfigGetBool(key, value);
+}
+
+int32_t CoreInterface::SetBoolConfigValue(TFW_ConfigKey key, bool value){
+    TFW_LOGD_CORE("SetBoolConfigValue called");
+    if(!isInitialized_) {
+        TFW_LOGE_CORE("CoreInterface not initialized");
+        return TFW_ERROR_NOT_INIT;
+    }
+    return TFW_ConfigSetBool(key, value);
+}
+
+int32_t CoreInterface::GetStringConfigValue(TFW_ConfigKey key, const char **value){
+    TFW_LOGD_CORE("GetStringConfigValue called");
+    if(value == nullptr) {
+        TFW_LOGE_CORE("Invalid parameter for GetStringConfigValue");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+    if(!isInitialized_) {
+        TFW_LOGE_CORE("CoreInterface not initialized");
+        return TFW_ERROR_NOT_INIT;
+    }
+    return TFW_ConfigGetString(key, value);
+}
+
+int32_t CoreInterface::SetStringConfigValue(TFW_ConfigKey key, const char *value){
+    TFW_LOGD_CORE("SetStringConfigValue called");
+    if(value == nullptr) {
+        TFW_LOGE_CORE("Invalid parameter for SetStringConfigValue");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+    if(!isInitialized_) {
+        TFW_LOGE_CORE("CoreInterface not initialized");
+        return TFW_ERROR_NOT_INIT;
+    }
+    return TFW_ConfigSetString(key, value);
+}
+
+int32_t CoreInterface::GetConfigValueTypeByKey(TFW_ConfigKey key, TFW_ConfigValueType *type){
+    TFW_LOGD_CORE("GetConfigValueTypeByKey called");
+    if(type == nullptr) {
+        TFW_LOGE_CORE("Invalid parameter for GetValueTypeByKey");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+    if(!isInitialized_) {
+        TFW_LOGE_CORE("CoreInterface not initialized");
+        return TFW_ERROR_NOT_INIT;
+    }
+    return TFW_ConfigGetValueTypeByKey(key, type);
 }
 
 }  // namespace TFW
@@ -237,6 +342,121 @@ void TFW_CoreInterfaceFreeAllConfigItems(TFW_ConfigItem *config_array) {
     // 调用C++实现释放配置项
     coreInstance->FreeAllConfigItems(config_array);
     return;
+}
+
+int32_t TFW_CoreInterfaceGetIntConfigValue(TFW_ConfigKey key, int32_t *value) {
+    TFW_LOGD_CORE("TFW_CoreInterfaceGetIntConfigValue called");
+
+    TFW::CoreInterface* coreInstance = TFW::CoreInterface::GetInstance();
+    if (coreInstance == nullptr) {
+        TFW_LOGE_CORE("Failed to get core instance");
+        return TFW_ERROR;
+    }
+
+    // 调用C++实现获取整数配置值
+    return coreInstance->GetIntConfigValue(key, value);
+}
+
+int32_t TFW_CoreInterfaceSetIntConfigValue(TFW_ConfigKey key, int32_t value) {
+    TFW_LOGD_CORE("TFW_CoreInterfaceSetIntConfigValue called");
+
+    TFW::CoreInterface* coreInstance = TFW::CoreInterface::GetInstance();
+    if (coreInstance == nullptr) {
+        TFW_LOGE_CORE("Failed to get core instance");
+        return TFW_ERROR;
+    }
+
+    // 调用C++实现设置整数配置值
+    return coreInstance->SetIntConfigValue(key, value);
+}
+
+int32_t TFW_CoreInterfaceGetFloatConfigValue(TFW_ConfigKey key, float *value) {
+    TFW_LOGD_CORE("TFW_CoreInterfaceGetFloatConfigValue called");
+
+    TFW::CoreInterface* coreInstance = TFW::CoreInterface::GetInstance();
+    if (coreInstance == nullptr) {
+        TFW_LOGE_CORE("Failed to get core instance");
+        return TFW_ERROR;
+    }
+
+    // 调用C++实现获取浮点数配置值
+    return coreInstance->GetFloatConfigValue(key, value);
+}
+
+int32_t TFW_CoreInterfaceSetFloatConfigValue(TFW_ConfigKey key, float value) {
+    TFW_LOGD_CORE("TFW_CoreInterfaceSetFloatConfigValue called");
+
+    TFW::CoreInterface* coreInstance = TFW::CoreInterface::GetInstance();
+    if (coreInstance == nullptr) {
+        TFW_LOGE_CORE("Failed to get core instance");
+        return TFW_ERROR;
+    }
+
+    // 调用C++实现设置浮点数配置值
+    return coreInstance->SetFloatConfigValue(key, value);
+}
+
+int32_t TFW_CoreInterfaceGetBoolConfigValue(TFW_ConfigKey key, bool *value) {
+    TFW_LOGD_CORE("TFW_CoreInterfaceGetBoolConfigValue called");
+
+    TFW::CoreInterface* coreInstance = TFW::CoreInterface::GetInstance();
+    if (coreInstance == nullptr) {
+        TFW_LOGE_CORE("Failed to get core instance");
+        return TFW_ERROR;
+    }
+
+    // 调用C++实现获取布尔配置值
+    return coreInstance->GetBoolConfigValue(key, value);
+}
+
+int32_t TFW_CoreInterfaceSetBoolConfigValue(TFW_ConfigKey key, bool value) {
+    TFW_LOGD_CORE("TFW_CoreInterfaceSetBoolConfigValue called");
+
+    TFW::CoreInterface* coreInstance = TFW::CoreInterface::GetInstance();
+    if (coreInstance == nullptr) {
+        TFW_LOGE_CORE("Failed to get core instance");
+        return TFW_ERROR;
+    }
+
+    // 调用C++实现设置布尔配置值
+    return coreInstance->SetBoolConfigValue(key, value);
+}
+
+int32_t TFW_CoreInterfaceGetStringConfigValue(TFW_ConfigKey key, const char **value) {
+    TFW_LOGD_CORE("TFW_CoreInterfaceGetStringConfigValue called");
+
+    TFW::CoreInterface* coreInstance = TFW::CoreInterface::GetInstance();
+    if (coreInstance == nullptr) {
+        TFW_LOGE_CORE("Failed to get core instance");
+        return TFW_ERROR;
+    }
+
+    // 调用C++实现获取字符串配置值
+    return coreInstance->GetStringConfigValue(key, value);
+}
+
+int32_t TFW_CoreInterfaceSetStringConfigValue(TFW_ConfigKey key, const char *value) {
+    TFW_LOGD_CORE("TFW_CoreInterfaceSetStringConfigValue called");
+
+    TFW::CoreInterface* coreInstance = TFW::CoreInterface::GetInstance();
+    if (coreInstance == nullptr) {
+        TFW_LOGE_CORE("Failed to get core instance");
+        return TFW_ERROR;
+    }
+    return coreInstance->SetStringConfigValue(key, value);
+}
+
+int32_t TFW_CoreInterfaceGetConfigValueTypeByKey(TFW_ConfigKey key, TFW_ConfigValueType *type) {
+    TFW_LOGD_CORE("TFW_CoreInterfaceGetValueTypeByKey called");
+
+    TFW::CoreInterface* coreInstance = TFW::CoreInterface::GetInstance();
+    if (coreInstance == nullptr) {
+        TFW_LOGE_CORE("Failed to get core instance");
+        return TFW_ERROR;
+    }
+
+    // 调用C++实现获取配置值类型
+    return coreInstance->GetConfigValueTypeByKey(key, type);
 }
 
 }  // extern "C"

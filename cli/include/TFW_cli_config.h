@@ -4,7 +4,7 @@
 #include "TFW_cli_common.h"
 
 
-ModuleGetterFunc GetConfigModuleInstance(void);
+CliTestModule* GetConfigModuleInstance(void);
 
 
 #endif // TFW_CLI_CONFIG_H

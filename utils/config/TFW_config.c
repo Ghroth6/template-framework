@@ -13,6 +13,7 @@
 #include "TFW_common_defines.h"
 #include "TFW_mem.h"
 #include "TFW_errorno.h"
+#include "TFW_thread.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,6 +22,7 @@
 static TFW_ConfigItem g_config_items[TFW_CONFIG_KEY_COUNT];  // 配置项数组
 static bool g_initialized = false;  // 配置模块初始化状态
 static TFW_ConfigUpdateCallback g_callbacks[TFW_CONFIG_MODULE_SYSTEM + 1] = {NULL};  // 配置更新回调
+static TFW_Mutex_t g_config_lock = 0;
 
 // 内部辅助函数声明
 static int32_t TFW_ConfigLoadFromFile(const char *file_path);
@@ -30,21 +32,40 @@ static const char *TFW_ConfigKeyToString(TFW_ConfigKey key);
 static TFW_ConfigKey TFW_ConfigStringToKey(const char *key_str);
 static int32_t JsonToConfigItems(cJSON* json_root);
 static int32_t ConfigItemsToJson(cJSON* json_root);
+static void TFW_ConfigFreeItemSringValue(TFW_ConfigItem* item);
 
 // 配置模块初始化
 int32_t TFW_ConfigInit(void) {
     // 初始化配置项数组
+    int32_t ret = TFW_ERROR;
+    ret = TFW_Mutex_Init(&g_config_lock, NULL);
+    if(ret != TFW_SUCCESS) {
+        TFW_LOGW_UTILS("Init config lock err");
+        return ret;
+    }
+    ret = TFW_Mutex_Lock_Safe(&g_config_lock);
+    if (ret != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("lock failed, ret=%d", ret);
+        return ret;
+    }
+
     for (int i = 0; i < TFW_CONFIG_KEY_COUNT; i++) {
         g_config_items[i].key = (TFW_ConfigKey)i;
         g_config_items[i].type = TFW_CONFIG_TYPE_INVALID;
         g_config_items[i].value.string_value = NULL;
     }
 
+    ret = TFW_Mutex_Unlock_Safe(&g_config_lock);
+    if (ret != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("unlock failed, ret=%d", ret);
+        return ret;
+    }
+
     // 尝试从文件加载配置
     char config_file_path[TFW_PATH_LEN_MAX];
     snprintf(config_file_path, sizeof(config_file_path), "%s/%s", TFW_CONFIG_FILE_PATH, TFW_CONFIG_FILE_NAME);
 
-    int32_t ret = TFW_ConfigLoadFromFile(config_file_path);
+    ret = TFW_ConfigLoadFromFile(config_file_path);
     if (ret != TFW_SUCCESS) {
         // 加载失败，创建默认配置
         TFW_LOGW_UTILS("Failed to load config from file, creating default config");
@@ -58,6 +79,11 @@ int32_t TFW_ConfigInit(void) {
     g_initialized = true;
     TFW_LOGI_UTILS("Config module initialized successfully");
     return TFW_SUCCESS;
+EXIT:
+    TFW_LOGE_UTILS("Failed to initialize config module");
+    g_initialized = false;
+    TFW_Mutex_Destroy(&g_config_lock);
+    return TFW_ERROR_INIT_FAIL;
 }
 
 // 配置模块反初始化
@@ -66,10 +92,20 @@ int32_t TFW_ConfigDeinit(void) {
     if (g_initialized) {
         TFW_ConfigSave();
     }
+    int32_t ret = TFW_ERROR;
+
+    ret = TFW_Mutex_Lock_Safe(&g_config_lock);
+    if (ret != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to lock config module, ret = %d, The deInit process forces it to continue running", ret);
+    }
 
     // 释放资源
     for (int i = 0; i < TFW_CONFIG_KEY_COUNT; i++) {
-        TFW_ConfigFreeItem(&g_config_items[i]);
+        TFW_ConfigFreeItemSringValue(&g_config_items[i]);
+    }
+    ret = TFW_Mutex_Unlock_Safe(&g_config_lock);
+    if(ret != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to unlock config module, ret = %d, The deInit process forces it to continue running", ret);
     }
 
     g_initialized = false;
@@ -78,6 +114,8 @@ int32_t TFW_ConfigDeinit(void) {
     for (int i = 0; i <= TFW_CONFIG_MODULE_SYSTEM; i++) {
         g_callbacks[i] = NULL;
     }
+
+    TFW_Mutex_Destroy(&g_config_lock);
 
     TFW_LOGI_UTILS("Config module deInitialized successfully");
     return TFW_SUCCESS;
@@ -128,6 +166,11 @@ int32_t TFW_ConfigGetAll(TFW_ConfigItem **config_array, uint32_t *count) {
         return TFW_ERROR;
     }
 
+    if(TFW_Mutex_Lock_Safe(&g_config_lock) != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to lock config lock");
+        return TFW_ERROR_LOCK_FAILED;
+    }
+
     // 复制配置项数组
     for (int i = 0; i < TFW_CONFIG_KEY_COUNT; i++) {
         (*config_array)[i].key = g_config_items[i].key;
@@ -138,21 +181,11 @@ int32_t TFW_ConfigGetAll(TFW_ConfigItem **config_array, uint32_t *count) {
             case TFW_CONFIG_TYPE_STRING:
                 if (g_config_items[i].value.string_value != NULL) {
                     (*config_array)[i].value.string_value = TFW_Strdup(g_config_items[i].value.string_value);
-                    if ((*config_array)[i].value.string_value == NULL) {
-                        TFW_LOGE_UTILS("Failed to allocate memory for string value");
-                        // 释放已分配的内存
-                        for (int j = 0; j < i; j++) {
-                            if ((*config_array)[j].type == TFW_CONFIG_TYPE_STRING &&
-                                (*config_array)[j].value.string_value != NULL) {
-                                TFW_Free((void*)(*config_array)[j].value.string_value);
-                            }
-                        }
-                        TFW_Free(*config_array);
-                        *config_array = NULL;
-                        return TFW_ERROR;
-                    }
                 } else {
-                    (*config_array)[i].value.string_value = NULL;
+                    (*config_array)[i].value.string_value = TFW_Strdup("Config item value is NULL");
+                }
+                if ((*config_array)[i].value.string_value == NULL) {
+                    TFW_LOGE_UTILS("Failed to allocate memory for string value");
                 }
                 break;
             case TFW_CONFIG_TYPE_INT:
@@ -168,6 +201,10 @@ int32_t TFW_ConfigGetAll(TFW_ConfigItem **config_array, uint32_t *count) {
                 break;
         }
     }
+    if(TFW_Mutex_Unlock_Safe(&g_config_lock) != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to unlock mutex");
+        return TFW_ERROR_LOCK_FAILED;
+    }
 
     return TFW_SUCCESS;
 }
@@ -177,11 +214,7 @@ void TFW_ConfigFreeAll(TFW_ConfigItem *config_array) {
     if (config_array != NULL) {
         // 释放字符串类型的内存
         for (int i = 0; i < TFW_CONFIG_KEY_COUNT; i++) {
-            if (config_array[i].type == TFW_CONFIG_TYPE_STRING &&
-                config_array[i].value.string_value != NULL) {
-                TFW_Free((void*)config_array[i].value.string_value);
-                config_array[i].value.string_value = NULL;
-            }
+            TFW_ConfigFreeItemSringValue(&config_array[i]);
         }
         TFW_Free(config_array);
     }
@@ -198,6 +231,10 @@ int32_t TFW_ConfigGetItem(TFW_ConfigKey key, TFW_ConfigItem *item) {
         TFW_LOGE_UTILS("Config module not initialized");
         return TFW_ERROR;
     }
+    if(TFW_Mutex_Lock_Safe(&g_config_lock) != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to lock config lock");
+        return TFW_ERROR_LOCK_FAILED;
+    }
 
     item->key = g_config_items[key].key;
     item->type = g_config_items[key].type;
@@ -205,72 +242,80 @@ int32_t TFW_ConfigGetItem(TFW_ConfigKey key, TFW_ConfigItem *item) {
     // 根据类型复制值
     switch (g_config_items[key].type) {
         case TFW_CONFIG_TYPE_STRING:
-            if (g_config_items[key].value.string_value != NULL) {
-                item->value.string_value = TFW_Strdup(g_config_items[key].value.string_value);
-                if (item->value.string_value == NULL) {
-                    TFW_LOGE_UTILS("Failed to allocate memory for string value");
-                    return TFW_ERROR;
-                }
-            } else {
-                item->value.string_value = NULL;
-            }
-            break;
+        item->value.string_value = g_config_items[key].value.string_value;
+        // only copy the reference, do not allocate new memory, user needs to use or copy immediately
+        break;
         case TFW_CONFIG_TYPE_INT:
-            item->value.int_value = g_config_items[key].value.int_value;
-            break;
+        item->value.int_value = g_config_items[key].value.int_value;
+        break;
         case TFW_CONFIG_TYPE_BOOL:
-            item->value.bool_value = g_config_items[key].value.bool_value;
-            break;
+        item->value.bool_value = g_config_items[key].value.bool_value;
+        break;
         case TFW_CONFIG_TYPE_FLOAT:
-            item->value.float_value = g_config_items[key].value.float_value;
-            break;
+        item->value.float_value = g_config_items[key].value.float_value;
+        break;
         default:
-            break;
+        break;
     }
 
+    if(TFW_Mutex_Unlock_Safe(&g_config_lock) != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to unlock mutex");
+        return TFW_ERROR_LOCK_FAILED;
+    }
     return TFW_SUCCESS;
 }
 
-static int32_t TFW_ConfigSetItemInner(TFW_ConfigKey key, const TFW_ConfigItem *item) {
+static int32_t TFW_ConfigSetItemInner(const TFW_ConfigItem *item) {
+    if( item == NULL || item->key < 0 || item->key >= TFW_CONFIG_KEY_COUNT) {
+        TFW_LOGE_UTILS("Invalid key or item");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+    if(TFW_Mutex_Lock_Safe(&g_config_lock) != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to lock config lock");
+        return TFW_ERROR_LOCK_FAILED;
+    }
+    int32_t ret = TFW_SUCCESS;
     // 释放旧值（如果是字符串）
-    TFW_ConfigFreeItem(&g_config_items[key]);
-
+    TFW_ConfigFreeItemSringValue(&g_config_items[item->key]);
     // 复制新值
-    g_config_items[key].type = item->type;
+    g_config_items[item->key].type = item->type;
     switch (item->type) {
         case TFW_CONFIG_TYPE_STRING:
             if (item->value.string_value != NULL) {
-                g_config_items[key].value.string_value = TFW_Strdup(item->value.string_value);
-                if (g_config_items[key].value.string_value == NULL) {
+                g_config_items[item->key].value.string_value = TFW_Strdup(item->value.string_value);
+                if (g_config_items[item->key].value.string_value == NULL) {
                     TFW_LOGE_UTILS("Failed to allocate memory for string value");
-                    g_config_items[key].type = TFW_CONFIG_TYPE_INVALID;
-                    return TFW_ERROR;
+                    ret = TFW_ERROR;
                 }
             } else {
-                g_config_items[key].value.string_value = NULL;
+                g_config_items[item->key].value.string_value = NULL;
             }
             break;
         case TFW_CONFIG_TYPE_INT:
-            g_config_items[key].value.int_value = item->value.int_value;
+            g_config_items[item->key].value.int_value = item->value.int_value;
             break;
         case TFW_CONFIG_TYPE_BOOL:
-            g_config_items[key].value.bool_value = item->value.bool_value;
+            g_config_items[item->key].value.bool_value = item->value.bool_value;
             break;
         case TFW_CONFIG_TYPE_FLOAT:
-            g_config_items[key].value.float_value = item->value.float_value;
+            g_config_items[item->key].value.float_value = item->value.float_value;
             break;
         default:
             TFW_LOGE_UTILS("Unsupported config type: %d", item->type);
-            return TFW_ERROR;
+            ret = TFW_ERROR_INVALID_PARAM;
     }
 
-    TFW_ConfigNotifyUpdate(key, item);
-    return TFW_SUCCESS;
+    TFW_ConfigNotifyUpdate(item->key, item);
+    if(TFW_Mutex_Unlock_Safe(&g_config_lock) != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to unlock mutex");
+        return TFW_ERROR_LOCK_FAILED;
+    }
+    return ret;
 }
 
 // 设置单项配置
-int32_t TFW_ConfigSetItem(TFW_ConfigKey key, const TFW_ConfigItem *item) {
-    if (item == NULL || key >= TFW_CONFIG_KEY_COUNT || key != item->key) {
+int32_t TFW_ConfigSetItem(const TFW_ConfigItem * const item) {
+    if (item == NULL || item->key < 0 || item->key >= TFW_CONFIG_KEY_COUNT) {
         TFW_LOGE_UTILS("Invalid parameter for TFW_ConfigSetItem");
         return TFW_ERROR_INVALID_PARAM;
     }
@@ -279,8 +324,7 @@ int32_t TFW_ConfigSetItem(TFW_ConfigKey key, const TFW_ConfigItem *item) {
         TFW_LOGE_UTILS("Config module not initialized");
         return TFW_ERROR;
     }
-
-    return TFW_ConfigSetItemInner(key, item);
+    return TFW_ConfigSetItemInner(item);
 }
 
 // 读取单项配置（整数）
@@ -294,13 +338,24 @@ int32_t TFW_ConfigGetInt(TFW_ConfigKey key, int32_t *value) {
         TFW_LOGE_UTILS("Config module not initialized");
         return TFW_ERROR;
     }
+    if(TFW_Mutex_Lock_Safe(&g_config_lock) != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to lock config lock");
+        return TFW_ERROR_LOCK_FAILED;
+    }
+    int32_t ret = TFW_ERROR;
 
     if (g_config_items[key].type != TFW_CONFIG_TYPE_INT) {
         TFW_LOGW_UTILS("Config key '%d' is not an integer", key);
-        return TFW_ERROR;
+        ret = TFW_ERROR;
+    }else {
+        *value = g_config_items[key].value.int_value;
+        ret = TFW_SUCCESS;
     }
 
-    *value = g_config_items[key].value.int_value;
+    if(TFW_Mutex_Unlock_Safe(&g_config_lock) != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to unlock mutex");
+        return TFW_ERROR_LOCK_FAILED;
+    }
     return TFW_SUCCESS;
 }
 
@@ -322,7 +377,7 @@ int32_t TFW_ConfigSetInt(TFW_ConfigKey key, int32_t value) {
     config_item.type = TFW_CONFIG_TYPE_INT;
     config_item.value.int_value = value;
 
-    return TFW_ConfigSetItem(key, &config_item);
+    return TFW_ConfigSetItem(&config_item);
 }
 
 // 读取单项配置（浮点数）
@@ -337,12 +392,20 @@ int32_t TFW_ConfigGetFloat(TFW_ConfigKey key, float *value) {
         return TFW_ERROR;
     }
 
+    if(TFW_Mutex_Lock_Safe(&g_config_lock) != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to lock config lock");
+        return TFW_ERROR_LOCK_FAILED;
+    }
     if (g_config_items[key].type != TFW_CONFIG_TYPE_FLOAT) {
         TFW_LOGW_UTILS("Config key '%d' is not a float", key);
         return TFW_ERROR;
     }
 
     *value = g_config_items[key].value.float_value;
+    if(TFW_Mutex_Unlock_Safe(&g_config_lock) != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to unlock mutex");
+        return TFW_ERROR_LOCK_FAILED;
+    }
     return TFW_SUCCESS;
 }
 
@@ -364,7 +427,7 @@ int32_t TFW_ConfigSetFloat(TFW_ConfigKey key, float value) {
     config_item.type = TFW_CONFIG_TYPE_FLOAT;
     config_item.value.float_value = value;
 
-    return TFW_ConfigSetItem(key, &config_item);
+    return TFW_ConfigSetItem(&config_item);
 }
 
 // 读取单项配置（布尔值）
@@ -378,13 +441,20 @@ int32_t TFW_ConfigGetBool(TFW_ConfigKey key, bool *value) {
         TFW_LOGE_UTILS("Config module not initialized");
         return TFW_ERROR;
     }
-
+    if(TFW_Mutex_Lock_Safe(&g_config_lock) != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to lock config lock");
+        return TFW_ERROR_LOCK_FAILED;
+    }
     if (g_config_items[key].type != TFW_CONFIG_TYPE_BOOL) {
         TFW_LOGW_UTILS("Config key '%d' is not a boolean", key);
         return TFW_ERROR;
     }
 
     *value = g_config_items[key].value.bool_value;
+    if(TFW_Mutex_Unlock_Safe(&g_config_lock) != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to unlock mutex");
+        return TFW_ERROR_LOCK_FAILED;
+    }
     return TFW_SUCCESS;
 }
 
@@ -406,11 +476,11 @@ int32_t TFW_ConfigSetBool(TFW_ConfigKey key, bool value) {
     config_item.type = TFW_CONFIG_TYPE_BOOL;
     config_item.value.bool_value = value;
 
-    return TFW_ConfigSetItem(key, &config_item);
+    return TFW_ConfigSetItem(&config_item);
 }
 
 // 读取单项配置（字符串）
-int32_t TFW_ConfigGetString(TFW_ConfigKey key, char **value) {
+int32_t TFW_ConfigGetString(TFW_ConfigKey key, const char **value) {
     if (value == NULL || key >= TFW_CONFIG_KEY_COUNT) {
         TFW_LOGE_UTILS("Invalid parameter for TFW_ConfigGetString");
         return TFW_ERROR_INVALID_PARAM;
@@ -457,7 +527,7 @@ int32_t TFW_ConfigSetString(TFW_ConfigKey key, const char *value) {
     config_item.type = TFW_CONFIG_TYPE_STRING;
     config_item.value.string_value = value; // TFW_ConfigSetItem会复制字符串
 
-    return TFW_ConfigSetItem(key, &config_item);
+    return TFW_ConfigSetItem(&config_item);
 }
 
 // 保存配置到文件
@@ -531,14 +601,14 @@ int32_t TFW_ConfigReload(void) {
     if (ret != TFW_SUCCESS) {
         // 加载失败，恢复备份
         for (int i = 0; i < TFW_CONFIG_KEY_COUNT; i++) {
-            TFW_ConfigFreeItem(&g_config_items[i]);
+            TFW_ConfigFreeItemSringValue(&g_config_items[i]);
             g_config_items[i] = backup_items[i];
         }
         TFW_LOGE_UTILS("Failed to reload config from file, restored backup");
     } else {
         // 加载成功，释放备份
         for (int i = 0; i < TFW_CONFIG_KEY_COUNT; i++) {
-            TFW_ConfigFreeItem(&backup_items[i]);
+            TFW_ConfigFreeItemSringValue(&backup_items[i]);
         }
         TFW_LOGI_UTILS("Config reloaded from file successfully");
     }
@@ -612,70 +682,70 @@ static int32_t TFW_ConfigCreateDefault(void) {
     item.key = TFW_CONFIG_MAIN_VERSION;
     item.type = TFW_CONFIG_TYPE_INT;
     item.value.int_value = 1;
-    TFW_ConfigSetItemInner(TFW_CONFIG_MAIN_VERSION, &item);
+    TFW_ConfigSetItemInner(&item);
 
     item.key = TFW_CONFIG_MAIN_DEBUG;
     item.type = TFW_CONFIG_TYPE_BOOL;
     item.value.bool_value = false;
-    TFW_ConfigSetItemInner(TFW_CONFIG_MAIN_DEBUG, &item);
+    TFW_ConfigSetItemInner(&item);
 
     item.key = TFW_CONFIG_MAIN_LOG_LEVEL;
     item.type = TFW_CONFIG_TYPE_INT;
     item.value.int_value = 1;
-    TFW_ConfigSetItemInner(TFW_CONFIG_MAIN_LOG_LEVEL, &item);
+    TFW_ConfigSetItemInner(&item);
 
     // Logging configuration
     item.key = TFW_CONFIG_LOGGING_LEVEL;
     item.type = TFW_CONFIG_TYPE_INT;
     item.value.int_value = 1;
-    TFW_ConfigSetItemInner(TFW_CONFIG_LOGGING_LEVEL, &item);
+    TFW_ConfigSetItemInner(&item);
 
     item.key = TFW_CONFIG_LOGGING_OUTPUT;
     item.type = TFW_CONFIG_TYPE_STRING;
     item.value.string_value = TFW_Strdup(TFW_CONFIG_DEFAULT_LOGGING_OUTPUT);
-    TFW_ConfigSetItemInner(TFW_CONFIG_LOGGING_OUTPUT, &item);
+    TFW_ConfigSetItemInner(&item);
     // 释放临时分配的字符串内存
     TFW_Free((void*)item.value.string_value);
 
     item.key = TFW_CONFIG_LOGGING_FILE_PATH;
     item.type = TFW_CONFIG_TYPE_STRING;
     item.value.string_value = TFW_Strdup(TFW_CONFIG_DEFAULT_LOGGING_FILE_PATH);
-    TFW_ConfigSetItemInner(TFW_CONFIG_LOGGING_FILE_PATH, &item);
+    TFW_ConfigSetItemInner(&item);
     // 释放临时分配的字符串内存
     TFW_Free((void*)item.value.string_value);
 
     item.key = TFW_CONFIG_LOGGING_FILE_PREFIX;
     item.type = TFW_CONFIG_TYPE_STRING;
     item.value.string_value = TFW_Strdup(TFW_CONFIG_DEFAULT_LOGGING_FILE_PREFIX);
-    TFW_ConfigSetItemInner(TFW_CONFIG_LOGGING_FILE_PREFIX, &item);
+    TFW_ConfigSetItemInner(&item);
     // 释放临时分配的字符串内存
     TFW_Free((void*)item.value.string_value);
 
     item.key = TFW_CONFIG_LOGGING_MAX_FILE_SIZE;
     item.type = TFW_CONFIG_TYPE_INT;
     item.value.int_value = atoi(TFW_CONFIG_DEFAULT_LOGGING_MAX_FILE_SIZE);
-    TFW_ConfigSetItemInner(TFW_CONFIG_LOGGING_MAX_FILE_SIZE, &item);
+    TFW_ConfigSetItemInner(&item);
 
     item.key = TFW_CONFIG_LOGGING_MAX_RETENTION_DAYS;
     item.type = TFW_CONFIG_TYPE_INT;
     item.value.int_value = atoi(TFW_CONFIG_DEFAULT_LOGGING_MAX_RETENTION_DAYS);
-    TFW_ConfigSetItemInner(TFW_CONFIG_LOGGING_MAX_RETENTION_DAYS, &item);
+    TFW_ConfigSetItemInner(&item);
 
     // Resources configuration
     item.key = TFW_CONFIG_RESOURCES_AUTO_UPDATE;
     item.type = TFW_CONFIG_TYPE_BOOL;
     item.value.bool_value = (strcmp(TFW_CONFIG_DEFAULT_RESOURCES_AUTO_UPDATE, "true") == 0);
-    TFW_ConfigSetItemInner(TFW_CONFIG_RESOURCES_AUTO_UPDATE, &item);
+    TFW_ConfigSetItemInner(&item);
 
     item.key = TFW_CONFIG_RESOURCES_UPDATE_INTERVAL;
     item.type = TFW_CONFIG_TYPE_INT;
     item.value.int_value = atoi(TFW_CONFIG_DEFAULT_RESOURCES_UPDATE_INTERVAL);
-    TFW_ConfigSetItemInner(TFW_CONFIG_RESOURCES_UPDATE_INTERVAL, &item);
+    TFW_ConfigSetItemInner(&item);
 
     item.key = TFW_CONFIG_RESOURCES_CACHE_PATH;
     item.type = TFW_CONFIG_TYPE_STRING;
     item.value.string_value = TFW_Strdup(TFW_CONFIG_DEFAULT_RESOURCES_CACHE_PATH);
-    TFW_ConfigSetItemInner(TFW_CONFIG_RESOURCES_CACHE_PATH, &item);
+    TFW_ConfigSetItemInner(&item);
     // 释放临时分配的字符串内存
     TFW_Free((void*)item.value.string_value);
 
@@ -683,12 +753,12 @@ static int32_t TFW_ConfigCreateDefault(void) {
     item.key = TFW_CONFIG_SYSTEM_MAX_THREADS;
     item.type = TFW_CONFIG_TYPE_INT;
     item.value.int_value = atoi(TFW_CONFIG_DEFAULT_SYSTEM_MAX_THREADS);
-    TFW_ConfigSetItemInner(TFW_CONFIG_SYSTEM_MAX_THREADS, &item);
+    TFW_ConfigSetItemInner(&item);
 
     item.key = TFW_CONFIG_SYSTEM_TIMEOUT;
     item.type = TFW_CONFIG_TYPE_INT;
     item.value.int_value = atoi(TFW_CONFIG_DEFAULT_SYSTEM_TIMEOUT);
-    TFW_ConfigSetItemInner(TFW_CONFIG_SYSTEM_TIMEOUT, &item);
+    TFW_ConfigSetItemInner(&item);
 
     TFW_LOGI_UTILS("Default config created successfully");
     return TFW_SUCCESS;
@@ -793,7 +863,7 @@ static int32_t JsonToConfigItems(cJSON* json_root) {
         }
 
         // 更新配置项数组
-        TFW_ConfigFreeItem(&g_config_items[key]);
+        TFW_ConfigFreeItemSringValue(&g_config_items[key]);
         g_config_items[key] = config_item;
     }
 
@@ -853,13 +923,38 @@ static int32_t ConfigItemsToJson(cJSON* json_root) {
 }
 
 // 释放单项配置项内存
-void TFW_ConfigFreeItem(TFW_ConfigItem* item) {
-    if (item == NULL) return;
-
-    if (item->type == TFW_CONFIG_TYPE_STRING && item->value.string_value != NULL) {
-        TFW_Free((void*)item->value.string_value);
-        item->value.string_value = NULL;
+static void TFW_ConfigFreeItemSringValue(TFW_ConfigItem* item) {
+    if (item == NULL) {
+        TFW_LOGE_UTILS("Invalid parameter for TFW_ConfigFreeItemSringValue");
+        return;
     }
 
-    item->type = TFW_CONFIG_TYPE_INVALID;
+    if (item->type == TFW_CONFIG_TYPE_STRING) {
+        if(item->value.string_value != NULL) {
+            TFW_Free((void*)item->value.string_value);
+            item->value.string_value = NULL;
+        }
+        item->type = TFW_CONFIG_TYPE_INVALID;
+    }
+}
+
+int32_t TFW_ConfigGetValueTypeByKey(TFW_ConfigKey key, TFW_ConfigValueType *type) {
+    if(key < 0 || key >= TFW_CONFIG_KEY_COUNT || type == NULL) {
+        TFW_LOGE_UTILS("Invalid parameter for TFW_ConfigGetValueTypeByKey");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+    if (!g_initialized) {
+        TFW_LOGE_UTILS("Config module not initialized");
+        return TFW_ERROR;
+    }
+    if(TFW_Mutex_Lock_Safe(&g_config_lock) != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to lock config lock");
+        return TFW_ERROR_LOCK_FAILED;
+    }
+    *type = g_config_items[key].type;
+    if(TFW_Mutex_Unlock_Safe(&g_config_lock) != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to unlock mutex");
+        return TFW_ERROR_LOCK_FAILED;
+    }
+    return TFW_SUCCESS;
 }

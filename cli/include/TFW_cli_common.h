@@ -126,6 +126,59 @@ static inline int32_t TFW_CliReadString(char* buffer, size_t buffer_size)
     return TFW_SUCCESS;
 }
 
+/**
+ * @brief Read a float value from standard input
+ *
+ * This inline function reads a float from stdin and handles input errors
+ *
+ * @param value Pointer to store the read float value
+ * @return TFW_SUCCESS if input is valid, TFW_ERROR_INVALID_PARAM for invalid input
+ *
+ * @note This function will keep prompting until a valid float is entered or EOF is reached
+ *
+ * Example usage:
+ * @code
+ * float price;
+ * printf("Enter the price: ");
+ * int32_t result = TFW_CliReadFloat(&price);
+ * if (result == TFW_SUCCESS) {
+ *     printf("The price is: %.2f\n", price);
+ * } else {
+ *     printf("Invalid input!\n");
+ * }
+ * @endcode
+ */
+static inline int32_t TFW_CliReadFloat(float* value)
+{
+    char buffer[32];
+    char* endptr;
+
+    if (value == NULL) {
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
+        return TFW_ERROR;
+    }
+
+    // Remove trailing newline if present
+    char* newline = strchr(buffer, '\n');
+    if (newline != NULL) {
+        *newline = '\0';
+    }
+
+    // Convert string to float
+    float result = strtof(buffer, &endptr);
+
+    // Check if conversion was successful
+    if (*endptr != '\0' && *endptr != '\n' && *endptr != '\r') {
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    *value = result;
+    return TFW_SUCCESS;
+}
+
 #ifdef __cplusplus
 }
 #endif

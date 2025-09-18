@@ -37,6 +37,24 @@ int32_t TFW_CoreInterfaceGetAllConfigItems(TFW_ConfigItem **config_array, uint32
  */
 void TFW_CoreInterfaceFreeAllConfigItems(TFW_ConfigItem *config_array);
 
+int32_t TFW_CoreInterfaceGetIntConfigValue(TFW_ConfigKey key, int32_t *value);
+
+int32_t TFW_CoreInterfaceSetIntConfigValue(TFW_ConfigKey key, int32_t value);
+
+int32_t TFW_CoreInterfaceGetFloatConfigValue(TFW_ConfigKey key, float *value);
+
+int32_t TFW_CoreInterfaceSetFloatConfigValue(TFW_ConfigKey key, float value);
+
+int32_t TFW_CoreInterfaceGetBoolConfigValue(TFW_ConfigKey key, bool *value);
+
+int32_t TFW_CoreInterfaceSetBoolConfigValue(TFW_ConfigKey key, bool value);
+
+int32_t TFW_CoreInterfaceGetStringConfigValue(TFW_ConfigKey key, const char **value);
+
+int32_t TFW_CoreInterfaceSetStringConfigValue(TFW_ConfigKey key, const char *value);
+
+int32_t TFW_CoreInterfaceGetConfigValueTypeByKey(TFW_ConfigKey key, TFW_ConfigValueType *type);
+
 #ifdef __cplusplus
 }
 #endif

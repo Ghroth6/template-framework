@@ -205,6 +205,24 @@ public:
      */
     void FreeAllConfigItems(TFW_ConfigItem *config_array);
 
+    int32_t GetIntConfigValue(TFW_ConfigKey key, int32_t *value);
+
+    int32_t SetIntConfigValue(TFW_ConfigKey key, int32_t value);
+
+    int32_t GetFloatConfigValue(TFW_ConfigKey key, float *value);
+
+    int32_t SetFloatConfigValue(TFW_ConfigKey key, float value);
+
+    int32_t GetBoolConfigValue(TFW_ConfigKey key, bool *value);
+
+    int32_t SetBoolConfigValue(TFW_ConfigKey key, bool value);
+
+    int32_t GetStringConfigValue(TFW_ConfigKey key, const char **value);
+
+    int32_t SetStringConfigValue(TFW_ConfigKey key, const char *value);
+
+    int32_t GetConfigValueTypeByKey(TFW_ConfigKey key, TFW_ConfigValueType *type);
+
 private:
     // Disable copy constructor and assignment operator
     // 禁用拷贝构造和赋值操作

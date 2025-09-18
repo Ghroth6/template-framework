@@ -11,7 +11,7 @@
 static ModuleGetterFunc g_cliTestModule[] = {
     GetConfigModuleInstance,
 };
-#define CLI_MODULE_NUM (sizeof(g_cliTestModule) / sizeof(ModuleGetterFunc))
+#define CLI_MODULE_NUM (int32_t)(sizeof(g_cliTestModule) / sizeof(ModuleGetterFunc))
 
 static void PrintModule(void)
 {
