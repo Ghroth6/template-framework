@@ -60,6 +60,7 @@ set(UTILS_C_SOURCES
     thread/src/TFW_thread.c
     json/TFW_json.c
     config/TFW_config.c
+    atomic/TFW_atomic.c
 )
 
 # 根据平台选择平台特定实现
@@ -71,7 +72,8 @@ if(WIN32)
         timer/win32/TFW_timer_impl.c
         thread/win32/TFW_thread_impl.c
         file/win32/TFW_file_impl.c
-        mem/win32/TFW_mem_impl.c)
+        mem/win32/TFW_mem_impl.c
+        atomic/win32/TFW_atomic_inner.c)
 elseif(APPLE)
     # macOS平台实现
     # macOS platform implementation
@@ -79,7 +81,8 @@ elseif(APPLE)
         timer/macos/TFW_timer_impl.c
         thread/posix/TFW_thread_impl.c
         file/posix/TFW_file_impl.c
-        mem/posix/TFW_mem_impl.c)
+        mem/posix/TFW_mem_impl.c
+        atomic/macos/TFW_atomic_inner.c)
 else()
     # Linux/Unix平台实现（默认）
     # Linux/Unix platform implementation (default)
@@ -87,7 +90,8 @@ else()
         timer/posix/TFW_timer_impl.c
         thread/posix/TFW_thread_impl.c
         file/posix/TFW_file_impl.c
-        mem/posix/TFW_mem_impl.c)
+        mem/posix/TFW_mem_impl.c
+        atomic/posix/TFW_atomic_inner.c)
 endif()
 
 # collect header files
@@ -95,16 +99,19 @@ endif()
 set(UTILS_HEADERS
     include/TFW_common_defines.h
     include/TFW_log.h
-    include/TFW_log_internal.h
+    log/include/TFW_log_internal.h
     include/TFW_core_log.h
     include/TFW_utils_log.h
+    include/TFW_sdk_log.h
     include/TFW_timer.h
     include/TFW_thread.h
     include/TFW_file.h
     include/TFW_mem.h
-    include/TFW_sdk_log.h
     include/TFW_json.h
     include/TFW_config.h
+    include/TFW_build_info.h
+    include/TFW_atomic.h
+    atomic/include/TFW_atomic_inner.h
 )
 
 # ============================================================================
@@ -199,6 +206,7 @@ target_include_directories(${MODULE_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/file/include
     ${CMAKE_CURRENT_SOURCE_DIR}/mem/include
     ${CMAKE_CURRENT_SOURCE_DIR}/json/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/atomic/include
 )
 
 # ============================================================================
