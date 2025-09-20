@@ -10,6 +10,7 @@
 #define TFW_UNUSED __attribute__((unused))
 #endif
 
+// TODO:编译生成文件独立存放
 // Version information / 版本信息
 // Note: Update these values manually when releasing new versions
 // 包含版本信息（如果构建系统生成了版本文件，则使用生成的版本）

@@ -36,25 +36,25 @@ extern "C" {
 int32_t TFW_GetTimestamp(char* timestamp, size_t buffer_size);
 
 /**
- * Get current timestamp (millisecond precision)
- * 获取当前时间戳（毫秒精度）
- * @return Millisecond timestamp
+ * Get current monotonic timestamp (millisecond precision)
+ * 获取当前单调时间戳（毫秒精度）
+ * @return Millisecond timestamp (monotonic time)
  */
-int64_t TFW_GetTimestampMs();
+uint64_t TFW_GetTimestampMs();
 
 /**
- * Get current timestamp (microsecond precision)
- * 获取当前时间戳（微秒精度）
- * @return Microsecond timestamp
+ * Get current monotonic timestamp (microsecond precision)
+ * 获取当前单调时间戳（微秒精度）
+ * @return Microsecond timestamp (monotonic time)
  */
-int64_t TFW_GetTimestampUs();
+uint64_t TFW_GetTimestampUs();
 
 /**
- * Get current timestamp (nanosecond precision)
- * 获取当前时间戳（纳秒精度）
- * @return Nanosecond timestamp
+ * Get current monotonic timestamp (nanosecond precision)
+ * 获取当前单调时间戳（纳秒精度）
+ * @return Nanosecond timestamp (monotonic time)
  */
-int64_t TFW_GetTimestampNs();
+uint64_t TFW_GetTimestampNs();
 
 #ifdef __cplusplus
 }

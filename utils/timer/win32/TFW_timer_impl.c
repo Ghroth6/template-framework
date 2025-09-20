@@ -32,32 +32,38 @@ int32_t TFW_GetTimestamp(char* timestamp, size_t buffer_size) {
     return TFW_SUCCESS;
 }
 
-int64_t TFW_GetTimestampMs() {
-    // Windows平台：使用 GetTickCount64() 获取毫秒级时间戳
-    // Windows platform: use GetTickCount64() to get millisecond timestamp
-    return (int64_t)GetTickCount64();
+uint64_t TFW_GetTimestampMs() {
+    // Windows平台：使用 QueryPerformanceCounter 获取单调时间
+    // Windows platform: use QueryPerformanceCounter to get monotonic time
+    LARGE_INTEGER frequency, counter;
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&counter);
+
+    // 转换为毫秒
+    // convert to millisecond
+    return (uint64_t)(TFW_TIME_SEC_TO_MS(counter.QuadPart) / frequency.QuadPart);
 }
 
-int64_t TFW_GetTimestampUs() {
-    // Windows平台：使用 QueryPerformanceCounter 获取微秒级时间戳
-    // Windows platform: use QueryPerformanceCounter to get microsecond timestamp
+uint64_t TFW_GetTimestampUs() {
+    // Windows平台：使用 QueryPerformanceCounter 获取单调时间
+    // Windows platform: use QueryPerformanceCounter to get monotonic time
     LARGE_INTEGER frequency, counter;
     QueryPerformanceFrequency(&frequency);
     QueryPerformanceCounter(&counter);
 
     // 转换为微秒
     // convert to microsecond
-    return (int64_t)(TFW_TIME_SEC_TO_US(counter.QuadPart) / frequency.QuadPart);
+    return (uint64_t)(TFW_TIME_SEC_TO_US(counter.QuadPart) / frequency.QuadPart);
 }
 
-int64_t TFW_GetTimestampNs() {
-    // Windows平台：使用 QueryPerformanceCounter 获取纳秒级时间戳
-    // Windows platform: use QueryPerformanceCounter to get nanosecond timestamp
+uint64_t TFW_GetTimestampNs() {
+    // Windows平台：使用 QueryPerformanceCounter 获取单调时间
+    // Windows platform: use QueryPerformanceCounter to get monotonic time
     LARGE_INTEGER frequency, counter;
     QueryPerformanceFrequency(&frequency);
     QueryPerformanceCounter(&counter);
 
     // 转换为纳秒
     // convert to nanosecond
-    return (int64_t)(TFW_TIME_SEC_TO_NS(counter.QuadPart) / frequency.QuadPart);
+    return (uint64_t)(TFW_TIME_SEC_TO_NS(counter.QuadPart) / frequency.QuadPart);
 }

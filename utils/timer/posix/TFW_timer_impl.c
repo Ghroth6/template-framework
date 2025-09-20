@@ -62,26 +62,26 @@ int32_t TFW_GetTimestamp(char* timestamp, size_t buffer_size) {
     return TFW_SUCCESS;
 }
 
-int64_t TFW_GetTimestampMs() {
-    // Linux/Unix平台：使用 clock_gettime()
-    // Linux/Unix platform: use clock_gettime()
+uint64_t TFW_GetTimestampMs() {
+    // Linux/Unix平台：使用 clock_gettime() 获取单调时间
+    // Linux/Unix platform: use clock_gettime() to get monotonic time
     struct timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts);
-    return (int64_t)(TFW_TIME_SEC_TO_MS(ts.tv_sec) + TFW_TIME_NS_TO_MS(ts.tv_nsec));
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (uint64_t)(TFW_TIME_SEC_TO_MS(ts.tv_sec) + TFW_TIME_NS_TO_MS(ts.tv_nsec));
 }
 
-int64_t TFW_GetTimestampUs() {
-    // Linux/Unix平台：使用 clock_gettime()
-    // Linux/Unix platform: use clock_gettime()
+uint64_t TFW_GetTimestampUs() {
+    // Linux/Unix平台：使用 clock_gettime() 获取单调时间
+    // Linux/Unix platform: use clock_gettime() to get monotonic time
     struct timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts);
-    return (int64_t)(TFW_TIME_SEC_TO_US(ts.tv_sec) + TFW_TIME_NS_TO_MS(ts.tv_nsec));
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (uint64_t)(TFW_TIME_SEC_TO_US(ts.tv_sec) + TFW_TIME_NS_TO_MS(ts.tv_nsec));
 }
 
-int64_t TFW_GetTimestampNs() {
-    // Linux/Unix平台：使用 clock_gettime()
-    // Linux/Unix platform: use clock_gettime()
+uint64_t TFW_GetTimestampNs() {
+    // Linux/Unix平台：使用 clock_gettime() 获取单调时间
+    // Linux/Unix platform: use clock_gettime() to get monotonic time
     struct timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts);
-    return (int64_t)(TFW_TIME_SEC_TO_NS(ts.tv_sec) + ts.tv_nsec);
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (uint64_t)(TFW_TIME_SEC_TO_NS(ts.tv_sec) + ts.tv_nsec);
 }

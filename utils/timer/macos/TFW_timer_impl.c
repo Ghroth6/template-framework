@@ -64,38 +64,62 @@ int32_t TFW_GetTimestamp(char* timestamp, size_t buffer_size) {
     return TFW_SUCCESS;
 }
 
-int64_t TFW_GetTimestampMs() {
-    // macOS平台：使用 gettimeofday()
-    // macOS platform: use gettimeofday()
-    struct timeval tv;
-    struct timezone tz;
-    gettimeofday(&tv, &tz);
-    return (int64_t)(TFW_TIME_SEC_TO_MS(tv.tv_sec) + TFW_TIME_NS_TO_MS(tv.tv_usec));
-}
-
-int64_t TFW_GetTimestampUs() {
-    // macOS平台：使用 gettimeofday()
-    // macOS platform: use gettimeofday()
-    struct timeval tv;
-    struct timezone tz;
-    gettimeofday(&tv, &tz);
-    return (int64_t)(TFW_TIME_SEC_TO_US(tv.tv_sec) + TFW_TIME_NS_TO_MS(tv.tv_usec));
-}
-
-int64_t TFW_GetTimestampNs() {
-    // macOS平台：尝试使用 clock_gettime()，如果不可用则回退到 gettimeofday()
-    // macOS platform: try to use clock_gettime(), if not available, fall back to gettimeofday()
-#ifdef CLOCK_REALTIME
+uint64_t TFW_GetTimestampMs() {
+    // macOS平台：使用 clock_gettime() 获取单调时间
+    // macOS platform: use clock_gettime() to get monotonic time
     struct timespec ts;
-    if (clock_gettime(CLOCK_REALTIME, &ts) == 0) {
-        return (int64_t)(TFW_TIME_SEC_TO_NS(ts.tv_sec) + ts.tv_nsec);
+#ifdef CLOCK_MONOTONIC
+    if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0) {
+        return (uint64_t)(TFW_TIME_SEC_TO_MS(ts.tv_sec) + TFW_TIME_NS_TO_MS(ts.tv_nsec));
     }
 #endif
 
-    // 回退到 gettimeofday()，转换为纳秒
-    // fallback to gettimeofday(), convert to nanoseconds
+    // 回退方案：使用 gettimeofday()，但注意这仍然不是单调时间
+    // fallback: use gettimeofday(), but note this is still not monotonic time
+    // 在不支持CLOCK_MONOTONIC的系统上，此实现可能受系统时间调整影响
+    // On systems that do not support CLOCK_MONOTONIC, this implementation may be affected by system time adjustments
     struct timeval tv;
     struct timezone tz;
     gettimeofday(&tv, &tz);
-    return (int64_t)(TFW_TIME_SEC_TO_NS(tv.tv_sec) + TFW_TIME_NS_TO_MS(tv.tv_usec));
+    return (uint64_t)(TFW_TIME_SEC_TO_MS(tv.tv_sec) + TFW_TIME_NS_TO_MS(tv.tv_usec));
+}
+
+uint64_t TFW_GetTimestampUs() {
+    // macOS平台：使用 clock_gettime() 获取单调时间
+    // macOS platform: use clock_gettime() to get monotonic time
+    struct timespec ts;
+#ifdef CLOCK_MONOTONIC
+    if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0) {
+        return (uint64_t)(TFW_TIME_SEC_TO_US(ts.tv_sec) + TFW_TIME_NS_TO_MS(ts.tv_nsec));
+    }
+#endif
+
+    // 回退方案：使用 gettimeofday()，但注意这仍然不是单调时间
+    // fallback: use gettimeofday(), but note this is still not monotonic time
+    // 在不支持CLOCK_MONOTONIC的系统上，此实现可能受系统时间调整影响
+    // On systems that do not support CLOCK_MONOTONIC, this implementation may be affected by system time adjustments
+    struct timeval tv;
+    struct timezone tz;
+    gettimeofday(&tv, &tz);
+    return (uint64_t)(TFW_TIME_SEC_TO_US(tv.tv_sec) + TFW_TIME_NS_TO_MS(tv.tv_usec));
+}
+
+uint64_t TFW_GetTimestampNs() {
+    // macOS平台：使用 clock_gettime() 获取单调时间
+    // macOS platform: use clock_gettime() to get monotonic time
+#ifdef CLOCK_MONOTONIC
+    struct timespec ts;
+    if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0) {
+        return (uint64_t)(TFW_TIME_SEC_TO_NS(ts.tv_sec) + ts.tv_nsec);
+    }
+#endif
+
+    // 回退方案：使用 gettimeofday()，但注意这仍然不是单调时间
+    // fallback: use gettimeofday(), but note this is still not monotonic time
+    // 在不支持CLOCK_MONOTONIC的系统上，此实现可能受系统时间调整影响
+    // On systems that do not support CLOCK_MONOTONIC, this implementation may be affected by system time adjustments
+    struct timeval tv;
+    struct timezone tz;
+    gettimeofday(&tv, &tz);
+    return (uint64_t)(TFW_TIME_SEC_TO_NS(tv.tv_sec) + TFW_TIME_NS_TO_MS(tv.tv_usec));
 }
