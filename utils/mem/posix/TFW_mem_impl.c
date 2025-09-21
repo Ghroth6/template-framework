@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <errno.h>
 
 // ============================================================================
 // POSIX platform memory management implementation
@@ -95,8 +96,6 @@ char* TFW_Strdup(const char* src) {
     return dest;
 }
 
-
-
 int32_t TFW_GetMemoryStats(uint64_t* total_allocated, uint64_t* total_freed, uint64_t* current_used) {
     if (total_allocated == NULL || total_freed == NULL || current_used == NULL) {
         return TFW_ERROR_INVALID_PARAM;
@@ -169,4 +168,24 @@ int32_t TFW_Strcat_S(char* dest, size_t destSize, const char* src) {
     memcpy(dest + destLen, src, srcLen);
     dest[destLen + srcLen] = '\0';
     return TFW_SUCCESS;
+}
+
+char* TFW_Strrchr(const char* str, int c) {
+    if (str == NULL) {
+        TFW_LOGE_UTILS("TFW_Strrchr: input string is NULL");
+        return NULL;
+    }
+    
+    // 使用标准库的strrchr实现
+    return (char*)strrchr(str, c);
+}
+
+char* TFW_Strtok_R(char* str, const char* delim, char** saveptr) {
+    if (delim == NULL || saveptr == NULL) {
+        TFW_LOGE_UTILS("TFW_Strtok_R: delimiter or saveptr is NULL");
+        return NULL;
+    }
+    
+    // 使用标准库的strtok_r实现（POSIX平台）
+    return strtok_r(str, delim, saveptr);
 }

@@ -61,6 +61,7 @@ set(UTILS_C_SOURCES
     json/TFW_json.c
     config/TFW_config.c
     atomic/TFW_atomic.c
+    message_loop/TFW_message_loop.c
 )
 
 # 根据平台选择平台特定实现
@@ -112,6 +113,7 @@ set(UTILS_HEADERS
     include/TFW_build_info.h
     include/TFW_atomic.h
     atomic/include/TFW_atomic_inner.h
+    include/TFW_message_loop.h
 )
 
 # ============================================================================

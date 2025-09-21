@@ -62,6 +62,26 @@ int32_t TFW_Memcpy_S(void* dest, size_t destSize, const void* src, size_t count)
 int32_t TFW_Strcpy_S(char* dest, size_t destSize, const char* src);
 int32_t TFW_Strcat_S(char* dest, size_t destSize, const char* src);
 
+// 字符串搜索函数的安全替代
+/**
+ * Find the last occurrence of a character in a string
+ * 查找字符串中字符最后一次出现的位置
+ * @param str String to search in / 要搜索的字符串
+ * @param c Character to search for / 要查找的字符
+ * @return Pointer to the last occurrence of c in str, or NULL if not found / 指向最后一次出现位置的指针，未找到则返回NULL
+ */
+char* TFW_Strrchr(const char* str, int c);
+
+/**
+ * Extract tokens from string (thread-safe)
+ * 从字符串中提取标记（线程安全）
+ * @param str String to tokenize / 要分词的字符串
+ * @param delim Delimiter characters / 分隔符字符
+ * @param saveptr Pointer to store context between calls / 用于存储调用间上下文的指针
+ * @return Next token, or NULL if no more tokens / 下一个标记，如果没有更多标记则返回NULL
+ */
+char* TFW_Strtok_R(char* str, const char* delim, char** saveptr);
+
 #ifdef __cplusplus
 }
 #endif

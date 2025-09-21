@@ -8,6 +8,7 @@
 #include "TFW_errorno.h"
 #include "TFW_mem.h"
 #include "TFW_common_defines.h"
+#include "TFW_utils_log.h"
 
 // ============================================================================
 // macOS平台时间实现
@@ -64,13 +65,13 @@ int32_t TFW_GetTimestamp(char* timestamp, size_t buffer_size) {
     return TFW_SUCCESS;
 }
 
-uint64_t TFW_GetTimestampMs() {
+int64_t TFW_GetTimestampMs() {
     // macOS平台：使用 clock_gettime() 获取单调时间
     // macOS platform: use clock_gettime() to get monotonic time
     struct timespec ts;
 #ifdef CLOCK_MONOTONIC
     if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0) {
-        return (uint64_t)(TFW_TIME_SEC_TO_MS(ts.tv_sec) + TFW_TIME_NS_TO_MS(ts.tv_nsec));
+        return (int64_t)(TFW_TIME_SEC_TO_MS(ts.tv_sec) + TFW_TIME_NS_TO_MS(ts.tv_nsec));
     }
 #endif
 
@@ -81,16 +82,16 @@ uint64_t TFW_GetTimestampMs() {
     struct timeval tv;
     struct timezone tz;
     gettimeofday(&tv, &tz);
-    return (uint64_t)(TFW_TIME_SEC_TO_MS(tv.tv_sec) + TFW_TIME_NS_TO_MS(tv.tv_usec));
+    return (int64_t)(TFW_TIME_SEC_TO_MS(tv.tv_sec) + TFW_TIME_NS_TO_MS(tv.tv_usec));
 }
 
-uint64_t TFW_GetTimestampUs() {
+int64_t TFW_GetTimestampUs() {
     // macOS平台：使用 clock_gettime() 获取单调时间
     // macOS platform: use clock_gettime() to get monotonic time
     struct timespec ts;
 #ifdef CLOCK_MONOTONIC
     if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0) {
-        return (uint64_t)(TFW_TIME_SEC_TO_US(ts.tv_sec) + TFW_TIME_NS_TO_MS(ts.tv_nsec));
+        return (int64_t)(TFW_TIME_SEC_TO_US(ts.tv_sec) + TFW_TIME_NS_TO_MS(ts.tv_nsec));
     }
 #endif
 
@@ -101,16 +102,16 @@ uint64_t TFW_GetTimestampUs() {
     struct timeval tv;
     struct timezone tz;
     gettimeofday(&tv, &tz);
-    return (uint64_t)(TFW_TIME_SEC_TO_US(tv.tv_sec) + TFW_TIME_NS_TO_MS(tv.tv_usec));
+    return (int64_t)(TFW_TIME_SEC_TO_US(tv.tv_sec) + TFW_TIME_NS_TO_MS(tv.tv_usec));
 }
 
-uint64_t TFW_GetTimestampNs() {
+int64_t TFW_GetTimestampNs() {
     // macOS平台：使用 clock_gettime() 获取单调时间
     // macOS platform: use clock_gettime() to get monotonic time
 #ifdef CLOCK_MONOTONIC
     struct timespec ts;
     if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0) {
-        return (uint64_t)(TFW_TIME_SEC_TO_NS(ts.tv_sec) + ts.tv_nsec);
+        return (int64_t)(TFW_TIME_SEC_TO_NS(ts.tv_sec) + ts.tv_nsec);
     }
 #endif
 
@@ -121,5 +122,100 @@ uint64_t TFW_GetTimestampNs() {
     struct timeval tv;
     struct timezone tz;
     gettimeofday(&tv, &tz);
-    return (uint64_t)(TFW_TIME_SEC_TO_NS(tv.tv_sec) + TFW_TIME_NS_TO_MS(tv.tv_usec));
+    return (int64_t)(TFW_TIME_SEC_TO_NS(tv.tv_sec) + TFW_TIME_NS_TO_MS(tv.tv_usec));
+}
+
+int32_t TFW_GetTime(TFW_SysTime* sysTime) {
+    if (sysTime == NULL) {
+        TFW_LOGE_UTILS("TFW_GetTime sysTime is null");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+#ifdef CLOCK_MONOTONIC
+    struct timespec time = {0};
+    if (clock_gettime(CLOCK_MONOTONIC, &time) != 0) {
+        TFW_LOGE_UTILS("TFW_GetTime clock_gettime failed");
+        return TFW_ERROR;
+    }
+
+    sysTime->sec = time.tv_sec;
+    sysTime->nsec = time.tv_nsec;
+    return TFW_SUCCESS;
+#else
+    // 回退方案：使用 gettimeofday()
+    struct timeval tv;
+    struct timezone tz;
+    if (gettimeofday(&tv, &tz) != 0) {
+        TFW_LOGE_UTILS("TFW_GetTime gettimeofday failed");
+        return TFW_ERROR;
+    }
+
+    sysTime->sec = tv.tv_sec;
+    sysTime->nsec = TFW_TIME_NS_TO_MS(tv.tv_usec);
+    return TFW_SUCCESS;
+#endif
+}
+
+int32_t TFW_TimeCompare(const TFW_SysTime* a, const TFW_SysTime* b) {
+    if (a == NULL || b == NULL) {
+        TFW_LOGE_UTILS("TFW_TimeCompare a or b is null");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    if (a->sec > b->sec) {
+        return 1;
+    } else if (a->sec < b->sec) {
+        return -1;
+    } else {
+        if (a->nsec > b->nsec) {
+            return 1;
+        } else if (a->nsec < b->nsec) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
+}
+
+int32_t TFW_TimeAdd(const TFW_SysTime* a, const TFW_SysTime* b, TFW_SysTime* result) {
+    if (a == NULL || b == NULL || result == NULL) {
+        TFW_LOGE_UTILS("TFW_TimeAdd a, b or result is null");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    const int64_t NS_PER_SECOND = 1000000000LL;
+
+    result->sec = a->sec + b->sec;
+    result->nsec = a->nsec + b->nsec;
+
+    if (result->nsec >= NS_PER_SECOND) {
+        result->sec += 1;
+        result->nsec -= NS_PER_SECOND;
+    }
+
+    return TFW_SUCCESS;
+}
+
+int32_t TFW_TimeSub(const TFW_SysTime* a, const TFW_SysTime* b, TFW_SysTime* result) {
+    if (a == NULL || b == NULL || result == NULL) {
+        TFW_LOGE_UTILS("TFW_TimeSub a, b or result is null");
+        return TFW_ERROR_INVALID_PARAM;
+    }
+
+    const int64_t NS_PER_SECOND = 1000000000LL;
+
+    if (TFW_TimeCompare(a, b) < 0) {
+        TFW_LOGE_UTILS("TFW_TimeSub a < b, result would be negative");
+        return TFW_ERROR;
+    }
+
+    result->sec = a->sec - b->sec;
+    result->nsec = a->nsec - b->nsec;
+
+    if (result->nsec < 0) {
+        result->sec -= 1;
+        result->nsec += NS_PER_SECOND;
+    }
+
+    return TFW_SUCCESS;
 }

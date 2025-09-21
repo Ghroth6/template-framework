@@ -21,6 +21,12 @@ extern "C" {
 #define TFW_TIME_MS_TO_NS(ms) ((ms) * (1000 * 1000))
 #define TFW_TIME_FORMAT_DEFAULT "%Y-%m-%d %H:%M:%S.mmm"
 
+// 时间结构体定义
+typedef struct {
+    int64_t sec;   // 秒
+    int64_t nsec;  // 纳秒
+} TFW_SysTime;
+
 // ============================================================================
 // Time related function declarations
 // 时间相关函数声明
@@ -40,21 +46,58 @@ int32_t TFW_GetTimestamp(char* timestamp, size_t buffer_size);
  * 获取当前单调时间戳（毫秒精度）
  * @return Millisecond timestamp (monotonic time)
  */
-uint64_t TFW_GetTimestampMs();
+int64_t TFW_GetTimestampMs();
 
 /**
  * Get current monotonic timestamp (microsecond precision)
  * 获取当前单调时间戳（微秒精度）
  * @return Microsecond timestamp (monotonic time)
  */
-uint64_t TFW_GetTimestampUs();
+int64_t TFW_GetTimestampUs();
 
 /**
  * Get current monotonic timestamp (nanosecond precision)
  * 获取当前单调时间戳（纳秒精度）
  * @return Nanosecond timestamp (monotonic time)
  */
-uint64_t TFW_GetTimestampNs();
+int64_t TFW_GetTimestampNs();
+
+/**
+ * Get current system time
+ * 获取当前系统时间
+ * @param sysTime System time structure / 系统时间结构体
+ * @return TFW_SUCCESS on success, negative value on error / 成功返回TFW_SUCCESS，失败返回负值
+ */
+int32_t TFW_GetTime(TFW_SysTime* sysTime);
+
+/**
+ * Compare two time values
+ * 比较两个时间值
+ * @param a First time value / 第一个时间值
+ * @param b Second time value / 第二个时间值
+ * @return Returns 1 if a > b, -1 if a < b, 0 if equal / a>b返回1，a<b返回-1，相等返回0
+ */
+int32_t TFW_TimeCompare(const TFW_SysTime* a, const TFW_SysTime* b);
+
+/**
+ * Add two time values
+ * 两个时间值相加
+ * @param a First time value / 第一个时间值
+ * @param b Second time value / 第二个时间值
+ * @param result Result time value / 结果时间值
+ * @return TFW_SUCCESS on success, negative value on error / 成功返回TFW_SUCCESS，失败返回负值
+ */
+int32_t TFW_TimeAdd(const TFW_SysTime* a, const TFW_SysTime* b, TFW_SysTime* result);
+
+/**
+ * Subtract two time values
+ * 两个时间值相减
+ * @param a First time value / 第一个时间值
+ * @param b Second time value / 第二个时间值
+ * @param result Result time value (a - b) / 结果时间值(a - b)
+ * @return TFW_SUCCESS on success, negative value on error / 成功返回TFW_SUCCESS，失败返回负值
+ */
+int32_t TFW_TimeSub(const TFW_SysTime* a, const TFW_SysTime* b, TFW_SysTime* result);
 
 #ifdef __cplusplus
 }

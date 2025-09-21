@@ -19,9 +19,6 @@ typedef struct {
     volatile int64_t value;
 } TFW_AtomicInt64;
 
-// 在TFW_atomic.h中添加类型别名
-typedef TFW_AtomicInt32 TFW_AtomicUInt32;
-typedef TFW_AtomicInt64 TFW_AtomicUInt64;
 
 // 32位原子操作函数
 int32_t TFW_AtomicAdd32(TFW_AtomicInt32* atomic, int32_t value);
@@ -40,15 +37,6 @@ int64_t TFW_AtomicDec64(TFW_AtomicInt64* atomic);
 bool TFW_AtomicCompareAndSwap64(TFW_AtomicInt64* atomic, int64_t expected, int64_t desired);
 int64_t TFW_AtomicLoad64(TFW_AtomicInt64* atomic);
 void TFW_AtomicStore64(TFW_AtomicInt64* atomic, int64_t value);
-
-// 可选：提供别名函数（实际只是类型转换）
-static inline void TFW_AtomicStoreU32(TFW_AtomicUInt32* atomic, uint32_t value) {
-    TFW_AtomicStore32((TFW_AtomicInt32*)atomic, (int32_t)value);
-}
-
-static inline uint32_t TFW_AtomicLoadU32(TFW_AtomicUInt32* atomic) {
-    return (uint32_t)TFW_AtomicLoad32((TFW_AtomicInt32*)atomic);
-}
 
 // 指针原子操作
 typedef struct {

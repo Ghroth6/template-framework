@@ -9,10 +9,40 @@
 // Windows platform memory management implementation
 // ============================================================================
 
-// Memory statistics (thread-safe)
-static volatile uint64_t g_total_allocated = 0;
-static volatile uint64_t g_total_freed = 0;
-static volatile uint64_t g_current_used = 0;
+// Memory statistics with mutex protection
+static uint64_t g_total_allocated = 0;
+static uint64_t g_total_freed = 0;
+static uint64_t g_current_used = 0;
+static CRITICAL_SECTION g_mem_stats_mutex;
+static BOOL g_mutex_initialized = FALSE;
+
+// Initialize mutex
+static void TFW_InitMutex() {
+    if (!g_mutex_initialized) {
+        InitializeCriticalSection(&g_mem_stats_mutex);
+        g_mutex_initialized = TRUE;
+    }
+
+char* TFW_Strrchr(const char* str, int c) {
+    if (str == NULL) {
+        TFW_LOGE_UTILS("TFW_Strrchr: input string is NULL");
+        return NULL;
+    }
+    
+    // 使用标准库的strrchr实现
+    return (char*)strrchr(str, c);
+}
+
+char* TFW_Strtok_R(char* str, const char* delim, char** saveptr) {
+    if (delim == NULL || saveptr == NULL) {
+        TFW_LOGE_UTILS("TFW_Strtok_R: delimiter or saveptr is NULL");
+        return NULL;
+    }
+    
+    // 使用Windows平台的strtok_s实现
+    return strtok_s(str, delim, saveptr);
+}
+}
 
 void* TFW_Malloc(uint32_t size) {
     // Check memory size limit
@@ -24,9 +54,14 @@ void* TFW_Malloc(uint32_t size) {
     // Windows platform: use malloc
     void* ptr = malloc(size);
     if (ptr != NULL) {
-        // Update statistics
-        InterlockedAdd64((LONG64*)&g_total_allocated, size);
-        InterlockedAdd64((LONG64*)&g_current_used, size);
+        // Initialize mutex if needed
+        TFW_InitMutex();
+        
+        // Update statistics (thread-safe)
+        EnterCriticalSection(&g_mem_stats_mutex);
+        g_total_allocated += size;
+        g_current_used += size;
+        LeaveCriticalSection(&g_mem_stats_mutex);
         TFW_LOGD_UTILS("Memory allocated: %u bytes at %p", size, ptr);
     } else {
         TFW_LOGE_UTILS("Memory allocation failed: %u bytes", size);
@@ -45,9 +80,14 @@ void* TFW_Calloc(uint32_t size) {
     // Windows platform: use calloc
     void* ptr = calloc(1, size);
     if (ptr != NULL) {
-        // Update statistics
-        InterlockedAdd64((LONG64*)&g_total_allocated, size);
-        InterlockedAdd64((LONG64*)&g_current_used, size);
+        // Initialize mutex if needed
+        TFW_InitMutex();
+        
+        // Update statistics (thread-safe)
+        EnterCriticalSection(&g_mem_stats_mutex);
+        g_total_allocated += size;
+        g_current_used += size;
+        LeaveCriticalSection(&g_mem_stats_mutex);
         TFW_LOGD_UTILS("Memory allocated and zeroed: %u bytes at %p", size, ptr);
     } else {
         TFW_LOGE_UTILS("Memory allocation failed: %u bytes", size);
@@ -99,6 +139,16 @@ int32_t TFW_GetMemoryStats(uint64_t* total_allocated, uint64_t* total_freed, uin
     *total_allocated = g_total_allocated;
     *total_freed = g_total_freed;
     *current_used = g_current_used;
+
+    // Initialize mutex if needed
+    TFW_InitMutex();
+
+    // 返回当前统计信息（线程安全）
+    EnterCriticalSection(&g_mem_stats_mutex);
+    *total_allocated = g_total_allocated;
+    *total_freed = g_total_freed;
+    *current_used = g_current_used;
+    LeaveCriticalSection(&g_mem_stats_mutex);
 
     return TFW_SUCCESS;
 }
