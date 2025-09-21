@@ -62,6 +62,7 @@ set(CORE_C_SOURCES
 # collect header files
 # 收集头文件
 set(CORE_HEADERS
+    include/TFW_core_interface.h
     include/TFW_core.h
 )
 

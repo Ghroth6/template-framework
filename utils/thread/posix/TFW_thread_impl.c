@@ -274,7 +274,7 @@ int32_t TFW_ThreadAttr_Init(TFW_ThreadAttr* attr) {
 // ============================================================================
 
 int32_t TFW_Thread_Create(TFW_Thread_t* thread, const TFW_ThreadAttr* attr,
-                         void* (*threadEntry)(void*), void* arg) {
+                            void* (*threadEntry)(void*), void* arg) {
     if (thread == NULL) {
         TFW_LOGE_UTILS("TFW_Thread_Create thread is null");
         return TFW_ERROR_INVALID_PARAM;

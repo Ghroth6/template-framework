@@ -179,23 +179,23 @@ static int32_t TFW_CreateFileWithPath(const char *fileName) {
     if (fileName == NULL) {
         return TFW_ERROR_INVALID_PARAM;
     }
-    
+
     // 创建文件路径的副本，因为dirname可能会修改输入字符串
     char *filePathCopy = TFW_Strdup(fileName);
     if (filePathCopy == NULL) {
         TFW_LOGE_UTILS("Failed to allocate memory for file path copy");
         return TFW_ERROR_MALLOC_ERR;
     }
-    
+
     // 获取目录路径
     char *dirPath = dirname(filePathCopy);
-    
+
     // 如果目录路径是当前目录或根目录，则无需创建
     if (strcmp(dirPath, ".") == 0 || strcmp(dirPath, "/") == 0) {
         TFW_Free(filePathCopy);
         return TFW_SUCCESS;
     }
-    
+
     // 创建目录路径的副本用于遍历
     char *pathCopy = TFW_Strdup(dirPath);
     if (pathCopy == NULL) {
@@ -203,10 +203,10 @@ static int32_t TFW_CreateFileWithPath(const char *fileName) {
         TFW_LOGE_UTILS("Failed to allocate memory for path copy");
         return TFW_ERROR_MALLOC_ERR;
     }
-    
+
     // 递归创建目录
     char currentPath[PATH_MAX] = {0};
-    
+
     // 处理绝对路径
     if (fileName[0] == '/') {
         if (TFW_Strcpy_S(currentPath, sizeof(currentPath), "/") != 0) {
@@ -216,7 +216,7 @@ static int32_t TFW_CreateFileWithPath(const char *fileName) {
             return TFW_ERROR;
         }
     }
-    
+
     // 分割路径并逐级创建
     char *token = NULL;
     char *saveptr = NULL;
@@ -236,7 +236,7 @@ static int32_t TFW_CreateFileWithPath(const char *fileName) {
             TFW_LOGE_UTILS("Failed to append token to path");
             return TFW_ERROR;
         }
-        
+
         // 检查目录是否存在
         struct stat st;
         if (stat(currentPath, &st) == -1) {
@@ -254,10 +254,10 @@ static int32_t TFW_CreateFileWithPath(const char *fileName) {
             TFW_Free(pathCopy);
             return TFW_ERROR;
         }
-        
+
         token = TFW_Strtok_R(NULL, "/", &saveptr);
     }
-    
+
     TFW_Free(filePathCopy);
     TFW_Free(pathCopy);
     return TFW_SUCCESS;
@@ -299,7 +299,7 @@ int32_t TFW_ReadFullFile(const char *fileName, char *readBuf, uint32_t maxLen) {
     }
 
     off_t fileLen = st.st_size;
-    
+
     // 检查缓冲区大小
     if (fileLen >= (off_t)maxLen) {
         TFW_LOGE_UTILS("Buffer too small for file %s. File size: %ld, Buffer size: %u", fileName, fileLen, maxLen);
@@ -399,7 +399,7 @@ int32_t TFW_OpenFile(const char *fileName, int32_t flags) {
     } else {
         fd = open(fileName, posixFlags);
     }
-    
+
     if (fd == -1) {
         TFW_LOGE_UTILS("Failed to open file %s: %s", fileName, strerror(errno));
         return TFW_ERROR;
@@ -580,7 +580,7 @@ int32_t TFW_ReadFullFileAndSize(const char *fileName, char *readBuf, uint32_t ma
     }
 
     off_t fileLen = st.st_size;
-    
+
     // 检查缓冲区大小
     if (fileLen >= (off_t)maxLen) {
         TFW_LOGE_UTILS("Buffer too small for file %s. File size: %ld, Buffer size: %u", fileName, fileLen, maxLen);

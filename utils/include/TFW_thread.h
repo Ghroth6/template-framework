@@ -50,8 +50,8 @@ int32_t TFW_Cond_Destroy(TFW_Cond_t* cond);
 int32_t TFW_ThreadAttr_Init(TFW_ThreadAttr* attr);
 
 // 线程操作函数
-int32_t TFW_Thread_Create(TFW_Thread_t* thread, const TFW_ThreadAttr* attr, 
-                         void* (*threadEntry)(void*), void* arg);
+int32_t TFW_Thread_Create(TFW_Thread_t* thread, const TFW_ThreadAttr* attr,
+                            void* (*threadEntry)(void*), void* arg);
 int32_t TFW_Thread_Join(TFW_Thread_t thread, void** value);
 int32_t TFW_Thread_SetName(TFW_Thread_t thread, const char* name);
 TFW_Thread_t TFW_Thread_GetSelf(void);
