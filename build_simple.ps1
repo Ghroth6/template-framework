@@ -84,6 +84,23 @@ function Test-Requirements {
     Write-Success "Build tools check completed"
 }
 
+# 运行清理脚本
+function Run-CleanScript {
+    Print-Info "运行清理脚本..."
+
+    if (Test-Path ".\clean.ps1") {
+        Print-Info "执行现有的clean.ps1脚本"
+        powershell -ExecutionPolicy Bypass -File ".\clean.ps1"
+        Print-Success "清理脚本执行完成"
+    } elseif (Test-Path ".\clean.sh") {
+        Print-Info "执行现有的clean.sh脚本"
+        bash ".\clean.sh"
+        Print-Success "清理脚本执行完成"
+    } else {
+        Print-Warning "未找到清理脚本，跳过清理步骤"
+    }
+}
+
 # 创建必要的目录
 
 function New-BuildDirectories {
@@ -213,6 +230,7 @@ function Main {
     Write-Info "Output directory: out\"
 
     Test-Requirements
+    Run-CleanScript
     New-BuildDirectories
     Invoke-CMakeConfigure
     Invoke-CMakeBuild

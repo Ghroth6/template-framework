@@ -46,6 +46,19 @@ check_requirements() {
     print_success "构建工具检查完成"
 }
 
+# 运行清理脚本
+run_clean_script() {
+    print_info "运行清理脚本..."
+
+    if [ -f "./clean.sh" ]; then
+        print_info "执行现有的clean.sh脚本"
+        bash ./clean.sh
+        print_success "清理脚本执行完成"
+    else
+        print_warning "未找到clean.sh脚本，跳过清理步骤"
+    fi
+}
+
 # 创建必要的目录
 create_directories() {
     print_info "创建构建目录..."
@@ -127,6 +140,7 @@ main() {
     print_info "输出目录: out/"
 
     check_requirements
+    run_clean_script
     create_directories
     configure_project
     build_project

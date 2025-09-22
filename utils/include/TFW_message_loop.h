@@ -8,7 +8,7 @@
 #include "TFW_thread.h"
 
 #ifdef __cplusplus
-extern "c" {
+extern "C" {
 #endif
 
 typedef struct TFW_Message TFW_Message;
@@ -43,6 +43,17 @@ struct TFW_Message {
     void (*FreeMessage)(TFW_Message *msg);
 };
 
+// 消息循环类型枚举
+typedef enum {
+    TFW_LOOP_TYPE_DEFAULT,
+    TFW_LOOP_TYPE_LOG,
+    TFW_LOOP_TYPE_MAX
+} TFW_LooperType;
+
+// 消息循环名称宏定义
+#define TFW_DEFAULT_LOOPER_NAME "TFW_Default_Lp"
+#define TFW_LOG_LOOPER_NAME "TFW_Log_Lp"
+
 TFW_Message *TFW_MallocMessage(void);
 
 void TFW_FreeMessage(TFW_Message *msg);
@@ -52,6 +63,14 @@ TFW_Looper *TFW_CreateNewLooper(const char *name);
 void TFW_DestroyLooper(TFW_Looper *looper);
 
 void TFW_SetLooperDumpable(TFW_Looper *loop, bool dumpable);
+
+TFW_Looper *TFW_GetLooper(TFW_LooperType type);
+
+void TFW_SetLooper(TFW_LooperType type, TFW_Looper *looper);
+
+int32_t TFW_LooperInit(void);
+
+void TFW_LooperDeinit(void);
 
 #ifdef __cplusplus
 }

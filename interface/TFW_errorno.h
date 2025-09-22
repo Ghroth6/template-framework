@@ -33,16 +33,19 @@ typedef enum {
     // Generic error code
     // 通用错误码
     TFW_ERROR_PUBLIC_ERR_BASE = -100,  // Base value for public error codes / 公共错误码基值
-    TFW_ERROR_TIMEOUT,                 // Operation timeout / 操作超时
     TFW_ERROR_INVALID_PARAM,           // Invalid parameter / 无效参数
+    TFW_ERROR_NOT_FOUND,               // Not found / 未找到
+    TFW_ERROR_TIMEOUT,                 // Operation timeout / 操作超时
+
     TFW_ERROR_INIT_FAIL,               // Initialization failed / 初始化失败
     TFW_ERROR_NOT_INIT,                // Not initialized / 未初始化
     TFW_ERROR_ALREADY_INIT,            // Already initialized / 已经初始化
     TFW_ERROR_DEINIT_FAIL,             // Deinitialization failed / 反初始化失败
+
     TFW_ERROR_MALLOC_ERR,              // Memory allocation error / 内存分配错误
     TFW_ERROR_LOCK_FAILED,             // Lock operation failed / 锁定操作失败
     TFW_ERROR_FILE_ERROR,              // File operation error / 文件操作错误
-    TFW_ERROR_NOT_FOUND,               // Not found / 未找到
+    TFW_ERROR_LOOPER_ERROR,            // Message loop error / 消息循环错误
 
     TFW_ERROR   = -1,                  // General error / 一般错误
     TFW_SUCCESS = 0                    // Success / 成功

@@ -54,6 +54,7 @@ set(CORE_CPP_SOURCES
     src/TFW_core.cpp
     src/TFW_core_impl.cpp
     src/TFW_config_manager.cpp
+    src/TFW_msg_loop_mgr.cpp
 )
 
 # collect C source files
