@@ -1,5 +1,6 @@
 #include "TFW_core_impl.h"
 #include "TFW_config_manager.h"
+#include "TFW_msg_loop_mgr.h"
 #include "TFW_core_log.h"
 #include "TFW_errorno.h"
 #include "TFW_types.h"
@@ -18,10 +19,18 @@ int32_t TFW_Core_Impl::Init() {
         return TFW_ERROR_ALREADY_INIT;
     }
 
-    // 初始化配置管理器
     int32_t result = TFW_ConfigManager::GetInstance().Init();
-    if (result != TFW_SUCCESS) {
+    if(result != TFW_SUCCESS) {
         TFW_LOGE_CORE("Failed to initialize config manager, error: %d", result);
+        TFW_ConfigManager::GetInstance().Deinit();
+        return result;
+    }
+    // 初始化配置管理器
+    result = TFW_MsgLoopMgr::GetInstance().Init();
+    if (result != TFW_SUCCESS) {
+        TFW_LOGE_CORE("Failed to initialize message loop manager, error: %d", result);
+        TFW_MsgLoopMgr::GetInstance().Deinit();
+        TFW_ConfigManager::GetInstance().Deinit();
         return result;
     }
 
@@ -41,10 +50,14 @@ int32_t TFW_Core_Impl::Deinit() {
     }
 
     // 清理配置管理器
-    int32_t result = TFW_ConfigManager::GetInstance().Deinit();
+    int32_t result = TFW_MsgLoopMgr::GetInstance().Deinit();
+    if (result != TFW_SUCCESS) {
+        TFW_LOGE_CORE("Failed to deinitialize message loop manager, error: %d", result);
+    }
+
+    result = TFW_ConfigManager::GetInstance().Deinit();
     if (result != TFW_SUCCESS) {
         TFW_LOGE_CORE("Failed to deinitialize config manager, error: %d", result);
-        return result;
     }
 
     // 重置初始化标志

@@ -9,8 +9,9 @@
 #include "TFW_timer.h"
 #include "TFW_utils_log.h"
 
-#define LOOP_NAME_LEN 16
+#define LOOP_NAME_LEN 32
 #define TIME_THOUSANDS_MULTIPLIER 1000LL
+#define MAX_LOOPER_CNT 30U
 #define MAX_LOOPER_PRINT_CNT 64
 
 typedef struct {
@@ -24,12 +25,56 @@ struct TFW_LooperContext {
     volatile unsigned char stop; // destroys looper, stop =1, and running =0
     volatile unsigned char running;
     TFW_Message *currentMsg;
-    unsigned int msgSize;
+    uint32_t msgSize;
     TFW_Mutex_t lock;
     TFW_MutexAttr_t attr;
     TFW_Cond_t cond;          // 用于通知有新消息
     TFW_Cond_t condRunning;   // 用于通知looper状态变化
 };
+
+// Looper配置项结构体
+struct LooperConfigItem {
+    TFW_LooperType type;
+    TFW_Looper *looper;
+};
+
+// 全局Looper配置数组
+static struct LooperConfigItem g_looperConfig[TFW_LOOP_TYPE_MAX] = {0}; // 只为有效枚举值分配空间
+
+static uint32_t g_looperCnt = 0;
+static int8_t g_isNeedDestroy = 0;
+static int8_t g_isThreadStarted = 0;
+
+TFW_Looper *TFW_GetLooper(TFW_LooperType type)
+{
+    // 检查类型是否有效
+    if (type < TFW_LOOP_TYPE_DEFAULT || type >= TFW_LOOP_TYPE_MAX) {
+        return NULL;
+    }
+
+    return g_looperConfig[type].looper;
+}
+
+void TFW_SetLooper(TFW_LooperType type, TFW_Looper *looper)
+{
+    // 检查类型是否有效
+    if (type < TFW_LOOP_TYPE_DEFAULT || type >= TFW_LOOP_TYPE_MAX) {
+        return;
+    }
+
+    g_looperConfig[type].type = type;
+    g_looperConfig[type].looper = looper;
+}
+
+static void ReleaseLooper(const TFW_Looper *looper)
+{
+    for (int32_t i = 0; i < (TFW_LOOP_TYPE_MAX); i++) {
+        if (g_looperConfig[i].looper == looper) {
+            g_looperConfig[i].looper = NULL;
+            return;
+        }
+    }
+}
 
 static int64_t UptimeMicros(void)
 {
@@ -61,6 +106,66 @@ void TFW_FreeMessage(TFW_Message *msg)
         FreeTFWMsg(msg);
     }
 }
+
+static void DumpLooperLocked(const TFW_Looper *looper)
+{
+    if (looper == NULL || looper->context == NULL) {
+        TFW_LOGE_UTILS("Invalid looper or context");
+        return;
+    }
+
+    const TFW_LooperContext *context = looper->context;
+    if (context->currentMsg != NULL) {
+        TFW_LOGI_UTILS("Current Message - What: %d, Time: %lld",
+                        context->currentMsg->what, context->currentMsg->time);
+    }
+
+    // 遍历消息队列并打印信息
+    if (!TFW_IsListEmpty(&context->msgHead)) {
+        TFW_ListNode *item = NULL;
+        TFW_ListNode *nextItem = NULL;
+        uint32_t count = 0;
+
+        TFW_LIST_FOR_EACH_SAFE(item, nextItem, &context->msgHead) {
+            TFW_MessageNode *itemNode = TFW_LIST_ENTRY(item, TFW_MessageNode, node);
+            if (itemNode->msg != NULL) {
+                TFW_LOGI_UTILS("Message[%u] - What: %d, Time: %lld, Handler: %s",
+                                count, itemNode->msg->what, itemNode->msg->time,
+                                (itemNode->msg->handler && itemNode->msg->handler->name) ?
+                                itemNode->msg->handler->name : "null");
+                count++;
+
+                // 避免打印过多信息
+                if (count >= MAX_LOOPER_PRINT_CNT) {
+                    TFW_LOGI_UTILS("... and more messages");
+                    break;
+                }
+            }
+        }
+    }
+
+    TFW_LOGI_UTILS("=== End Looper Dump ===");
+}
+
+void DumpLooper(const TFW_Looper *looper)
+{
+    if (looper == NULL || looper->context == NULL) {
+        TFW_LOGE_UTILS("Invalid looper or context");
+        return;
+    }
+
+    TFW_LooperContext *context = looper->context;
+    if (TFW_Mutex_Lock(&context->lock) != 0) {
+        TFW_LOGE_UTILS("Failed to lock looper mutex");
+        return;
+    }
+
+    DumpLooperLocked(looper);
+
+    (void)TFW_Mutex_Unlock(&context->lock);
+}
+
+// ... existing code ...
 
 static void *LoopTask(void *arg)
 {
@@ -160,7 +265,7 @@ static void *LoopTask(void *arg)
     return NULL;
 }
 
-static int StartNewLooperThread(TFW_Looper *looper)
+static int32_t StartNewLooperThread(TFW_Looper *looper)
 {
     TFW_ThreadAttr attr;
     TFW_ThreadAttr_Init(&attr);
@@ -170,23 +275,23 @@ static int StartNewLooperThread(TFW_Looper *looper)
     int32_t ret = TFW_Thread_Create(&tid, &attr, LoopTask, looper);
     if (ret != TFW_SUCCESS) {
         TFW_LOGE_UTILS("Init LoopTask Thread failed");
-        return -1;
+        return ret;
     }
 
     TFW_LOGI_UTILS("loop thread creating. name=%s", looper->context->name);
-    return 0;
+    return TFW_SUCCESS;
 }
 
 static int32_t PostMessageAtTimeParamVerify(const TFW_Looper *looper, TFW_Message *msgPost)
 {
     if (msgPost == NULL) {
         TFW_LOGE_UTILS("the msgPost param is null.");
-        return -1;
+        return TFW_ERROR_INVALID_PARAM;
     }
 
     if (looper == NULL) {
         TFW_LOGE_UTILS("the looper param is null.");
-        return -1;
+        return TFW_ERROR_INVALID_PARAM;
     }
 
     if (looper->dumpable) {
@@ -196,10 +301,10 @@ static int32_t PostMessageAtTimeParamVerify(const TFW_Looper *looper, TFW_Messag
 
     if (msgPost->handler == NULL) {
         TFW_LOGE_UTILS("[%s] msg handler is null", looper->context->name);
-        return -1;
+        return TFW_ERROR_LOOPER_ERROR;
     }
 
-    return 0;
+    return TFW_SUCCESS;
 }
 
 static void PostMessageAtTime(const TFW_Looper *looper, TFW_Message *msgPost)
@@ -249,6 +354,7 @@ static void PostMessageAtTime(const TFW_Looper *looper, TFW_Message *msgPost)
     context->msgSize++;
     if (looper->dumpable) {
         TFW_LOGD_UTILS("PostMessageAtTime insert. name=%s", context->name);
+        DumpLooperLocked(looper);
     }
     (void)TFW_Mutex_Unlock(&context->lock);
 }
@@ -281,7 +387,7 @@ static void LooperPostMessageDelay(const TFW_Looper *looper, TFW_Message *msg, u
     PostMessageAtTime(looper, msg);
 }
 
-static int WhatRemoveFunc(const TFW_Message *msg, void *args)
+static int32_t WhatRemoveFunc(const TFW_Message *msg, void *args)
 {
     int32_t what = (int32_t)(intptr_t)args;
     if (msg->what == what) {
@@ -291,7 +397,7 @@ static int WhatRemoveFunc(const TFW_Message *msg, void *args)
 }
 
 static void LoopRemoveMessageCustom(const TFW_Looper *looper, const TFW_Handler *handler,
-    int (*customFunc)(const TFW_Message*, void*), void *args)
+    int32_t (*customFunc)(const TFW_Message*, void*), void *args)
 {
     TFW_LooperContext *context = looper->context;
     if (TFW_Mutex_Lock(&context->lock) != 0) {
@@ -336,6 +442,11 @@ void TFW_SetLooperDumpable(TFW_Looper *loop, bool dumpable)
 
 TFW_Looper *TFW_CreateNewLooper(const char *name)
 {
+    if (g_looperCnt >= (MAX_LOOPER_CNT)) {
+        TFW_LOGE_UTILS("Looper exceeds the maximum, count=%u,", g_looperCnt);
+        return NULL;
+    }
+
     TFW_Looper *looper = (TFW_Looper *)TFW_Calloc(sizeof(TFW_Looper));
     if (looper == NULL) {
         TFW_LOGE_UTILS("Looper TFW_Calloc fail");
@@ -377,13 +488,15 @@ TFW_Looper *TFW_CreateNewLooper(const char *name)
     looper->RemoveMessage = LooperRemoveMessage;
     looper->RemoveMessageCustom = LoopRemoveMessageCustom;
 
-    int ret = StartNewLooperThread(looper);
+    int32_t ret = StartNewLooperThread(looper);
     if (ret != 0) {
         TFW_LOGE_UTILS("start fail");
         TFW_Free(looper);
         TFW_Free(context);
         return NULL;
     }
+
+    g_looperCnt++;
 
     TFW_LOGD_UTILS("wait looper start ok. name=%s", context->name);
     return looper;
@@ -435,5 +548,48 @@ void TFW_DestroyLooper(TFW_Looper *looper)
         TFW_Free(context);
         looper->context = NULL;
     }
+    // 清理g_looperConfig数组中的引用
+    ReleaseLooper(looper);
+
     TFW_Free(looper);
+    if (g_looperCnt != 0) {
+        g_looperCnt--;
+    }
+}
+
+int32_t TFW_LooperInit(void)
+{
+    TFW_Looper *looper = TFW_CreateNewLooper(TFW_DEFAULT_LOOPER_NAME);
+    if (!looper) {
+        TFW_LOGE_UTILS("init default looper fail.");
+        return TFW_ERROR_LOOPER_ERROR;
+    }
+    TFW_SetLooper(TFW_LOOP_TYPE_DEFAULT, looper);
+
+    looper = TFW_CreateNewLooper(TFW_LOG_LOOPER_NAME);
+    if (!looper) {
+        TFW_LOGE_UTILS("init log looper fail.");
+        return TFW_ERROR_LOOPER_ERROR;
+    }
+    TFW_SetLooper(TFW_LOOP_TYPE_LOG, looper);
+
+    TFW_LOGD_UTILS("init looper success.");
+    return TFW_SUCCESS;
+}
+
+void TFW_LooperDeinit(void)
+{
+    for (int32_t i = 0; i < (TFW_LOOP_TYPE_MAX); i++) {
+        if (g_looperConfig[i].looper == NULL) {
+            continue;
+        }
+        (void)TFW_Mutex_Lock(&(g_looperConfig[i].looper->context->lock));
+        if (g_isThreadStarted == 0) {
+            g_isNeedDestroy = 1;
+            (void)TFW_Mutex_Unlock(&(g_looperConfig[i].looper->context->lock));
+            return;
+        }
+        (void)TFW_Mutex_Unlock(&(g_looperConfig[i].looper->context->lock));
+        TFW_DestroyLooper(g_looperConfig[i].looper);
+    }
 }
