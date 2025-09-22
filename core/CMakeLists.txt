@@ -51,6 +51,9 @@ set(MODULE_DESCRIPTION "TFW framework core module")
 # 收集 C++ 源文件
 set(CORE_CPP_SOURCES
     TFW_core_interface.cpp
+    src/TFW_core.cpp
+    src/TFW_core_impl.cpp
+    src/TFW_config_manager.cpp
 )
 
 # collect C source files
@@ -62,8 +65,14 @@ set(CORE_C_SOURCES
 # collect header files
 # 收集头文件
 set(CORE_HEADERS
-    include/TFW_core_interface.h
+    include/TFW_types.h
+    include/TFW_errorno.h
+    include/TFW_single_instance.h
     include/TFW_core.h
+    include/TFW_core_interface.h
+    include/TFW_c_interface.h
+    include/TFW_core_impl.h
+    include/TFW_config_manager.h
 )
 
 # ============================================================================
