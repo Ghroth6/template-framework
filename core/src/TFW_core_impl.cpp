@@ -34,6 +34,15 @@ int32_t TFW_Core_Impl::Init() {
         return result;
     }
 
+    result = TFW_LogInit();
+    if (result != TFW_SUCCESS) {
+        TFW_LOGE_CORE("Failed to initialize log module, error: %d", result);
+        TFW_LogDeinit();
+        TFW_MsgLoopMgr::GetInstance().Deinit();
+        TFW_ConfigManager::GetInstance().Deinit();
+        return result;
+    }
+
     // 设置初始化标志
     isInitialized_ = true;
     TFW_LOGI_CORE("TFW_Core_Impl initialized successfully");
@@ -48,9 +57,13 @@ int32_t TFW_Core_Impl::Deinit() {
         TFW_LOGI_CORE("Core not initialized");
         return TFW_SUCCESS;
     }
+    int32_t result = TFW_ERROR;
+
+    // 退出日志系统
+    result = TFW_LogDeinit();
 
     // 清理配置管理器
-    int32_t result = TFW_MsgLoopMgr::GetInstance().Deinit();
+    result = TFW_MsgLoopMgr::GetInstance().Deinit();
     if (result != TFW_SUCCESS) {
         TFW_LOGE_CORE("Failed to deinitialize message loop manager, error: %d", result);
     }

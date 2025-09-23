@@ -8,11 +8,11 @@
 #include "TFW_common_defines.h"
 #include "TFW_errorno.h"
 #include "TFW_log.h"
-#include "TFW_log_internal.h"
 #include "TFW_timer.h"
 #include "TFW_types.h"
 #include "TFW_file.h"
 #include "TFW_thread.h"
+#include "TFW_config.h"
 
 // ============================================================================
 // 内部结构体定义
@@ -22,7 +22,7 @@
 typedef struct TFW_LogContext {
     TFW_LogLevel logLevel;
     bool logInitialized;
-    TFW_LogOutputMode logOutputMode;
+    int32_t logOutputMode;
 } TFW_LogContext;
 
 typedef struct {
@@ -42,7 +42,7 @@ typedef struct {
 static TFW_LogContext g_logContext = {
     .logLevel = TFW_LOG_LEVEL_DEBUG,
     .logInitialized = false,
-    .logOutputMode = TFW_LOG_OUTPUT_CONSOLE
+    .logOutputMode = (1 << TFW_LOG_OUTPUT_CONSOLE),
 };
 
 static TFW_LogLabel g_logLabel[] = {
@@ -146,8 +146,11 @@ static TFW_UNUSED int32_t TFW_Log_GetFileName(const char *file_path, char *filen
 
     int32_t ret = TFW_GetFileName(file_path, filename, buffer_size);
 
-        if (ret != TFW_SUCCESS) {
-        return ret;
+    if (ret != TFW_SUCCESS) {
+        // 如果获取文件名失败，使用默认值
+        strncpy(filename, "unknown", buffer_size - 1);
+        filename[buffer_size - 1] = '\0';
+        return TFW_ERROR; // 返回成功，因为已经有了默认值
     }
     return TFW_SUCCESS;
 }
@@ -217,12 +220,8 @@ int32_t TFW_LOG_IMPL(int32_t module, int32_t level, const char *file,
     // add file name and line number
     char filename[TFW_FILENAME_LEN_MAX] = {0};
     ret = TFW_Log_GetFileName(file, filename, TFW_FILENAME_LEN_MAX);
-    if (ret != TFW_SUCCESS) {
-        // 如果获取文件名失败，使用默认值
-        // if failed to get filename, use default value
-        strncpy(filename, "unknown", TFW_FILENAME_LEN_MAX - 1);
-        filename[TFW_FILENAME_LEN_MAX - 1] = '\0';
-    }
+    // 如果获取文件名失败，使用默认值
+
     offset += snprintf(logMessage + offset, sizeof(logMessage) - offset,
                         "[%s:%d] ", filename, line);
 
@@ -243,35 +242,61 @@ int32_t TFW_LOG_IMPL(int32_t module, int32_t level, const char *file,
 
     // 根据配置决定是否输出日志到标准输出
     // output log to console according to configuration
-    if (g_logContext.logOutputMode == TFW_LOG_OUTPUT_CONSOLE ||
-        g_logContext.logOutputMode == TFW_LOG_OUTPUT_BOTH) {
+    if (g_logContext.logOutputMode  & (1 << TFW_LOG_OUTPUT_CONSOLE)) {
         TFW_Log_OutputToStdout(logMessage);
     }
 
     // 根据配置决定是否输出到文件
     // output log to file according to configuration
-    if (g_logContext.logOutputMode == TFW_LOG_OUTPUT_FILE ||
-        g_logContext.logOutputMode == TFW_LOG_OUTPUT_BOTH) {
+    if (g_logContext.logOutputMode & (1 << TFW_LOG_OUTPUT_FILE)) {
         TFW_Log_OutputToFile(logMessage);
     }
 
     return TFW_SUCCESS;
 }
 
+static void TFW_LogOnConfigUpdate(TFW_ConfigKey key, const TFW_ConfigItem *item) {
+    TFW_LOGI_UTILS("Log config updated: key=%d", key);
+    switch (key) {
+        case TFW_CONFIG_LOGGING_LEVEL:
+            g_logContext.logLevel = item->value.int_value;
+            TFW_LOGI_UTILS("Log level set to %d", g_logContext.logLevel);
+            break;
+        default:
+            TFW_LOGE_UTILS("Unsupported log config key: key=%d", key);
+            break;
+    }
+}
+
 /**
      * 从配置文件初始化日志系统
      * Initialize log system from configuration file
      */
-int32_t TFW_Log_Init(void) {
+int32_t TFW_LogInit(void) {
     // 如果已经初始化过，直接返回
     // if already initialized, return directly
-
+    TFW_LOGI_UTILS("TFW_LogInit called");
+    int32_t ret = TFW_ConfigRegisterUpdateCallback(TFW_CONFIG_MODULE_LOG, TFW_LogOnConfigUpdate);
+    if(ret != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Register log config callback err, ret=%d", ret);
+        return ret;
+    }
+    ret = TFW_ConfigGetInt(TFW_CONFIG_LOGGING_LEVEL, (int32_t*)&g_logContext.logLevel);
+    if(ret != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Get log level from config err, ret=%d", ret);
+        return ret;
+    }
+    g_logContext.logInitialized = true;
+    TFW_LOGI_UTILS("Log module initialized successfully");
     return TFW_SUCCESS;
 }
 
 /**
  * 退出日志系统
  */
-int32_t TFW_Log_Deinit(void) {
+int32_t TFW_LogDeinit(void) {
+    TFW_ConfigUnregisterUpdateCallback(TFW_CONFIG_MODULE_LOG);
+    g_logContext.logInitialized = false;
+    TFW_LOGI_UTILS("Log module deinitialized successfully");
     return TFW_SUCCESS;
 }

@@ -9,19 +9,6 @@ namespace TFW {
 
 TFW_IMPLEMENT_SINGLE_INSTANCE(TFW_ConfigManager)
 
-void TFW_ConfigManager::InitializeDefaultConfig() {
-    TFW_LOGD_CORE("InitializeDefaultConfig called");
-
-    // 初始化一些默认配置项
-    // 示例：添加一个整数配置项
-    TFW_ConfigSetInt(TFW_CONFIG_LOGGING_LEVEL, 1); // 默认日志级别
-
-    // 示例：添加一个字符串配置项
-    TFW_ConfigSetString(TFW_CONFIG_LOGGING_FILE_PATH, "/tmp/tfw.log"); // 默认日志路径
-
-    TFW_LOGD_CORE("Default config initialized");
-}
-
 int32_t TFW_ConfigManager::Init() {
     TFW_LOGI_CORE("TFW_ConfigManager::Init called");
 
@@ -36,9 +23,6 @@ int32_t TFW_ConfigManager::Init() {
         TFW_LOGE_CORE("Failed to initialize utils config module, error: %d", result);
         return result;
     }
-
-    // 初始化默认配置
-    InitializeDefaultConfig();
 
     // 设置初始化标志
     isInitialized_ = true;

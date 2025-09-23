@@ -22,10 +22,8 @@ extern "C" {
 
 // 配置模块类型枚举
 typedef enum {
-    TFW_CONFIG_MODULE_CORE = 0,    // 核心模块/Core module
-    TFW_CONFIG_MODULE_UTILS,       // 工具模块/Utils module
-    TFW_CONFIG_MODULE_SDK,         // SDK模块/SDK module
-    TFW_CONFIG_MODULE_SYSTEM       // 系统模块/System module
+    TFW_CONFIG_MODULE_LOG = 0,      // 核心模块/Core module
+    TFW_CONFIG_MODULE_MAX           // 模块类型枚举最大值，请勿修改/Module type enumeration maximum value, please do not modify
 } TFW_ConfigModule;
 
 // 配置更新回调函数类型

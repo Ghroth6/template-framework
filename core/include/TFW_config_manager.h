@@ -14,9 +14,6 @@ private:
     // 内部状态
     bool isInitialized_ = false;
 
-    // 内部方法
-    void InitializeDefaultConfig();
-
 public:
     // 初始化和去初始化
     int32_t Init();

@@ -20,6 +20,16 @@ typedef enum {
 } TFW_LogModule;
 
 // ============================================================================
+// 日志输出目标（使用位标志）
+// Log output targets (using bit flags)
+// ============================================================================
+typedef enum {
+    TFW_LOG_OUTPUT_CONSOLE = 0,             // 控制台输出/Console output
+    TFW_LOG_OUTPUT_FILE    = 1,             // 文件输出/File output
+    TFW_LOG_OUTPUT_MAX     = 32             // 当前定义的最大输出目标位置
+} TFW_LogOutputTarget;
+
+// ============================================================================
 // 日志宏定义
 // Log macro definition
 // ============================================================================
@@ -51,11 +61,11 @@ typedef enum {
 
 // 日志系统初始化（从配置文件读取配置）
 // Log system initialization (read configuration from configuration file)
-int32_t TFW_Log_Init(void);
+int32_t TFW_LogInit(void);
 
 // 日志系统反初始化
 // Log system deinit
-int32_t TFW_Log_Deinit(void);
+int32_t TFW_LogDeinit(void);
 
 
 // 日志实现函数声明（由log目录下的实现文件提供）

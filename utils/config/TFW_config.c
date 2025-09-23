@@ -21,7 +21,7 @@
 // 配置模块内部状态
 static TFW_ConfigItem g_config_items[TFW_CONFIG_KEY_COUNT];  // 配置项数组
 static bool g_initialized = false;  // 配置模块初始化状态
-static TFW_ConfigUpdateCallback g_callbacks[TFW_CONFIG_MODULE_SYSTEM + 1] = {NULL};  // 配置更新回调
+static TFW_ConfigUpdateCallback g_callbacks[TFW_CONFIG_MODULE_MAX] = {0};  // 配置更新回调
 static TFW_Mutex_t g_config_lock = 0;
 
 // 内部辅助函数声明
@@ -111,7 +111,7 @@ int32_t TFW_ConfigDeinit(void) {
     g_initialized = false;
 
     // 清空回调函数
-    for (int i = 0; i <= TFW_CONFIG_MODULE_SYSTEM; i++) {
+    for (int i = 0; i < TFW_CONFIG_MODULE_MAX; i++) {
         g_callbacks[i] = NULL;
     }
 
@@ -123,7 +123,7 @@ int32_t TFW_ConfigDeinit(void) {
 
 // 注册配置更新回调
 int32_t TFW_ConfigRegisterUpdateCallback(TFW_ConfigModule module, TFW_ConfigUpdateCallback callback) {
-    if (callback == NULL || module > TFW_CONFIG_MODULE_SYSTEM) {
+    if (callback == NULL || module >= TFW_CONFIG_MODULE_MAX) {
         TFW_LOGE_UTILS("Invalid parameter for TFW_ConfigRegisterUpdateCallback");
         return TFW_ERROR_INVALID_PARAM;
     }
@@ -135,7 +135,7 @@ int32_t TFW_ConfigRegisterUpdateCallback(TFW_ConfigModule module, TFW_ConfigUpda
 
 // 取消注册配置更新回调
 int32_t TFW_ConfigUnregisterUpdateCallback(TFW_ConfigModule module) {
-    if (module > TFW_CONFIG_MODULE_SYSTEM) {
+    if (module >= TFW_CONFIG_MODULE_MAX) {
         TFW_LOGE_UTILS("Invalid parameter for TFW_ConfigUnregisterUpdateCallback");
         return TFW_ERROR_INVALID_PARAM;
     }
@@ -356,7 +356,7 @@ int32_t TFW_ConfigGetInt(TFW_ConfigKey key, int32_t *value) {
         TFW_LOGE_UTILS("Failed to unlock mutex");
         return TFW_ERROR_LOCK_FAILED;
     }
-    return TFW_SUCCESS;
+    return ret;
 }
 
 // 设置单项配置（整数）
@@ -392,21 +392,23 @@ int32_t TFW_ConfigGetFloat(TFW_ConfigKey key, float *value) {
         return TFW_ERROR;
     }
 
+    int32_t ret = TFW_ERROR;
     if(TFW_Mutex_Lock_Safe(&g_config_lock) != TFW_SUCCESS) {
         TFW_LOGE_UTILS("Failed to lock config lock");
         return TFW_ERROR_LOCK_FAILED;
     }
     if (g_config_items[key].type != TFW_CONFIG_TYPE_FLOAT) {
         TFW_LOGW_UTILS("Config key '%d' is not a float", key);
-        return TFW_ERROR;
+        ret = TFW_ERROR;
+    } else {
+        *value = g_config_items[key].value.float_value;
+        ret = TFW_SUCCESS;
     }
-
-    *value = g_config_items[key].value.float_value;
     if(TFW_Mutex_Unlock_Safe(&g_config_lock) != TFW_SUCCESS) {
         TFW_LOGE_UTILS("Failed to unlock mutex");
         return TFW_ERROR_LOCK_FAILED;
     }
-    return TFW_SUCCESS;
+    return ret;
 }
 
 // 设置单项配置（浮点数）
@@ -441,21 +443,24 @@ int32_t TFW_ConfigGetBool(TFW_ConfigKey key, bool *value) {
         TFW_LOGE_UTILS("Config module not initialized");
         return TFW_ERROR;
     }
+    int32_t ret = TFW_ERROR;
     if(TFW_Mutex_Lock_Safe(&g_config_lock) != TFW_SUCCESS) {
         TFW_LOGE_UTILS("Failed to lock config lock");
         return TFW_ERROR_LOCK_FAILED;
     }
     if (g_config_items[key].type != TFW_CONFIG_TYPE_BOOL) {
         TFW_LOGW_UTILS("Config key '%d' is not a boolean", key);
-        return TFW_ERROR;
+        ret = TFW_ERROR;
+    } else {
+        *value = g_config_items[key].value.bool_value;
+        ret = TFW_SUCCESS;
     }
 
-    *value = g_config_items[key].value.bool_value;
     if(TFW_Mutex_Unlock_Safe(&g_config_lock) != TFW_SUCCESS) {
         TFW_LOGE_UTILS("Failed to unlock mutex");
         return TFW_ERROR_LOCK_FAILED;
     }
-    return TFW_SUCCESS;
+    return ret;
 }
 
 // 设置单项配置（布尔值）
@@ -491,22 +496,36 @@ int32_t TFW_ConfigGetString(TFW_ConfigKey key, const char **value) {
         return TFW_ERROR;
     }
 
+    if(TFW_Mutex_Lock_Safe(&g_config_lock) != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to lock config lock");
+        return TFW_ERROR_LOCK_FAILED;
+    }
+
+    int32_t ret = TFW_ERROR;
+
     if (g_config_items[key].type != TFW_CONFIG_TYPE_STRING) {
         TFW_LOGW_UTILS("Config key '%d' is not a string", key);
-        return TFW_ERROR;
-    }
-
-    if (g_config_items[key].value.string_value != NULL) {
-        *value = TFW_Strdup(g_config_items[key].value.string_value);
-        if (*value == NULL) {
-            TFW_LOGE_UTILS("Failed to allocate memory for string value");
-            return TFW_ERROR;
-        }
+        ret = TFW_ERROR;
     } else {
-        *value = NULL;
+        ret = TFW_SUCCESS;
+        if (g_config_items[key].value.string_value != NULL) {
+            *value = TFW_Strdup(g_config_items[key].value.string_value);
+            if (*value == NULL) {
+                TFW_LOGE_UTILS("Failed to allocate memory for string value");
+                ret = TFW_ERROR;
+            }
+        } else {
+            *value = NULL;
+        }
     }
 
-    return TFW_SUCCESS;
+    if(TFW_Mutex_Unlock_Safe(&g_config_lock) != TFW_SUCCESS) {
+        TFW_LOGE_UTILS("Failed to unlock mutex");
+        return TFW_ERROR_LOCK_FAILED;
+    }
+
+
+    return ret;
 }
 
 // 设置单项配置（字符串）
@@ -685,11 +704,9 @@ static int32_t TFW_ConfigCreateDefault(void) {
     TFW_ConfigSetItemInner(&item);
 
     item.key = TFW_CONFIG_LOGGING_OUTPUT;
-    item.type = TFW_CONFIG_TYPE_STRING;
-    item.value.string_value = TFW_Strdup(TFW_CONFIG_DEFAULT_LOGGING_OUTPUT);
+    item.type = TFW_CONFIG_TYPE_INT;
+    item.value.int_value = (1 << TFW_LOG_OUTPUT_CONSOLE);
     TFW_ConfigSetItemInner(&item);
-    // 释放临时分配的字符串内存
-    TFW_Free((void*)item.value.string_value);
 
     item.key = TFW_CONFIG_LOGGING_FILE_PATH;
     item.type = TFW_CONFIG_TYPE_STRING;
@@ -749,12 +766,13 @@ static int32_t TFW_ConfigCreateDefault(void) {
 }
 
 static void TFW_ConfigNotifyUpdate(TFW_ConfigKey key, const TFW_ConfigItem *item) {
-    // 通知所有已注册的回调函数
-    for (int i = 0; i <= TFW_CONFIG_MODULE_SYSTEM; i++) {
+    TFW_LOGI_UTILS("TFW_ConfigNotifyUpdate called: key=%d", key);
+    for (int i = 0; i < TFW_CONFIG_MODULE_MAX; i++) {
         if (g_callbacks[i] != NULL) {
             g_callbacks[i](key, item);
         }
     }
+    TFW_LOGI_UTILS("TFW_ConfigNotifyUpdate finished");
 }
 
 static const char *TFW_ConfigKeyToString(TFW_ConfigKey key) {
