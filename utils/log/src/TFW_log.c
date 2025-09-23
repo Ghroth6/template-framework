@@ -40,7 +40,7 @@ typedef struct {
 // Global variables
 // ============================================================================
 static TFW_LogContext g_logContext = {
-    .logLevel = TFW_LOG_LEVEL_INFO,
+    .logLevel = TFW_LOG_LEVEL_DEBUG,
     .logInitialized = false,
     .logOutputMode = TFW_LOG_OUTPUT_CONSOLE
 };

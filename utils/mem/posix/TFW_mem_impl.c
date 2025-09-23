@@ -32,7 +32,7 @@ void* TFW_Malloc(uint32_t size) {
         g_current_used += size;
         pthread_mutex_unlock(&g_mem_stats_mutex);
 
-        TFW_LOGD_UTILS("Memory allocated: %u bytes at %p", size, ptr);
+        // TFW_LOGD_UTILS("Memory allocated: %u bytes at %p", size, ptr);
     } else {
         TFW_LOGE_UTILS("Memory allocation failed: %u bytes", size);
     }
@@ -56,7 +56,7 @@ void* TFW_Calloc(uint32_t size) {
         g_current_used += size;
         pthread_mutex_unlock(&g_mem_stats_mutex);
 
-        TFW_LOGD_UTILS("Memory allocated and zeroed: %u bytes at %p", size, ptr);
+        // TFW_LOGD_UTILS("Memory allocated and zeroed: %u bytes at %p", size, ptr);
     } else {
         TFW_LOGE_UTILS("Memory allocation failed: %u bytes", size);
     }
@@ -74,7 +74,7 @@ void TFW_Free(void* ptr) {
     // In practical applications, may need to maintain a memory block info table
     free(ptr);
 
-    TFW_LOGD_UTILS("Memory freed at %p", ptr);
+    // TFW_LOGD_UTILS("Memory freed at %p", ptr);
     // Note: Cannot accurately update statistics here, as freed memory size is unknown
 }
 
@@ -92,7 +92,7 @@ char* TFW_Strdup(const char* src) {
     }
 
     strcpy(dest, src);
-    TFW_LOGD_UTILS("String duplicated: '%s' at %p", src, dest);
+    // TFW_LOGD_UTILS("String duplicated: '%s' at %p", src, dest);
     return dest;
 }
 
@@ -175,7 +175,7 @@ char* TFW_Strrchr(const char* str, int c) {
         TFW_LOGE_UTILS("TFW_Strrchr: input string is NULL");
         return NULL;
     }
-    
+
     // 使用标准库的strrchr实现
     return (char*)strrchr(str, c);
 }
@@ -185,7 +185,7 @@ char* TFW_Strtok_R(char* str, const char* delim, char** saveptr) {
         TFW_LOGE_UTILS("TFW_Strtok_R: delimiter or saveptr is NULL");
         return NULL;
     }
-    
+
     // 使用标准库的strtok_r实现（POSIX平台）
     return strtok_r(str, delim, saveptr);
 }

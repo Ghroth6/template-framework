@@ -354,6 +354,7 @@ static void PostMessageAtTime(const TFW_Looper *looper, TFW_Message *msgPost)
         TFW_LOGD_UTILS("PostMessageAtTime insert. name=%s", context->name);
         DumpLooperLocked(looper);
     }
+    TFW_Cond_Broadcast(&context->cond);
     (void)TFW_Mutex_Unlock(&context->lock);
 }
 
@@ -557,19 +558,19 @@ void TFW_DestroyLooper(TFW_Looper *looper)
 
 int32_t TFW_LooperInit(void)
 {
-    TFW_Looper *looper = TFW_CreateNewLooper(TFW_DEFAULT_LOOPER_NAME);
-    if (!looper) {
+    TFW_Looper *defaultLooper = TFW_CreateNewLooper(TFW_DEFAULT_LOOPER_NAME);
+    if (!defaultLooper) {
         TFW_LOGE_UTILS("init default looper fail.");
         return TFW_ERROR_LOOPER_ERROR;
     }
-    TFW_SetLooper(TFW_LOOP_TYPE_DEFAULT, looper);
+    TFW_SetLooper(TFW_LOOP_TYPE_DEFAULT, defaultLooper);
 
-    looper = TFW_CreateNewLooper(TFW_LOG_LOOPER_NAME);
-    if (!looper) {
+    TFW_Looper *logLooper = TFW_CreateNewLooper(TFW_LOG_LOOPER_NAME);
+    if (!logLooper) {
         TFW_LOGE_UTILS("init log looper fail.");
         return TFW_ERROR_LOOPER_ERROR;
     }
-    TFW_SetLooper(TFW_LOOP_TYPE_LOG, looper);
+    TFW_SetLooper(TFW_LOOP_TYPE_LOG, logLooper);
 
     TFW_LOGD_UTILS("init looper success.");
     return TFW_SUCCESS;

@@ -28,7 +28,7 @@ char* TFW_Strrchr(const char* str, int c) {
         TFW_LOGE_UTILS("TFW_Strrchr: input string is NULL");
         return NULL;
     }
-    
+
     // 使用标准库的strrchr实现
     return (char*)strrchr(str, c);
 }
@@ -38,7 +38,7 @@ char* TFW_Strtok_R(char* str, const char* delim, char** saveptr) {
         TFW_LOGE_UTILS("TFW_Strtok_R: delimiter or saveptr is NULL");
         return NULL;
     }
-    
+
     // 使用Windows平台的strtok_s实现
     return strtok_s(str, delim, saveptr);
 }
@@ -56,13 +56,13 @@ void* TFW_Malloc(uint32_t size) {
     if (ptr != NULL) {
         // Initialize mutex if needed
         TFW_InitMutex();
-        
+
         // Update statistics (thread-safe)
         EnterCriticalSection(&g_mem_stats_mutex);
         g_total_allocated += size;
         g_current_used += size;
         LeaveCriticalSection(&g_mem_stats_mutex);
-        TFW_LOGD_UTILS("Memory allocated: %u bytes at %p", size, ptr);
+        // TFW_LOGD_UTILS("Memory allocated: %u bytes at %p", size, ptr);
     } else {
         TFW_LOGE_UTILS("Memory allocation failed: %u bytes", size);
     }
@@ -82,13 +82,13 @@ void* TFW_Calloc(uint32_t size) {
     if (ptr != NULL) {
         // Initialize mutex if needed
         TFW_InitMutex();
-        
+
         // Update statistics (thread-safe)
         EnterCriticalSection(&g_mem_stats_mutex);
         g_total_allocated += size;
         g_current_used += size;
         LeaveCriticalSection(&g_mem_stats_mutex);
-        TFW_LOGD_UTILS("Memory allocated and zeroed: %u bytes at %p", size, ptr);
+        // TFW_LOGD_UTILS("Memory allocated and zeroed: %u bytes at %p", size, ptr);
     } else {
         TFW_LOGE_UTILS("Memory allocation failed: %u bytes", size);
     }
@@ -124,7 +124,7 @@ char* TFW_Strdup(const char* src) {
     }
 
     strcpy(dest, src);
-    TFW_LOGD_UTILS("String duplicated: '%s' at %p", src, dest);
+    // TFW_LOGD_UTILS("String duplicated: '%s' at %p", src, dest);
     return dest;
 }
 
