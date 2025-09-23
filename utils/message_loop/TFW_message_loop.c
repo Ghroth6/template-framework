@@ -515,6 +515,7 @@ void TFW_DestroyLooper(TFW_Looper *looper)
         TFW_LOGI_UTILS("set stop 1. name=%s", context->name);
         context->stop = 1;
 
+        TFW_Cond_Broadcast(&context->cond);
         (void)TFW_Mutex_Unlock(&context->lock);
         // 等待线程结束
         while (1) {
