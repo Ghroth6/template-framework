@@ -71,7 +71,7 @@ int32_t TFW_LogDeinit(void);
 // 日志实现函数声明（由log目录下的实现文件提供）
 // Log implementation function declaration (provided by the implementation file in the log directory)
 int32_t TFW_LOG_IMPL(int32_t module, int32_t level, const char* file, int32_t line,
-                  const char* function, const char* fmt, ...);
+                    const char* function, const char* fmt, ...);
 
 #ifdef __cplusplus
 }

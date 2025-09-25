@@ -28,6 +28,11 @@ int32_t TFW_MsgLoopMgr::Init() {
         return TFW_ERROR;
     }
 
+    // 初始化异步回调处理器
+    asyncCallbackHandler_.name = const_cast<char*>(TFW_ASYNC_CALLBACK_HANDLER_NAME);
+    asyncCallbackHandler_.looper = nullptr;
+    asyncCallbackHandler_.HandleMessage = AsyncCallbackHandler;
+
     // 设置初始化标志
     isInitialized_ = true;
     TFW_LOGI_CORE("TFW_MsgLoopMgr initialized successfully");
@@ -42,6 +47,9 @@ int32_t TFW_MsgLoopMgr::Deinit() {
         TFW_LOGI_CORE("Msg loop manager not initialized");
         return TFW_SUCCESS;
     }
+
+    asyncCallbackHandler_.looper = nullptr;
+    asyncCallbackHandler_.HandleMessage = nullptr;
 
     // 清理资源
     TFW_LooperDeinit();
@@ -121,13 +129,6 @@ void TFW_MsgLoopMgr::InitAsyncCallbackMessage(TFW_Message* msg, int32_t what, vo
     msg->time = 0;
 }
 
-// 初始化异步回调处理器
-void TFW_MsgLoopMgr::InitAsyncCallbackHandler(TFW_Handler* handler, TFW_Looper* looper) {
-    handler->name = const_cast<char*>(TFW_ASYNC_CALLBACK_HANDLER_NAME);
-    handler->looper = looper;
-    handler->HandleMessage = AsyncCallbackHandler;
-}
-
 // 创建异步回调信息
 TFW_AsyncCallbackInfo* TFW_MsgLoopMgr::CreateAsyncCallbackInfo(TFW_Looper* looper,
     TFW_AsyncCallbackFunc callback, void* para) {
@@ -138,11 +139,18 @@ TFW_AsyncCallbackInfo* TFW_MsgLoopMgr::CreateAsyncCallbackInfo(TFW_Looper* loope
         TFW_LOGE_CORE("Failed to allocate memory for async callback info");
         return nullptr;
     }
-
+    TFW_Message* msg = (TFW_Message*)TFW_Calloc(sizeof(TFW_Message));
+    if (msg == nullptr) {
+        TFW_LOGE_CORE("Failed to allocate memory for async callback message");
+        TFW_Free(info);
+        return nullptr;
+    }
+    info->msg = msg;
     info->callback = callback;
     info->cbPara = para;
-    InitAsyncCallbackHandler(&info->handler, looper);
-    InitAsyncCallbackMessage(&info->msg, TFW_ASYNC_CALLBACK_MSG_TYPE, (void*)info, &info->handler);
+    info->handler = asyncCallbackHandler_;
+    info->handler.looper = looper;
+    InitAsyncCallbackMessage(info->msg, TFW_ASYNC_CALLBACK_MSG_TYPE, (void*)info, &info->handler);
 
     return info;
 }
@@ -176,7 +184,7 @@ int32_t TFW_MsgLoopMgr::PostAsyncCallback(TFW_LooperType type, TFW_AsyncCallback
 
     // 直接通过looper发送消息
     if (looper->PostMessage != nullptr) {
-        looper->PostMessage(looper, &info->msg);
+        looper->PostMessage(looper, info->msg);
     } else {
         TFW_LOGE_CORE("PostMessage function pointer is null for looper type: %d", type);
         TFW_Free(info);
@@ -214,9 +222,9 @@ int32_t TFW_MsgLoopMgr::PostAsyncCallbackDelay(TFW_LooperType type, TFW_AsyncCal
         return TFW_ERROR_MALLOC_ERR;
     }
 
-    // 直接通过looper发送延迟消息
+    // 通过looper发送延迟消息
     if (looper->PostMessageDelay != nullptr) {
-        looper->PostMessageDelay(looper, &info->msg, delayMillis);
+        looper->PostMessageDelay(looper, info->msg, delayMillis);
     } else {
         TFW_LOGE_CORE("PostMessageDelay function pointer is null for looper type: %d", type);
         TFW_Free(info);

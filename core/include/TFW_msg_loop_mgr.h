@@ -12,7 +12,7 @@ typedef void (*TFW_AsyncCallbackFunc)(void* para);
 
 // 回调信息结构体
 typedef struct {
-    TFW_Message msg;
+    TFW_Message* msg;
     TFW_Handler handler;
     TFW_AsyncCallbackFunc callback;
     void* cbPara;
@@ -24,12 +24,12 @@ class TFW_MsgLoopMgr {
 private:
     // 内部状态
     bool isInitialized_ = false;
+    TFW_Handler asyncCallbackHandler_;  // 成员变量，避免重复初始化
 
     // 私有方法用于处理异步回调消息
     static void AsyncCallbackHandler(TFW_Message* msg);
     static void FreeAsyncCallbackMessage(TFW_Message* msg);
     static void InitAsyncCallbackMessage(TFW_Message* msg, int32_t what, void* obj, TFW_Handler* handler);
-    static void InitAsyncCallbackHandler(TFW_Handler* handler, TFW_Looper* looper);
     TFW_AsyncCallbackInfo* CreateAsyncCallbackInfo(TFW_Looper* looper, TFW_AsyncCallbackFunc callback, void* para);
 
 public:
