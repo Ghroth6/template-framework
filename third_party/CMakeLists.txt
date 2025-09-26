@@ -41,6 +41,27 @@ else()
     message(WARNING "cjson library CMakeLists.txt not found")
 endif()
 
+# 检查并添加zlog库
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/zlog/src")
+    # zlog使用静态库构建
+    set(BUILD_SHARED_LIBS OFF)
+
+    # 设置zlog构建选项，禁用示例和测试
+    set(ENABLE_ZLOG_TEST OFF CACHE BOOL "Disable zlog tests")
+    set(ENABLE_ZLOG_EXAMPLE OFF CACHE BOOL "Disable zlog examples")
+
+    # 添加zlog子目录
+    add_subdirectory(zlog)
+
+    # 创建导入库目标别名
+    if(TARGET zlog)
+        add_library(thirdparty::zlog ALIAS zlog)
+        message(STATUS "Third party library zlog added as target thirdparty::zlog")
+    endif()
+else()
+    message(WARNING "zlog library source not found")
+endif()
+
 # 可以在这里添加更多第三方库
 # Example for adding more third party libraries:
 # if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/other_lib/CMakeLists.txt")
