@@ -6,8 +6,6 @@
 # this file is used to configure the compilation of the TFW core module
 # 本文件用于配置 TFW 核心模块的编译
 # it should conform to the TFW project coding standard requirements
-# 它应符合 TFW 项目编码规范要求
-# 符合TFW项目编码规范要求 (Note: This line appears to be a Chinese repetition of the above line)
 #
 # ============================================================================
 #
@@ -152,45 +150,6 @@ target_include_directories(${MODULE_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/core/include
 )
 
-# ============================================================================
-# compilation option configuration
-# ============================================================================
-
-# set C++ standard
-# 设置 C++ 标准
-target_compile_features(${MODULE_NAME} PRIVATE
-    cxx_std_17
-)
-
-# set C standard
-# 设置 C 标准
-target_compile_features(${MODULE_NAME} PRIVATE
-    c_std_11
-)
-
-# platform specific compilation options
-# 平台特定编译选项
-if(WIN32)
-    # Windows platform specific options
-    # Windows 平台特定选项
-    target_compile_definitions(${MODULE_NAME} PRIVATE
-        _WIN32_WINNT=0x0601
-        WIN32_LEAN_AND_MEAN
-    )
-elseif(APPLE)
-    # macOS platform specific options
-    # macOS 平台特定选项
-    target_compile_definitions(${MODULE_NAME} PRIVATE
-        __APPLE__
-    )
-else()
-    # Linux/Unix platform specific options (default)
-    # Linux/Unix 平台特定选项（默认）
-    target_compile_definitions(${MODULE_NAME} PRIVATE
-        __linux__
-        _GNU_SOURCE
-    )
-endif()
 
 # ============================================================================
 # link library configuration

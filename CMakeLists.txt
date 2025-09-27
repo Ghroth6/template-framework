@@ -5,8 +5,6 @@
 #
 # this file is used to configure the compilation of the TFW project
 # 本文件用于配置 TFW 项目的编译
-# it should conform to the TFW project coding standard requirements
-# 它应符合 TFW 项目编码规范要求
 #
 # ============================================================================
 #
@@ -118,17 +116,19 @@ if(MSVC)
 endif()
 
 # ============================================================================
-# C/C++ standard configuration
-# C/C++ 标准配置
+# Global C/C++ standard configuration
+# 全局C/C++标准配置
 # ============================================================================
 
-# Set C/C++ standard
-# 设置 C/C++ 标准
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
+# 设置全局C++标准
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
+# 设置全局C标准
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
 # ============================================================================
 # shared library specific settings
 # 动态库特定设置

@@ -1,5 +1,4 @@
 # TFW项目清理脚本 (Windows PowerShell)
-# 基于编码规范9.4节要求
 # PowerShell 5.1兼容版本
 
 # 设置错误处理

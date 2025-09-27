@@ -91,61 +91,6 @@ else()
     message(STATUS "Core module not available, CLI tool will be built without core support")
 endif()
 
-# ============================================================================
-# Platform-specific configuration
-# 平台特定配置
-# ============================================================================
-
-# Windows platform specific settings
-# Windows 平台特定设置
-if(WIN32)
-    # Windows specific compile definitions
-    # Windows 特定编译定义
-    target_compile_definitions(${MODULE_NAME} PRIVATE
-        _CRT_SECURE_NO_WARNINGS
-        WIN32_LEAN_AND_MEAN
-    )
-
-    # Windows specific link libraries
-    # Windows 特定链接库
-    target_link_libraries(${MODULE_NAME} PRIVATE
-        advapi32
-        shell32
-    )
-endif()
-
-# macOS platform specific settings
-# macOS 平台特定设置
-if(APPLE)
-    # macOS specific compile definitions
-    # macOS 特定编译定义
-    target_compile_definitions(${MODULE_NAME} PRIVATE
-        _DARWIN_C_SOURCE
-    )
-
-    # macOS specific link libraries
-    # macOS 特定链接库
-    target_link_libraries(${MODULE_NAME} PRIVATE
-        System
-    )
-endif()
-
-# Linux/Unix platform specific settings
-# Linux/Unix 平台特定设置
-if(UNIX AND NOT APPLE)
-    # Linux specific compile definitions
-    # Linux 特定编译定义
-    target_compile_definitions(${MODULE_NAME} PRIVATE
-        _POSIX_C_SOURCE=200809L
-    )
-
-    # Linux specific link libraries
-    # Linux 特定链接库
-    target_link_libraries(${MODULE_NAME} PRIVATE
-        dl
-        pthread
-    )
-endif()
 
 # ============================================================================
 # Installation configuration

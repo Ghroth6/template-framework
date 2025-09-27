@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # TFW项目清理脚本 (Linux/macOS/WSL)
-# 基于编码规范9.4节要求
 
 set -e  # 遇到错误立即退出
 

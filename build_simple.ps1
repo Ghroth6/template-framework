@@ -1,7 +1,5 @@
 # TFW项目构建脚本 (Windows PowerShell)
 
-# 基于编码规范9.4节要求
-
 # 设置错误处理
 
 $ErrorActionPreference = "Stop"

@@ -5,8 +5,6 @@
 #
 # this file is used to configure the compilation of the TFW utils module
 # 本文件用于配置 TFW 工具模块的编译
-# it should conform to the TFW project coding standard requirements
-# 它应符合 TFW 项目编码规范要求
 #
 # ============================================================================
 #
@@ -216,11 +214,6 @@ target_include_directories(${MODULE_NAME} PRIVATE
 # 编译选项配置
 # ============================================================================
 
-# set C standard
-# 设置 C 标准
-target_compile_features(${MODULE_NAME} PRIVATE
-    c_std_11
-)
 
 # platform specific compilation options
 # 平台特定编译选项
